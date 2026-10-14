@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thank You — People Connect Initiative</title>
+  <meta name="description" content="Thank you for registering with the People Connect Initiative.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy:        #0052cc;
+      --navy-deep:   #1d4ed8;
+      --ink:         #111827;
+      --muted:       #6b7280;
+      --green:       #008751;
+      --green-light: #10b981;
+      --green-deep:  #0b3c26;
+      --green-pale:  #e8f8f0;
+      --green-mist:  #f0fdf6;
+      --line:        #e5e7eb;
+      --bg:          #f9fafb;
+      --white:       #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── NAV ─────────────────────────────────── */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 20px;
+      max-width: 680px;
+      margin-inline: auto;
+      width: 100%;
+    }
+    .brand-name {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      letter-spacing: -.02em;
+    }
+    .brand-sub {
+      font-size: 10.5px;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--navy);
+      border: 1.5px solid var(--navy);
+      border-radius: 999px;
+      padding: 7px 16px;
+      white-space: nowrap;
+      min-height: 38px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media (hover: hover) { .nav-back:hover { background: #eff6ff; } }
+
+    /* ── HERO ────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--green-deep) 0%, var(--green) 100%);
+      color: var(--white);
+      padding: 44px 24px 48px;
+      text-align: center;
+    }
+    .hero-tick {
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,.18);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      margin: 0 auto 16px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 999px;
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #a7f3d0;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: "Sora", sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 6vw, 38px);
+      line-height: 1.12;
+      letter-spacing: -.03em;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: 15px;
+      color: #c8f0dc;
+      max-width: 34ch;
+      margin-inline: auto;
+    }
+
+    /* ── PAGE BODY ───────────────────────────── */
+    .page-body {
+      flex: 1;
+      padding: 28px 16px 48px;
+      max-width: 680px;
+      margin-inline: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── WHAT'S NEXT label ───────────────────── */
+    .section-label {
+      font-family: "Sora", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 4px 4px;
+    }
+
+    /* ── SUMMARY CARD (what they submitted) ──── */
+    .summary-card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      overflow: hidden;
+    }
+    .summary-header {
+      background: var(--green-pale);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .summary-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--green);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex: none;
+    }
+    .summary-title {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--green-deep);
+    }
+    .summary-sub {
+      font-size: 12.5px;
+      color: var(--green);
+    }
+    .summary-rows {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .summary-row .label {
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+      min-width: 90px;
+    }
+    .summary-row .value {
+      color: var(--ink);
+      text-align: right;
+      word-break: break-word;
+    }
+    .summary-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 0 20px;
+    }
+
+    /* ── APM BONUS CARD ─────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      overflow: hidden;
+      position: relative;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--green-deep), var(--green-light));
+      border-radius: 20px 20px 0 0;
+    }
+    .card-inner {
+      padding: 22px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--green-deep), var(--green));
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex: none;
+    }
+    .card-title {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+    .bonus-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--green-pale);
+      color: var(--green-deep);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .card-body {
+      font-size: 14.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── BUTTON ─────────────────────────────── */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 999px;
+      border: none;
+      font: inherit;
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 15.5px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:active { opacity: .85; transform: scale(.98); }
+    .btn-bonus {
+      background: var(--green);
+      color: var(--white);
+      box-shadow: 0 6px 18px -4px rgba(0,135,81,.4);
+    }
+    @media (hover: hover) { .btn-bonus:hover { background: #006b40; } }
+
+    /* ── CONNECTOR CARD ─────────────────────── */
+    .connector-card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      padding: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .connector-icon {
+      font-size: 26px;
+      flex: none;
+      margin-top: 2px;
+    }
+    .connector-text h3 {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .connector-text p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── FOOTER ─────────────────────────────── */
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--line);
+      padding: 18px 20px 28px;
+      text-align: center;
+    }
+    .foot-text {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+    :focus-visible {
+      outline: 3px solid var(--green);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div>
+        <div class="brand-name">People Connect Initiative</div>
+        <div class="brand-sub">Connecting People. Creating Opportunities.</div>
+      </div>
+      <a href="index.html#register" class="nav-back">← Back</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tick" aria-hidden="true">✓</div>
+    <div class="hero-badge">Registration Received</div>
+    <h1>Welcome, <span id="user-name">Neighbour</span>!</h1>
+    <p>You are now part of the PCI network.</p>
+  </div>
+
+  <!-- BODY -->
+  <main class="page-body">
+
+    <div class="section-label">Your submission</div>
+
+    <!-- Summary of what they filled -->
+    <div class="summary-card">
+      <div class="summary-header">
+        <div class="summary-icon" aria-hidden="true">PCI</div>
+        <div>
+          <div class="summary-title">Registration Details</div>
+          <div class="summary-sub">Submitted successfully</div>
+        </div>
+      </div>
+      <div class="summary-rows" id="summary-rows">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:8px;">What's next</div>
+
+    <!-- APM Bonus card -->
+    <div class="card">
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="card-icon" aria-hidden="true">APM</div>
+          <div class="card-title">APM 2027 Bonus</div>
+        </div>
+        <span class="bonus-tag">Members only</span>
+        <p class="card-body">
+          Discover exclusive benefits, rewards, and opportunities available to PCI members ahead of the APM 2027 campaign.
+        </p>
+        <button class="btn btn-bonus" id="btn-apm-start" type="button">
+          Click to Start
+        </button>
+      </div>
+    </div>
+
+    <!-- Ward connector note -->
+    <div class="connector-card">
+      <div class="connector-icon" aria-hidden="true">PCI</div>
+      <div class="connector-text">
+        <h3>Your Ward Connector</h3>
+        <p>A PCI Connector in your ward will reach out shortly to welcome you and share next steps.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-text">
+      <div>&copy; <span id="yr">2026</span> People Connect Initiative. All rights reserved.</div>
+      <div>Connect &middot; Listen &middot; Empower &middot; Engage</div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    /* ---- Personalise from sessionStorage ---- */
+    (function () {
+      try {
+        var name = sessionStorage.getItem('pci_name');
+        if (name) document.getElementById('user-name').textContent = name;
+
+        /* Build summary rows from stored data */
+        var rows = document.getElementById('summary-rows');
+        var fields = [
+          { key: 'pci_name',    label: 'Name' },
+          { key: 'pci_phone',   label: 'Phone' },
+          { key: 'pci_lga',     label: 'LGA' },
+          { key: 'pci_ward',    label: 'Ward' },
+          { key: 'pci_votercard', label: 'Voter\'s card' }
+        ];
+        var html = '';
+        var first = true;
+        fields.forEach(function (f) {
+          var val = sessionStorage.getItem(f.key);
+          if (!val) return;
+          if (!first) html += '<div class="summary-divider"></div>';
+          html += '<div class="summary-row">'
+                +   '<span class="label">' + f.label + '</span>'
+                +   '<span class="value">' + val + '</span>'
+                + '</div>';
+          first = false;
+        });
+        if (html) rows.innerHTML = html;
+        else rows.innerHTML = '<p style="font-size:14px;color:#6b7280;padding:4px 0;">Details submitted successfully.</p>';
+      } catch (e) {}
+    })();
+
+    /* ---- APM Bonus ---- */
+    document.getElementById('btn-apm-start').addEventListener('click', function () {
+      alert('APM 2027 Bonus details coming soon! A PCI Connector will reach out to you.');
+    });
+  </script>
+
+</body>
+</html>

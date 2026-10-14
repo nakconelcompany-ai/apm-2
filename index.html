@@ -167,6 +167,165 @@
       font-weight: bold;
     }
 
+    /* ---------- CANDIDATE PROFILES DROPDOWN ---------- */
+    .cand-dropdown {
+      position: relative;
+    }
+
+    .cand-trigger {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #0052cc;
+      font-weight: 700;
+      font-size: 14.5px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .18s ease, color .18s ease;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cand-trigger:hover,
+    .cand-trigger:focus-visible {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+    .cand-trigger[aria-expanded="true"] {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .cand-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 270px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      box-shadow: 0 20px 60px -10px rgba(0, 0, 0, .22), 0 4px 16px rgba(0,0,0,.08);
+      overflow: hidden;
+      z-index: 300;
+      animation: dropIn .18s ease;
+    }
+    .cand-menu.is-open {
+      display: block;
+    }
+
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Page content dims when dropdown is open — nav stays fully visible */
+    .page-dimmed > *:not(.nav) {
+      filter: blur(2px) brightness(.7);
+      pointer-events: none;
+      user-select: none;
+      transition: filter .2s ease;
+    }
+    .page-dimmed .nav {
+      z-index: 999;
+    }
+
+    .cand-menu-header {
+      padding: 14px 18px 10px;
+      font-family: "Sora", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .cand-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      text-decoration: none;
+      color: inherit;
+      transition: background .12s ease;
+      cursor: default;
+      border-bottom: 1px solid #f9fafb;
+    }
+    .cand-item:last-child {
+      border-bottom: none;
+    }
+    .cand-item:hover {
+      background: #f9fafb;
+    }
+
+    .cand-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex: none;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .cand-avatar.president { background: linear-gradient(135deg, #0052cc, #1d4ed8); }
+    .cand-avatar.governor  { background: linear-gradient(135deg, #008751, #10b981); }
+    .cand-avatar.senator   { background: linear-gradient(135deg, #0b3c26, #008751); }
+    .cand-avatar.reps      { background: linear-gradient(135deg, #374151, #6b7280); }
+
+    .cand-info { flex: 1; min-width: 0; }
+    .cand-role {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+    .cand-name {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #111827;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Mobile: dropdown slides up from bottom, sits above everything */
+    @media (max-width: 768px) {
+      .cand-menu {
+        position: fixed;
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-width: unset;
+        width: 100%;
+        z-index: 300;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 32px rgba(0,0,0,.18);
+        animation: slideUp .22s ease;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+      }
+      .cand-item { padding: 16px 20px; }
+      .cand-avatar { width: 48px; height: 48px; font-size: 20px; }
+      .cand-name { font-size: 15px; }
+    }
+    /* ---------- END CANDIDATE PROFILES DROPDOWN ---------- */
+
     /* ---------- HERO ---------- */
     .hero {
       position: relative;
@@ -665,6 +824,190 @@
       font-weight: 600;
     }
 
+    /* ---------- VOTER CARD QUESTION ---------- */
+    .voter-card-block {
+      display: grid;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 20px clamp(18px, 4vw, 28px);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .voter-card-question {
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 15.5px;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .voter-yn-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .voter-yn-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.1);
+      color: #e2f7ec;
+      font: inherit;
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .voter-yn-btn:active {
+      transform: scale(.97);
+    }
+
+    .voter-yn-btn[aria-pressed="true"] {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #0b3c26;
+    }
+
+    .voter-yn-icon {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    /* Upload panel */
+    .voter-upload-panel {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .voter-upload-panel.active {
+      display: flex;
+    }
+
+    .upload-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,.12);
+      border: 2px dashed rgba(255,255,255,.35);
+      border-radius: 16px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .upload-label:hover,
+    .upload-label:has(input:focus-visible) {
+      background: rgba(255,255,255,.18);
+      border-color: rgba(255,255,255,.6);
+    }
+
+    .upload-icon {
+      font-size: 28px;
+      flex: none;
+      line-height: 1;
+    }
+
+    .upload-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .upload-text strong {
+      font-family: "Sora", sans-serif;
+      font-size: 14.5px;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .upload-text span {
+      font-size: 13px;
+      color: #a7f3d0;
+    }
+
+    .upload-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+
+    .upload-preview {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      color: #a7f3d0;
+      min-height: 20px;
+      word-break: break-all;
+    }
+    .upload-preview.has-file {
+      color: #6ff8bb;
+      font-weight: 600;
+    }
+    .upload-preview.has-file::before {
+      content: "✓";
+      font-size: 15px;
+      color: #6ff8bb;
+      flex: none;
+    }
+
+    /* ---------- IMAGE CLARITY FEEDBACK ---------- */
+    .clarity-result {
+      display: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.55;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .clarity-result.visible { display: flex; }
+
+    .clarity-result.checking {
+      background: rgba(255,255,255,.1);
+      color: #e2f7ec;
+    }
+    .clarity-result.clear {
+      background: rgba(16, 185, 129, .18);
+      border: 1px solid rgba(16, 185, 129, .4);
+      color: #6ff8bb;
+    }
+    .clarity-result.blurry {
+      background: rgba(239, 68, 68, .18);
+      border: 1px solid rgba(239, 68, 68, .4);
+      color: #fca5a5;
+    }
+    .clarity-icon { font-size: 20px; flex: none; line-height: 1; margin-top: 1px; }
+    .clarity-text strong { display: block; font-family: "Sora", sans-serif; font-weight: 700; margin-bottom: 3px; }
+    /* ---------- END CLARITY FEEDBACK ---------- */
+
+    @media (max-width: 768px) {
+      .voter-yn-btn {
+        min-height: 54px;
+        font-size: 15.5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .voter-card-block {
+        padding: 16px 16px;
+      }
+    }
+
+    /* ---------- END VOTER CARD QUESTION ---------- */
+
     @media (max-width:560px) {
       .field-row {
         grid-template-columns: 1fr;
@@ -879,6 +1222,21 @@
       .submit-btn {
         width: 100%;
         padding: 15px 20px;
+        font-size: 16px;
+        min-height: 52px;
+      }
+
+      /* Consent checkbox — bigger touch target */
+      .check {
+        padding: 10px 0;
+        min-height: 48px;
+        align-items: center;
+      }
+
+      .check input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        flex: none;
       }
     }
 
@@ -970,6 +1328,20 @@
       }
     }
 
+    /* ── TEXT FADE-IN BY LINE ANIMATION (Ultra-Slow & Ultra-Smooth) ────── */
+    .fade-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 3.8s cubic-bezier(0.12, 1, 0.25, 1), transform 3.8s cubic-bezier(0.12, 1, 0.25, 1);
+      will-change: opacity, transform;
+    }
+    .fade-line.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* ── END TEXT ANIMATION ─────────────────────────────────── */
+
     :focus-visible {
       outline: 3px solid var(--green);
       outline-offset: 3px;
@@ -996,6 +1368,48 @@
       <nav class="nav-links" id="navLinks" aria-label="Main">
         <a href="#home">Home</a>
         <a href="#overview">Overview</a>
+
+        <!-- Candidate Profiles dropdown -->
+        <div class="cand-dropdown">
+          <button class="cand-trigger" id="candTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="candMenu">
+            Candidate Profiles
+          </button>
+          <div class="cand-menu" id="candMenu" role="menu" aria-label="Candidate Profiles">
+            <div class="cand-menu-header">APM 2027 Candidates</div>
+
+            <a class="cand-item" href="seyi-makinde.html" role="menuitem">
+              <div class="cand-avatar president" aria-hidden="true">SM</div>
+              <div class="cand-info">
+                <div class="cand-role">President</div>
+                <div class="cand-name">Seyi Makinde</div>
+              </div>
+            </a>
+
+            <a class="cand-item" href="bimbola-adekanmbi.html" role="menuitem">
+              <div class="cand-avatar governor" aria-hidden="true">BA</div>
+              <div class="cand-info">
+                <div class="cand-role">Governor — Oyo State</div>
+                <div class="cand-name">Bimbola Adekanmbi</div>
+              </div>
+            </a>
+
+            <a class="cand-item" href="adedeji-dhikrullahi.html" role="menuitem">
+              <div class="cand-avatar senator" aria-hidden="true">AD</div>
+              <div class="cand-info">
+                <div class="cand-role">Senator — Oyo State</div>
+                <div class="cand-name">Adedeji Dhikrullahi</div>
+              </div>
+            </a>
+
+            <a class="cand-item" href="akin-fagbemi.html" role="menuitem">
+              <div class="cand-avatar reps" aria-hidden="true">AF</div>
+              <div class="cand-info">
+                <div class="cand-role">House of Representatives</div>
+                <div class="cand-name">Akin Fagbemi</div>
+              </div>
+            </a>
+          </div>
+        </div>
       </nav>
     </div>
   </header>
@@ -1010,11 +1424,11 @@
         alt="Voter casting ballot in INEC box">
       <div class="hero-copy">
         <div class="wrap">
-          <h1>Empowering Communities, Building Our Future</h1>
+          <h1 class="text-animate">Empowering Communities, Building Our Future</h1>
           <div class="hero-rule"></div>
-          <p>Connecting citizens, communities, candidates, information and opportunities through a continuous grassroots
+          <p class="text-animate">Connecting citizens, communities, candidates, information and opportunities through a continuous grassroots
             engagement network across Oyo State.</p>
-          <span class="hero-tag">Connect &nbsp;·&nbsp; Listen &nbsp;·&nbsp; Empower &nbsp;·&nbsp; Engage</span>
+          <span class="hero-tag text-animate">Connect &nbsp;·&nbsp; Listen &nbsp;·&nbsp; Empower &nbsp;·&nbsp; Engage</span>
         </div>
       </div>
     </section>
@@ -1024,8 +1438,8 @@
         <div class="idea-grid">
           <div>
             <p class="eyebrow">Overview</p>
-            <h2>The big idea</h2>
-            <p class="lede">A people-centred political engagement and community opportunity platform — built on a simple
+            <h2 class="text-animate">The big idea</h2>
+            <p class="lede text-animate">A people-centred political engagement and community opportunity platform — built on a simple
               physical card, QR technology, digital communication and grassroots community clusters.</p>
           </div>
           <div class="idea-body">
@@ -1061,7 +1475,7 @@
       <div class="wrap">
         <div class="agenda-head">
           <p class="eyebrow">APM 2027 Manifesto</p>
-          <h2>APM 2027 Winning Team Agenda</h2>
+          <h2 class="text-animate">APM 2027 Winning Team Agenda</h2>
           <p class="lede">Our 9 core pillars for progressive leadership, community development, and sustainable growth
             across Oyo State.</p>
         </div>
@@ -1150,10 +1564,44 @@
               </div>
             </div>
 
-            <div class="field-row">
               <div class="field">
                 <label for="f-lga">Local government</label>
-                <input id="f-lga" name="lga" type="text" placeholder="e.g. Ibadan South West">
+                <select id="f-lga" name="lga" required>
+                  <option value="" disabled selected>Select Local Government Area</option>
+                  <option value="Afijio">Afijio</option>
+                  <option value="Akinyele">Akinyele</option>
+                  <option value="Atiba">Atiba</option>
+                  <option value="Atisbo">Atisbo</option>
+                  <option value="Egbeda">Egbeda</option>
+                  <option value="Ibadan North">Ibadan North</option>
+                  <option value="Ibadan North-East">Ibadan North-East</option>
+                  <option value="Ibadan North-West">Ibadan North-West</option>
+                  <option value="Ibadan South-East">Ibadan South-East</option>
+                  <option value="Ibadan South-West">Ibadan South-West</option>
+                  <option value="Ibarapa Central">Ibarapa Central</option>
+                  <option value="Ibarapa East">Ibarapa East</option>
+                  <option value="Ibarapa North">Ibarapa North</option>
+                  <option value="Ido">Ido</option>
+                  <option value="Irepo">Irepo</option>
+                  <option value="Iseyin">Iseyin</option>
+                  <option value="Itesiwaju">Itesiwaju</option>
+                  <option value="Iwajowa">Iwajowa</option>
+                  <option value="Kajola">Kajola</option>
+                  <option value="Lagelu">Lagelu</option>
+                  <option value="Ogbomoso North">Ogbomoso North</option>
+                  <option value="Ogbomoso South">Ogbomoso South</option>
+                  <option value="Ogo Oluwa">Ogo Oluwa</option>
+                  <option value="Olorunsogo">Olorunsogo</option>
+                  <option value="Oluyole">Oluyole</option>
+                  <option value="Ona Ara">Ona Ara</option>
+                  <option value="Oorelope">Oorelope</option>
+                  <option value="Ori Ire">Ori Ire</option>
+                  <option value="Oyo East">Oyo East</option>
+                  <option value="Oyo West">Oyo West</option>
+                  <option value="Saki East">Saki East</option>
+                  <option value="Saki West">Saki West</option>
+                  <option value="Surulere">Surulere</option>
+                </select>
               </div>
               <div class="field">
                 <label for="f-ward">Ward</label>
@@ -1166,17 +1614,47 @@
               <input id="f-address" name="address" type="text" placeholder="Street, area">
             </div>
 
-            <div class="verify-block">
-              <p class="verify-label">Verify with voter's card</p>
-              <div class="field">
-                <label for="f-vin">Voter's Identification Number (VIN)</label>
-                <input id="f-vin" name="vin" type="text" placeholder="Enter the VIN on your voter's card" required>
+            <!-- ── Voter card question ───────────────────────────── -->
+            <div class="voter-card-block">
+              <p class="voter-card-question">Do you have a voter's card?</p>
+              <div class="voter-yn-row" role="group" aria-label="Do you have a voter's card?">
+                <button type="button" class="voter-yn-btn" id="voter-yes" aria-pressed="false">
+                  Yes
+                </button>
+                <button type="button" class="voter-yn-btn" id="voter-no" aria-pressed="false">
+                  No
+                </button>
               </div>
-              <label class="check">
-                <input type="checkbox" name="confirm" required>
-                <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
-              </label>
+              <input type="hidden" id="f-has-voter-card" name="hasVoterCard" value="">
+
+              <!-- Upload panel — shown only when Yes is chosen -->
+              <div class="voter-upload-panel" id="voter-upload-panel" aria-hidden="true">
+                <label for="f-voter-card-file" class="upload-label">
+                  <span class="upload-text">
+                    <strong>Upload your voter's card</strong>
+                    <span>Tap to choose a photo or PDF</span>
+                  </span>
+                  <input
+                    id="f-voter-card-file"
+                    name="voterCardFile"
+                    type="file"
+                    accept="image/*,.pdf"
+                    capture="environment"
+                    class="upload-input">
+                </label>
+                <div class="upload-preview" id="upload-preview" aria-live="polite"></div>
+                <!-- Clarity check result -->
+                <div class="clarity-result" id="clarity-result" role="status" aria-live="polite">
+                  <span class="clarity-icon" aria-hidden="true" id="clarity-icon"></span>
+                  <div class="clarity-text" id="clarity-text"></div>
+                </div>
+              </div>
             </div>
+
+            <label class="check" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; margin-top:4px;">
+              <input type="checkbox" name="confirm" required style="margin-top:3px; flex:none; width:18px; height:18px; accent-color:#10b981;">
+              <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
+            </label>
 
             <button type="submit" class="submit-btn">Submit Registration</button>
             <p class="form-note" id="form-status" role="status" aria-live="polite"></p>
@@ -1186,6 +1664,8 @@
     </section>
 
 
+
+  </main>
 
     <footer>
       <div class="wrap">
@@ -1220,6 +1700,90 @@
     <script>
       document.getElementById('yr').textContent = new Date().getFullYear();
 
+      /* ── TEXT FADE-IN BY LINE ANIMATION ────────────────────────────
+         Mirrors MagicUI TextAnimate animation="fadeIn" by="line"
+         Works on any element with class .text-animate
+      ──────────────────────────────────────────────────────────────── */
+      (function () {
+        function splitIntoLines(el) {
+          var text = el.innerHTML;
+          // For elements that have HTML (like &nbsp;), treat whole content as one line
+          var isSimple = el.childElementCount === 0;
+          var lines;
+          if (isSimple) {
+            // Split plain text by natural word-wrap using a hidden measurer
+            var words = el.textContent.trim().split(/\s+/);
+            var measurer = document.createElement('span');
+            measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:inherit;';
+            el.parentNode.insertBefore(measurer, el);
+            var lineGroups = [];
+            var currentLine = [];
+            var maxWidth = el.offsetWidth || 600;
+            words.forEach(function (word) {
+              currentLine.push(word);
+              measurer.textContent = currentLine.join(' ');
+              if (measurer.offsetWidth > maxWidth && currentLine.length > 1) {
+                currentLine.pop();
+                lineGroups.push(currentLine.join(' '));
+                currentLine = [word];
+              }
+            });
+            if (currentLine.length) lineGroups.push(currentLine.join(' '));
+            el.parentNode.removeChild(measurer);
+            lines = lineGroups;
+          } else {
+            // Has HTML — treat whole element as single animated unit
+            lines = [text];
+          }
+          // Rebuild element with each line wrapped in a span
+          el.innerHTML = lines.map(function (line) {
+            return '<span class="fade-line">' + line + '</span>';
+          }).join(' ');
+        }
+
+        function initAnimations() {
+          var elements = document.querySelectorAll('.text-animate');
+          elements.forEach(function (el) {
+            splitIntoLines(el);
+          });
+
+          // IntersectionObserver triggers animation when element enters viewport
+          if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  // Find all .fade-line spans inside and stagger them
+                  var spans = entry.target.querySelectorAll('.fade-line');
+                  spans.forEach(function (span, i) {
+                    setTimeout(function () {
+                      span.classList.add('is-visible');
+                    }, 250 + i * 650);
+                  });
+                  observer.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.15 });
+
+            elements.forEach(function (el) {
+              observer.observe(el);
+            });
+          } else {
+            // Fallback: show all immediately
+            document.querySelectorAll('.fade-line').forEach(function (s) {
+              s.classList.add('is-visible');
+            });
+          }
+        }
+
+        // Run after fonts/layout settle
+        if (document.readyState === 'complete') {
+          initAnimations();
+        } else {
+          window.addEventListener('load', initAnimations);
+        }
+      })();
+      /* ── END TEXT ANIMATION ─────────────────────────────────────── */
+
       var navToggle = document.getElementById('navToggle');
       var navLinks = document.getElementById('navLinks');
       if (navToggle && navLinks) {
@@ -1235,18 +1799,261 @@
         });
       }
 
-      var pciForm = document.getElementById('pci-form');
-      if (pciForm) {
-        pciForm.addEventListener('submit', function (e) {
-          e.preventDefault();
-          var note = document.getElementById('form-note');
-          if (note) {
-            note.textContent = 'Thanks — your details have been captured. A PCI Connector in your ward will reach out.';
+      /* ── Candidate Profiles dropdown ──────────────────────────── */
+      var candTrigger = document.getElementById('candTrigger');
+      var candMenu    = document.getElementById('candMenu');
+      if (candTrigger && candMenu) {
+        function openCandMenu() {
+          candMenu.classList.add('is-open');
+          candTrigger.setAttribute('aria-expanded', 'true');
+          // Dim everything except the nav using CSS class on <body>
+          document.body.classList.add('page-dimmed');
+        }
+        function closeCandMenu() {
+          candMenu.classList.remove('is-open');
+          candTrigger.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('page-dimmed');
+        }
+        candTrigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (candMenu.classList.contains('is-open')) { closeCandMenu(); }
+          else { openCandMenu(); }
+        });
+        document.addEventListener('click', function (e) {
+          if (!candMenu.contains(e.target) && e.target !== candTrigger) {
+            closeCandMenu();
           }
-          this.reset();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeCandMenu();
         });
       }
-    </script>
+
+      var pciForm = document.getElementById('pci-form');
+      if (pciForm) {
+
+        /* -- Voter card Yes / No toggle --------------------------------- */
+        var btnVoterYes    = document.getElementById('voter-yes');
+        var btnVoterNo     = document.getElementById('voter-no');
+        var uploadPanel    = document.getElementById('voter-upload-panel');
+        var hasVoterInput  = document.getElementById('f-has-voter-card');
+        var voterFileInput = document.getElementById('f-voter-card-file');
+        var uploadPreview  = document.getElementById('upload-preview');
+
+        function setVoterChoice(choice) {
+          hasVoterInput.value = choice;
+          btnVoterYes.setAttribute('aria-pressed', choice === 'yes' ? 'true' : 'false');
+          btnVoterNo.setAttribute('aria-pressed',  choice === 'no'  ? 'true' : 'false');
+          if (choice === 'yes') {
+            uploadPanel.classList.add('active');
+            uploadPanel.setAttribute('aria-hidden', 'false');
+          } else {
+            uploadPanel.classList.remove('active');
+            uploadPanel.setAttribute('aria-hidden', 'true');
+            voterFileInput.value = '';
+            uploadPreview.textContent = '';
+            uploadPreview.className = 'upload-preview';
+          }
+        }
+
+        btnVoterYes.addEventListener('click', function () { setVoterChoice('yes'); });
+        btnVoterNo.addEventListener('click',  function () { setVoterChoice('no');  });
+
+        /* Show selected filename + run clarity check */
+        var clarityResult = document.getElementById('clarity-result');
+        var clarityIcon   = document.getElementById('clarity-icon');
+        var clarityText   = document.getElementById('clarity-text');
+        var imageIsClear  = false; // gate: blocks submit until check passes
+
+        function setClarityState(state, iconEmoji, title, body) {
+          clarityResult.className = 'clarity-result visible ' + state;
+          clarityIcon.textContent = iconEmoji;
+          clarityText.innerHTML   = '<strong>' + title + '</strong>' + body;
+          imageIsClear = (state === 'clear');
+        }
+
+        function clearClarityState() {
+          clarityResult.className = 'clarity-result';
+          clarityIcon.textContent = '';
+          clarityText.innerHTML   = '';
+          imageIsClear = false;
+        }
+
+        /* Client-side sharpness estimate using Canvas Laplacian variance */
+        function estimateSharpness(file, callback) {
+          var img = new Image();
+          var url = URL.createObjectURL(file);
+          img.onload = function () {
+            var SIZE = 200; // sample at 200x200 for speed
+            var canvas = document.createElement('canvas');
+            canvas.width  = SIZE;
+            canvas.height = SIZE;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, SIZE, SIZE);
+            URL.revokeObjectURL(url);
+            var data = ctx.getImageData(0, 0, SIZE, SIZE).data;
+            // Convert to greyscale and apply Laplacian kernel [0,1,0,1,-4,1,0,1,0]
+            var grey = new Float32Array(SIZE * SIZE);
+            for (var i = 0; i < SIZE * SIZE; i++) {
+              grey[i] = 0.299 * data[i*4] + 0.587 * data[i*4+1] + 0.114 * data[i*4+2];
+            }
+            var lap = 0, count = 0;
+            for (var y = 1; y < SIZE - 1; y++) {
+              for (var x = 1; x < SIZE - 1; x++) {
+                var v = -4 * grey[y*SIZE+x]
+                         + grey[(y-1)*SIZE+x] + grey[(y+1)*SIZE+x]
+                         + grey[y*SIZE+(x-1)] + grey[y*SIZE+(x+1)];
+                lap += v * v;
+                count++;
+              }
+            }
+            var variance = lap / count;
+            callback(variance);
+          };
+          img.onerror = function () { URL.revokeObjectURL(url); callback(-1); };
+          img.src = url;
+        }
+
+        voterFileInput.addEventListener('change', function () {
+          var file = this.files && this.files[0];
+          if (!file) {
+            uploadPreview.textContent = '';
+            uploadPreview.className = 'upload-preview';
+            clearClarityState();
+            return;
+          }
+
+          var name = file.name;
+          var size = (file.size / 1024).toFixed(0) + ' KB';
+          uploadPreview.textContent = name + ' (' + size + ')';
+          uploadPreview.className = 'upload-preview has-file';
+          clearClarityState();
+
+          // PDFs skip client-side check — server will verify
+          if (file.type === 'application/pdf') {
+            setClarityState('checking', '', 'PDF uploaded',
+              'PDF will be verified on submission.');
+            imageIsClear = true;
+            return;
+          }
+
+          // Show checking state
+          setClarityState('checking', '', 'Checking image quality…',
+            'Please wait while we check your voter\'s card clarity.');
+
+          estimateSharpness(file, function (variance) {
+            var THRESHOLD = 60; // tuned for typical voter card photos
+            if (variance < 0) {
+              setClarityState('blurry', '', 'Could not read image',
+                'Please try a different file format (JPG or PNG recommended).');
+              return;
+            }
+            if (variance < THRESHOLD) {
+              setClarityState('blurry', '', 'Image is too blurry',
+                'Please upload a clearer photo of your voter\'s card. Make sure it is well-lit, in focus, and all text is readable.');
+              imageIsClear = false;
+              return;
+            }
+            // Canvas says OK — also ask the server for a second opinion
+            var fd2 = new FormData();
+            fd2.append('image', file);
+            fetch('/api/check-image-clarity', { method: 'POST', body: fd2 })
+              .then(function(r){ return r.json(); })
+              .then(function(j){
+                if (j.clear === false) {
+                  setClarityState('blurry', '', 'Image quality issue detected',
+                    j.message || 'Please upload a clearer photo of your voter\'s card.');
+                } else {
+                  setClarityState('clear', '', 'Image looks good!',
+                    'Your voter\'s card image is clear and readable.');
+                }
+              })
+              .catch(function(){
+                // Server unreachable — trust the canvas result
+                setClarityState('clear', '', 'Image looks good!',
+                  'Your voter\'s card image is clear and readable.');
+              });
+          });
+        });
+
+        /* -- Form submit ------------------------------------------------- */
+        pciForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var note = document.getElementById('form-status');
+          var btn  = pciForm.querySelector('.submit-btn');
+
+          /* Validate voter card answer */
+          if (!hasVoterInput.value) {
+            if (note) {
+              note.textContent = "Please answer whether you have a voter's card.";
+              note.style.color = '#fca5a5';
+            }
+            document.getElementById('voter-yes').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+
+          /* Block submit if image was uploaded but failed clarity check */
+          if (hasVoterInput.value === 'yes' && voterFileInput.files[0]
+              && voterFileInput.files[0].type !== 'application/pdf'
+              && !imageIsClear) {
+            if (note) {
+              note.textContent = 'Please upload a clearer photo of your voter\'s card before submitting.';
+              note.style.color = '#fca5a5';
+            }
+            document.getElementById('voter-upload-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+          }
+
+          if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+          if (note) { note.textContent = ''; note.style.color = ''; }
+
+          /* Build FormData -- supports file + text fields */
+          var fd = new FormData();
+          fd.append('name',         document.getElementById('f-name').value);
+          fd.append('dob',          document.getElementById('f-dob').value);
+          fd.append('phone',        document.getElementById('f-phone').value);
+          fd.append('lga',          document.getElementById('f-lga').value);
+          fd.append('ward',         document.getElementById('f-ward').value);
+          fd.append('address',      document.getElementById('f-address').value);
+          fd.append('hasVoterCard', hasVoterInput.value);
+
+          if (hasVoterInput.value === 'yes' && voterFileInput.files[0]) {
+            fd.append('voterCardFile', voterFileInput.files[0]);
+          }
+
+          /* Store key fields for thankyou.html summary */
+          try {
+            var firstName = document.getElementById('f-name').value.trim().split(' ')[0];
+            sessionStorage.setItem('pci_name',  firstName);
+            sessionStorage.setItem('pci_phone', document.getElementById('f-phone').value.trim());
+            sessionStorage.setItem('pci_lga',   document.getElementById('f-lga').value.trim());
+            sessionStorage.setItem('pci_ward',  document.getElementById('f-ward').value.trim());
+            sessionStorage.setItem('pci_votercard',
+              hasVoterInput.value === 'yes'
+                ? (voterFileInput.files[0] ? 'Uploaded (' + voterFileInput.files[0].name + ')' : 'Yes')
+                : 'No'
+            );
+          } catch(err) {}
+
+          fetch('/api/register', {
+            method: 'POST',
+            body: fd   /* No Content-Type header -- browser sets multipart boundary */
+          })
+          .then(function (res) { return res.json(); })
+          .then(function (json) {
+            if (json.success) {
+              window.location.href = 'thankyou.html';
+            } else {
+              if (note) { note.textContent = json.message || 'Something went wrong. Please try again.'; note.style.color = '#fca5a5'; }
+              if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration'; }
+            }
+          })
+          .catch(function () {
+            window.location.href = 'thankyou.html';
+          });
+        });
+      }
+            </script>
 </body>
 
 </html>
