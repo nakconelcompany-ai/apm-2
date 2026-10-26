@@ -894,22 +894,21 @@
 
     /* Hero registration journey: message, campaign banner, perks, then CTA. */
     .hero-party-message {
-      width: min(100%, 900px);
-      margin: clamp(18px, 2.5vw, 28px) auto;
-      padding: clamp(16px, 2.3vw, 24px);
-      border-left: 4px solid #008751;
-      border-radius: 0 16px 16px 0;
-      background: linear-gradient(90deg, #effaf5, #f8fbff);
-      box-shadow: 0 10px 24px rgba(10, 48, 91, .08);
+      width: min(100%, 980px);
+      margin: clamp(20px, 2.8vw, 32px) auto;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
     }
 
     .hero-copy .hero-party-message p {
       max-width: none;
       margin: 0;
       color: #17355e !important;
-      font-size: clamp(1rem, 1.6vw, 1.18rem);
+      font-size: clamp(1.05rem, 1.8vw, 1.28rem);
       font-weight: 600;
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     .hero-campaign-banner {
@@ -942,7 +941,10 @@
     }
 
     .hero-registration-perks .perks-kicker {
-      margin: 0 0 6px;
+      display: block;
+      width: 100%;
+      margin: 0 auto 8px;
+      text-align: center;
       color: #0052cc !important;
       font-size: 12px;
       font-weight: 800;
@@ -1399,8 +1401,6 @@
 
       .hero-party-message {
         margin: 16px auto;
-        padding: 16px;
-        border-radius: 0 12px 12px 0;
       }
 
       .hero-campaign-banner,
@@ -2530,8 +2530,8 @@
             <span class="hl-yellow">2027</span>
           </span>
 
-          <img class="hero-artwork text-animate" src="apm-oyo-fingerprint.png"
-            width="1760" height="893" fetchpriority="high"
+          <img class="hero-artwork text-animate" src="/apm-oyo-fingerprint.png?v=20261026"
+            width="1760" height="893" fetchpriority="high" decoding="async"
             alt="Allied Peoples' Movement Oyo logo with a fingerprint">
 
           <!-- Main title -->
@@ -2543,21 +2543,21 @@
           </h1>
 
           <div class="hero-party-message text-animate">
-            <p>APM stands for practical service: stronger communities, fairer opportunities, and a government that listens, acts, and keeps Oyo people at the centre of every decision.</p>
+            <p>Vote APM for leadership that listens, acts with integrity and puts stronger communities, fair opportunities and real progress within reach for every family in Oyo.</p>
           </div>
 
           <figure class="hero-campaign-banner text-animate">
-            <img src="apm-campaign-banner.png" width="1672" height="941"
+            <img src="/apm-campaign-banner.png?v=20261026" width="1672" height="941" decoding="async"
               alt="APM campaign banner featuring Seyi Makinde and Bimbo Adekanmbi">
           </figure>
 
           <section class="hero-registration-perks text-animate" aria-labelledby="hero-registration-perks-title">
             <p class="perks-kicker">Your registration, your voice</p>
-            <h2 id="hero-registration-perks-title">What filling the form helps you do</h2>
+            <h2 id="hero-registration-perks-title">Register today for trusted updates, local opportunities and community-support information</h2>
             <ul>
-              <li><strong>Stay connected</strong>Receive updates from your ward and the PCI network.</li>
-              <li><strong>Make your voice visible</strong>Help strengthen community engagement in your area.</li>
-              <li><strong>Discover opportunities</strong>Hear about relevant civic conversations and community programmes.</li>
+              <li><strong>Community-support alerts</strong>Be among the first to hear verified updates on food support, data initiatives, training and other local programmes when available.</li>
+              <li><strong>Make your voice count</strong>Share the priorities of your community and help ensure the issues that matter are heard.</li>
+              <li><strong>Stay in the know</strong>Receive invitations to local conversations, civic events and relevant opportunities near you.</li>
             </ul>
           </section>
 
