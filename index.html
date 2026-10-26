@@ -892,6 +892,101 @@
       box-shadow: 0 14px 30px -8px rgba(0, 82, 204, 0.6);
     }
 
+    /* Hero registration journey: message, campaign banner, perks, then CTA. */
+    .hero-party-message {
+      width: min(100%, 900px);
+      margin: clamp(18px, 2.5vw, 28px) auto;
+      padding: clamp(16px, 2.3vw, 24px);
+      border-left: 4px solid #008751;
+      border-radius: 0 16px 16px 0;
+      background: linear-gradient(90deg, #effaf5, #f8fbff);
+      box-shadow: 0 10px 24px rgba(10, 48, 91, .08);
+    }
+
+    .hero-copy .hero-party-message p {
+      max-width: none;
+      margin: 0;
+      color: #17355e !important;
+      font-size: clamp(1rem, 1.6vw, 1.18rem);
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .hero-campaign-banner {
+      width: min(100%, 860px);
+      margin: 0 auto clamp(20px, 3vw, 30px);
+      overflow: hidden;
+      border: 1px solid rgba(0, 82, 204, .15);
+      border-radius: clamp(14px, 2vw, 22px);
+      background: #003d80;
+      box-shadow: 0 20px 38px rgba(3, 38, 83, .18);
+    }
+
+    .hero-campaign-banner img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1672 / 941;
+      object-fit: cover;
+    }
+
+    .hero-registration-perks {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding: clamp(20px, 3vw, 32px);
+      border: 1px solid rgba(0, 82, 204, .12);
+      border-radius: 20px;
+      background: #f4f8ff;
+      box-shadow: 0 12px 28px rgba(10, 48, 91, .09);
+      text-align: center;
+    }
+
+    .hero-registration-perks .perks-kicker {
+      margin: 0 0 6px;
+      color: #0052cc !important;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .hero-registration-perks h2 {
+      margin: 0;
+      color: #0b3c73;
+      font-family: "Manrope", sans-serif;
+      font-size: clamp(1.3rem, 3vw, 1.65rem);
+      letter-spacing: -.025em;
+      line-height: 1.2;
+    }
+
+    .hero-registration-perks ul {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hero-registration-perks li {
+      min-height: 100%;
+      padding: 14px 12px;
+      border: 1px solid rgba(0, 82, 204, .08);
+      border-radius: 12px;
+      background: #ffffff;
+      color: #36506f;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .hero-registration-perks strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #073f86;
+      font-size: 13.5px;
+    }
+
     .form-note {
       min-height: 20px;
       margin: 0;
@@ -1301,6 +1396,18 @@
         font-size: 16px;
         min-height: 52px;
       }
+
+      .hero-party-message {
+        margin: 16px auto;
+        padding: 16px;
+        border-radius: 0 12px 12px 0;
+      }
+
+      .hero-campaign-banner,
+      .hero-registration-perks { border-radius: 14px; }
+
+      .hero-registration-perks ul { grid-template-columns: 1fr; gap: 8px; }
+      .hero-registration-perks li { padding: 12px 14px; }
 
       /* Consent checkbox — bigger touch target */
       .check {
@@ -2435,7 +2542,26 @@
             <span class="small-word">for Governor, Oyo State</span>
           </h1>
 
-          <a class="hero-tag text-animate" href="#register">Join APM Voters</a>
+          <div class="hero-party-message text-animate">
+            <p>APM stands for practical service: stronger communities, fairer opportunities, and a government that listens, acts, and keeps Oyo people at the centre of every decision.</p>
+          </div>
+
+          <figure class="hero-campaign-banner text-animate">
+            <img src="apm-campaign-banner.png" width="1672" height="941"
+              alt="APM campaign banner featuring Seyi Makinde and Bimbo Adekanmbi">
+          </figure>
+
+          <section class="hero-registration-perks text-animate" aria-labelledby="hero-registration-perks-title">
+            <p class="perks-kicker">Your registration, your voice</p>
+            <h2 id="hero-registration-perks-title">What filling the form helps you do</h2>
+            <ul>
+              <li><strong>Stay connected</strong>Receive updates from your ward and the PCI network.</li>
+              <li><strong>Make your voice visible</strong>Help strengthen community engagement in your area.</li>
+              <li><strong>Discover opportunities</strong>Hear about relevant civic conversations and community programmes.</li>
+            </ul>
+          </section>
+
+          <a class="hero-tag text-animate" href="#register">Fill the Registration Form</a>
         </div>
       </div>
     </section>
@@ -2662,7 +2788,7 @@
               <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
             </label>
 
-            <div style="text-align:center; margin-top:8px;">
+            <div class="registration-submit" style="text-align:center; margin-top:8px;">
               <button type="submit" class="submit-btn" style="width:auto; padding:14px 52px; display:inline-block;">Submit Registration</button>
             </div>
             <p class="form-note" id="form-status" role="status" aria-live="polite"></p>
