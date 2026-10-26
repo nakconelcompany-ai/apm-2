@@ -64,6 +64,7 @@
 
     .wrap {
       width: min(1160px, 92vw);
+      max-width: calc(100vw - var(--sidebar-w, 0px) - 48px);
       margin-inline: auto
     }
 
@@ -441,9 +442,9 @@
     .hero-main-title .small-word {
       font-family: "Plus Jakarta Sans", sans-serif;
       font-size: .38em;
-      font-weight: 600;
-      letter-spacing: .04em;
-      color: rgba(255,255,255,.7);
+      font-weight: 700;
+      letter-spacing: .08em;
+      color: #fde68a;
       display: block;
       margin-top: 4px;
       text-transform: uppercase;
@@ -889,6 +890,7 @@
       background: rgba(255, 255, 255, 0.08);
       border-radius: 18px;
       padding: 20px clamp(18px, 4vw, 28px);
+      max-width: calc(50% - 10px);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,.12);
     }
@@ -2281,9 +2283,12 @@
               </div>
             </div>
 
-            <div class="field">
-              <label for="f-address">Residential address</label>
-              <input id="f-address" name="address" type="text" placeholder="Street, area">
+            <div class="field-row">
+              <div class="field">
+                <label for="f-address">Residential address</label>
+                <input id="f-address" name="address" type="text" placeholder="Street, area">
+              </div>
+              <div class="field" style="visibility:hidden;pointer-events:none;"></div>
             </div>
 
             <!-- ── Voter card question ───────────────────────────── -->
