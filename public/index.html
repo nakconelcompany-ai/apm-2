@@ -929,6 +929,10 @@
       object-fit: cover;
     }
 
+    .hero-campaign-banner picture {
+      display: block;
+    }
+
     .hero-registration-perks {
       width: min(100%, 980px);
       margin: 0 auto;
@@ -1409,6 +1413,8 @@
 
       .hero-campaign-banner,
       .hero-registration-perks { border-radius: 14px; }
+
+      .hero-campaign-banner img { aspect-ratio: 1122 / 1402; }
 
       .hero-registration-perks ul { grid-template-columns: 1fr; gap: 8px; }
       .hero-registration-perks li { padding: 12px 14px; }
@@ -2579,8 +2585,11 @@
           </div>
 
           <figure class="hero-campaign-banner text-animate">
-            <img src="/apm-campaign-banner.png?v=20261026" width="1672" height="941" decoding="async"
-              alt="APM campaign banner featuring Seyi Makinde and Bimbo Adekanmbi">
+            <picture>
+              <source media="(max-width: 768px)" srcset="/apm-campaign-poster-mobile.png?v=20261026">
+              <img src="/apm-campaign-banner.png?v=20261026" width="1672" height="941" decoding="async"
+                alt="APM campaign banner featuring Seyi Makinde and Bimbo Adekanmbi">
+            </picture>
           </figure>
 
           <section class="hero-registration-perks text-animate" aria-labelledby="hero-registration-perks-title">
