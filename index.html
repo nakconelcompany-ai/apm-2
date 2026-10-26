@@ -868,7 +868,6 @@
       transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
       margin-top: 6px;
       box-shadow: 0 10px 25px -8px rgba(0, 82, 204, 0.5);
-      width: 100%;
     }
 
     .submit-btn:hover {
@@ -2284,13 +2283,17 @@
               </div>
             </div>
 
-            <div class="field">
-              <label for="f-address">Residential address</label>
-              <input id="f-address" name="address" type="text" placeholder="Street, area">
+            <div class="field-row">
+              <div class="field">
+                <label for="f-address">Residential address</label>
+                <input id="f-address" name="address" type="text" placeholder="Street, area">
+              </div>
+              <div><!-- spacer --></div>
             </div>
 
             <!-- ── Voter card question ───────────────────────────── -->
-            <div class="voter-card-block">
+            <div class="field-row">
+              <div class="voter-card-block">
               <p class="voter-card-question">Do you have a voter's card?</p>
               <div class="voter-yn-row" role="group" aria-label="Do you have a voter's card?">
                 <button type="button" class="voter-yn-btn" id="voter-yes" aria-pressed="false">
@@ -2325,13 +2328,17 @@
                 </div>
               </div>
             </div>
+              <div><!-- spacer --></div>
+            </div>
 
-            <label class="check" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; margin-top:4px;">
+            <label class="check" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; margin-top:4px; max-width: calc(50% - 10px);">
               <input type="checkbox" name="confirm" required style="margin-top:3px; flex:none; width:18px; height:18px; accent-color:#10b981;">
               <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
             </label>
 
-            <button type="submit" class="submit-btn">Submit Registration</button>
+            <div style="display:flex; justify-content:flex-start; max-width:calc(50% - 10px);">
+              <button type="submit" class="submit-btn" style="width:auto; padding:14px 40px;">Submit Registration</button>
+            </div>
             <p class="form-note" id="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>
