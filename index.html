@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Bebas+Neue&family=Playfair+Display:wght@700;900&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -389,6 +389,64 @@
 
     .hero-copy h1 span {
       display: block
+    }
+
+    /* ── APM Hero Title Styles ── */
+    .hero-apm-tag {
+      display: block;
+      font-family: "Bebas Neue", "Sora", sans-serif;
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
+      letter-spacing: .18em;
+      color: rgba(255,255,255,.6);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-apm-tag .hl-green {
+      color: #10b981;
+      font-size: 1.15em;
+    }
+
+    .hero-apm-tag .hl-yellow {
+      color: #fbbf24;
+      font-size: 1.15em;
+    }
+
+    .hero-main-title {
+      font-family: "Playfair Display", "Sora", serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      color: #ffffff;
+      margin: 0 0 24px;
+    }
+
+    .hero-main-title .big-name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.45em;
+      letter-spacing: .04em;
+      display: block;
+      line-height: 1.0;
+    }
+
+    .hero-main-title .hl-white {
+      color: #ffffff;
+    }
+
+    .hero-main-title .hl-green {
+      color: #10b981;
+    }
+
+    .hero-main-title .small-word {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: .38em;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: rgba(255,255,255,.7);
+      display: block;
+      margin-top: 4px;
+      text-transform: uppercase;
     }
 
     .hero-rule {
@@ -1365,8 +1423,8 @@
       left: 0;
       width: var(--sidebar-w);
       height: 100dvh;
-      background: #f9fafb;
-      border-right: 1px solid #e5e7eb;
+      background: linear-gradient(to bottom, #f0fdf4 0%, #f9fafb 40%);
+      border-right: 1px solid #bbf7d0;
       overflow-y: auto;
       overflow-x: hidden;
       z-index: 200;
@@ -1384,8 +1442,8 @@
     /* ── Sidebar brand block ── */
     .sidebar-brand-block {
       padding: 20px 18px 16px;
-      border-bottom: 1px solid #e5e7eb;
-      background: #ffffff;
+      border-bottom: 1px solid #bbf7d0;
+      background: #f0fdf4;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1660,7 +1718,7 @@
     /* ── Divider ── */
     .sidebar-divider {
       height: 1px;
-      background: #f3f4f6;
+      background: #d1fae5;
       margin: 4px 12px;
     }
 
@@ -2024,7 +2082,21 @@
         alt="Voter casting ballot in INEC box">
       <div class="hero-copy">
         <div class="wrap">
-          <h1 class="text-animate">Empowering Communities, Building Our Future</h1>
+          <!-- APM tag line -->
+          <span class="hero-apm-tag text-animate">
+            <span class="hl-green">APM</span> for
+            <span class="hl-yellow">Oyo</span>
+            <span class="hl-yellow">2027</span>
+          </span>
+
+          <!-- Main title -->
+          <h1 class="hero-main-title text-animate">
+            <span class="big-name hl-green">Seyi Makinde</span>
+            <span class="small-word">for President</span>
+            <span class="big-name hl-white">Bimbola Adekanmbi</span>
+            <span class="small-word">for Governor, Oyo State</span>
+          </h1>
+
           <div class="hero-rule"></div>
           <p class="text-animate">Connecting citizens, communities, candidates, information and opportunities through a continuous grassroots
             engagement network across Oyo State.</p>
