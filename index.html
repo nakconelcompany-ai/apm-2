@@ -1849,15 +1849,20 @@
 
     /* Campaign hub sidebar — a distinct, card-led treatment inspired by the
        reference's hierarchy, while using APM's own blue, green and white identity. */
-    :root { --sidebar-w: 292px; }
+    :root { --sidebar-w: clamp(248px, 22vw, 292px); }
 
     .sidebar {
+      box-sizing: border-box;
       background: linear-gradient(160deg, #f7faff 0%, #eff7f2 50%, #f8fafc 100%);
       border-right: 1px solid rgba(0, 82, 204, .16);
       box-shadow: 10px 0 34px rgba(10, 48, 91, .10);
       padding: 0 12px 28px;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
       scrollbar-color: #9ebce5 transparent;
     }
+
+    .sidebar > * { flex-shrink: 0; }
 
     .sidebar-brand-block {
       position: relative;
@@ -2043,6 +2048,33 @@
     .sidebar-cta-sub { color: #dbeafe; }
     .sidebar-cta-btn { color: #0052cc; box-shadow: 0 6px 14px rgba(0, 0, 0, .12); }
     .sidebar-cta-btn:hover { background: #dbeafe; color: #003d99; }
+
+    /* Keep every sidebar element readable and reachable on shorter laptops. */
+    @media (min-width: 769px) and (max-height: 850px) {
+      .sidebar { padding-bottom: 16px; }
+      .sidebar-brand-block { margin-bottom: 10px; padding: 16px 14px; border-radius: 0 0 18px 18px; }
+      .sidebar-brand-block img { width: 40px; height: 40px; border-radius: 12px; }
+      .sidebar-brand-name { font-size: 20px; }
+      .sidebar-brand-sub { margin-top: 3px; font-size: 9px; }
+      .sidebar-section-label { padding: 8px 5px 6px; }
+      .sidebar-nav-links { gap: 4px; }
+      .sidebar-nav-link,
+      .sidebar-cand-trigger { min-height: 37px; padding: 7px 9px; font-size: 12px; }
+      .sidebar-card { padding: 12px; border-radius: 13px; }
+      .sidebar-card-body { font-size: 11px; line-height: 1.42; }
+      .sidebar-tag { padding: 4px 7px; font-size: 9.5px; }
+      .sidebar-divider { margin: 10px 4px 2px; }
+      .sidebar-cta { margin-top: 10px; padding: 13px 12px; gap: 7px; border-radius: 14px; }
+      .sidebar-cta-sub { font-size: 10.5px; line-height: 1.38; }
+      .sidebar-cta-btn { padding: 8px 12px; }
+    }
+
+    @media (min-width: 769px) and (max-height: 650px) {
+      .sidebar-brand-block { padding: 12px; }
+      .sidebar-section-label { padding-top: 6px; }
+      .sidebar-card { padding: 10px; }
+      .sidebar-cta-title { font-size: 12px; }
+    }
 
     /* ════════════════════════════════════════════════════════
        HERO — white background, text centered
@@ -2408,11 +2440,8 @@
       <a href="#home" class="sidebar-nav-link">
         <span class="nav-dot"></span>Home
       </a>
-      <a href="#overview" class="sidebar-nav-link">
-        <span class="nav-dot"></span>Overview
-      </a>
       <a href="#winning-team" class="sidebar-nav-link">
-        <span class="nav-dot"></span>APM 2027 Agenda
+        <span class="nav-dot"></span>APM 2027 Promises
       </a>
       <a href="#register" class="sidebar-nav-link">
         <span class="nav-dot"></span>Register
@@ -2463,10 +2492,10 @@
     <div class="sidebar-divider"></div>
 
     <!-- APM 2027 Info card -->
-    <div class="sidebar-section-label">About APM 2027</div>
+    <div class="sidebar-section-label">Why APM 2027</div>
     <div class="sidebar-card">
-      <div class="sidebar-card-title">Allied Peoples&rsquo; Movement</div>
-      <div class="sidebar-card-body">A grassroots movement connecting citizens, communities and candidates across Oyo State and Nigeria.</div>
+      <div class="sidebar-card-title">A movement built around you</div>
+      <div class="sidebar-card-body">APM 2027 brings people, ideas and action together for an Oyo where every voice is heard, every community can grow, and progress feels personal.</div>
       <div class="sidebar-tag-row">
         <span class="sidebar-tag">Oyo State</span>
         <span class="sidebar-tag">APM 2027</span>
@@ -2497,7 +2526,6 @@
       </a>
       <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile site navigation">
         <a href="#home" class="mobile-menu-link">Home</a>
-        <a href="#overview" class="mobile-menu-link">Overview</a>
         <div class="mobile-cand-wrap">
           <button class="mobile-cand-trigger" id="mobileCandTrigger" aria-expanded="false">
             Profiles <span aria-hidden="true">&#9650;</span>
