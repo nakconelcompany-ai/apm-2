@@ -398,7 +398,7 @@
       font-family: "Bebas Neue", "Sora", sans-serif;
       font-size: clamp(1.1rem, 3vw, 1.6rem);
       letter-spacing: .18em;
-      color: rgba(255,255,255,.6);
+      color: #fbbf24;
       text-transform: uppercase;
       margin-bottom: 10px;
     }
@@ -765,6 +765,7 @@
     .form-wrap {
       max-width: 680px;
       margin: 0 auto;
+      width: 100%;
     }
 
     .reg-form {
@@ -867,6 +868,7 @@
       transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
       margin-top: 6px;
       box-shadow: 0 10px 25px -8px rgba(0, 82, 204, 0.5);
+      width: 100%;
     }
 
     .submit-btn:hover {
@@ -890,7 +892,6 @@
       background: rgba(255, 255, 255, 0.08);
       border-radius: 18px;
       padding: 20px clamp(18px, 4vw, 28px);
-      max-width: calc(50% - 10px);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(255,255,255,.12);
     }
@@ -2283,12 +2284,9 @@
               </div>
             </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="f-address">Residential address</label>
-                <input id="f-address" name="address" type="text" placeholder="Street, area">
-              </div>
-              <div class="field" style="visibility:hidden;pointer-events:none;"></div>
+            <div class="field">
+              <label for="f-address">Residential address</label>
+              <input id="f-address" name="address" type="text" placeholder="Street, area">
             </div>
 
             <!-- ── Voter card question ───────────────────────────── -->
