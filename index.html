@@ -789,6 +789,14 @@
       gap: 20px;
     }
 
+    .field-centered,
+    .voter-card-block {
+      width: 100%;
+      max-width: 680px;
+      margin-inline: auto;
+      justify-self: center;
+    }
+
     .field label {
       font-size: 14.5px;
       font-weight: 600;
@@ -844,6 +852,14 @@
       font-size: 14.5px;
       color: #e2f7ec;
       cursor: pointer;
+    }
+
+    .check-consent {
+      justify-content: center;
+      align-items: center;
+      justify-self: center;
+      max-width: 100%;
+      text-align: center;
     }
 
     .check input {
@@ -2283,17 +2299,13 @@
               </div>
             </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="f-address">Residential address</label>
-                <input id="f-address" name="address" type="text" placeholder="Street, area">
-              </div>
-              <div><!-- spacer --></div>
+            <div class="field field-centered">
+              <label for="f-address">Residential address</label>
+              <input id="f-address" name="address" type="text" placeholder="Street, area">
             </div>
 
             <!-- ── Voter card question ───────────────────────────── -->
-            <div class="field-row">
-              <div class="voter-card-block">
+            <div class="voter-card-block">
               <p class="voter-card-question">Do you have a voter's card?</p>
               <div class="voter-yn-row" role="group" aria-label="Do you have a voter's card?">
                 <button type="button" class="voter-yn-btn" id="voter-yes" aria-pressed="false">
@@ -2321,23 +2333,20 @@
                     class="upload-input">
                 </label>
                 <div class="upload-preview" id="upload-preview" aria-live="polite"></div>
-                <!-- Clarity check result -->
                 <div class="clarity-result" id="clarity-result" role="status" aria-live="polite">
                   <span class="clarity-icon" aria-hidden="true" id="clarity-icon"></span>
                   <div class="clarity-text" id="clarity-text"></div>
                 </div>
               </div>
             </div>
-              <div><!-- spacer --></div>
-            </div>
 
-            <label class="check" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; margin-top:4px; max-width: calc(50% - 10px);">
-              <input type="checkbox" name="confirm" required style="margin-top:3px; flex:none; width:18px; height:18px; accent-color:#10b981;">
+            <label class="check check-consent" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; cursor:pointer; margin-top:4px;">
+              <input type="checkbox" name="confirm" required style="margin-top:0; flex:none; width:18px; height:18px; accent-color:#10b981;">
               <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
             </label>
 
-            <div style="display:flex; justify-content:flex-start; max-width:calc(50% - 10px);">
-              <button type="submit" class="submit-btn" style="width:auto; padding:14px 40px;">Submit Registration</button>
+            <div style="text-align:center; margin-top:8px;">
+              <button type="submit" class="submit-btn" style="width:auto; padding:14px 52px; display:inline-block;">Submit Registration</button>
             </div>
             <p class="form-note" id="form-status" role="status" aria-live="polite"></p>
           </form>
