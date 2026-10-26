@@ -17,7 +17,9 @@ card uploads because function filesystems are not persistent.
 4. Use Node.js 20 or newer in the Vercel project settings, then redeploy.
 
 The build script copies the root-level site pages and images into `public/` for
-Vercel's static asset delivery. The generated directory is ignored by Git.
+Vercel's static asset delivery. Keep the generated `public/` files committed so
+the static assets are included even when the Vercel project does not run a build
+command.
 Registration data and voter card files are not stored on the Vercel function's
 local filesystem. Uploads are limited to 4 MB on Vercel to stay within the
 function request-body limit; local development retains the 10 MB limit.

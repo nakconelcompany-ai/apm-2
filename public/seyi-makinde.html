@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Seyi Makinde — APM 2027 Presidential Candidate</title>
+ <meta name="description" content="Profile of Engr. Seyi Makinde — APM 2027 Presidential Candidate and Governor of Oyo State.">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+ <style>
+ :root {
+ --navy:#0052cc; --navy-deep:#1d4ed8;
+ --ink:#111827; --muted:#6b7280;
+ --green:#008751; --green-light:#10b981;
+ --green-deep:#0b3c26; --green-pale:#e8f8f0; --green-mist:#f0fdf6;
+ --gold:#f59e0b; --gold-pale:#fef3c7;
+ --line:#e5e7eb; --bg:#f9fafb; --white:#ffffff;
+ }
+ *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+ body{background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100dvh;display:flex;flex-direction:column}
+ a{color:inherit;text-decoration:none}
+ img{display:block;max-width:100%}
+
+ /* NAV */
+ .nav{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+ .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;max-width:1100px;margin-inline:auto;width:100%}
+ .brand-name{font-family:"Sora",sans-serif;font-weight:700;font-size:14px;color:var(--navy);letter-spacing:-.02em}
+ .brand-sub{font-size:10.5px;color:var(--muted);font-style:italic}
+ .nav-back{display:inline-flex;align-items:center;gap:6px;font-family:"Sora",sans-serif;font-weight:700;font-size:13px;color:var(--navy);border:1.5px solid var(--navy);border-radius:999px;padding:7px 16px;white-space:nowrap;min-height:38px;transition:background .15s}
+ .nav-back:hover{background:#eff6ff}
+
+ /* HERO */
+ .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-deep) 100%);color:var(--white);padding:56px 20px 0}
+ .hero-inner{max-width:1100px;margin-inline:auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:flex-end;padding-bottom:0}
+ .hero-text{padding-bottom:48px}
+ .hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#bfdbfe;margin-bottom:20px}
+ .hero-role{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#93c5fd;margin-bottom:10px}
+ .hero h1{font-family:"Sora",sans-serif;font-weight:800;font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.1;letter-spacing:-.03em;margin-bottom:16px}
+ .hero-sub{font-size:15.5px;color:#bfdbfe;line-height:1.6;max-width:42ch}
+ .hero-photo{width:100%;max-width:420px;margin-inline:auto;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.25);background:rgba(255,255,255,.08);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;position:relative;top:-48px;margin-bottom:-48px}
+ .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+ .photo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.4);font-size:13px;text-align:center;padding:24px;height:100%;width:100%}
+ .photo-placeholder .initials{width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:50%;display:grid;place-items:center;font-family:"Sora",sans-serif;font-weight:800;font-size:36px;color:rgba(255,255,255,.7)}
+
+ /* CONTENT */
+ .page-body{flex:1;max-width:1100px;margin-inline:auto;width:100%;padding:48px 20px 64px;display:flex;flex-direction:column;gap:48px}
+
+ /* STAT ROW */
+ .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+ .stat-card{background:var(--white);border-radius:18px;padding:22px 20px;box-shadow:0 2px 12px rgba(0,0,0,.06);text-align:center}
+ .stat-number{font-family:"Sora",sans-serif;font-weight:800;font-size:28px;color:var(--navy);letter-spacing:-.03em;margin-bottom:4px}
+ .stat-label{font-size:13px;color:var(--muted);font-weight:600}
+
+ /* SECTIONS */
+ .section-card{background:var(--white);border-radius:20px;padding:32px 28px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+ .section-eyebrow{font-family:"Sora",sans-serif;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-light);margin-bottom:8px}
+ .section-title{font-family:"Sora",sans-serif;font-weight:700;font-size:clamp(1.2rem,2.5vw,1.6rem);color:var(--ink);letter-spacing:-.025em;margin-bottom:20px;line-height:1.2}
+ .section-body{font-size:15.5px;color:#374151;line-height:1.75}
+ .section-body p+p{margin-top:14px}
+
+ /* ACHIEVEMENT LIST */
+ .achieve-list{list-style:none;display:flex;flex-direction:column;gap:14px;margin-top:4px}
+ .achieve-item{display:flex;gap:14px;align-items:flex-start;font-size:15px;color:#374151;line-height:1.6}
+ .achieve-dot{width:32px;height:32px;background:var(--green-pale);border-radius:10px;display:grid;place-items:center;font-size:16px;flex:none;margin-top:1px}
+
+ /* ASPIRATION */
+ .aspiration-card{background:linear-gradient(135deg,var(--green-deep) 0%,var(--green) 100%);border-radius:20px;padding:36px 32px;color:var(--white)}
+ .aspiration-card .section-eyebrow{color:#6ee7b7}
+ .aspiration-card .section-title{color:var(--white)}
+ .aspiration-card .section-body{color:#c8f0dc}
+ .aspiration-card .section-body p+p{margin-top:14px}
+
+ /* POLICY PILLS */
+ .policy-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+ .policy-pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 18px;font-size:13.5px;font-weight:600;color:var(--white)}
+
+ /* QUOTE */
+ .quote-block{border-left:4px solid var(--green-light);padding:16px 20px;background:var(--green-mist);border-radius:0 14px 14px 0;margin-top:20px}
+ .quote-text{font-size:16px;font-style:italic;color:var(--green-deep);line-height:1.65;font-weight:500}
+ .quote-attr{margin-top:8px;font-size:13px;font-weight:700;color:var(--green);letter-spacing:.03em}
+
+ /* FOOTER */
+ footer{background:var(--white);border-top:1px solid var(--line);padding:20px;text-align:center;font-size:12.5px;color:var(--muted)}
+
+ /* RESPONSIVE */
+ @media(max-width:768px){
+ .hero-inner{grid-template-columns:1fr;gap:32px}
+ .hero-photo{max-width:280px;border-radius:20px 20px 0 0}
+ .hero-text{padding-bottom:0}
+ .stat-row{grid-template-columns:1fr 1fr}
+ .section-card,.aspiration-card{padding:24px 20px}
+ }
+ @media(max-width:480px){
+ .stat-row{grid-template-columns:1fr}
+ .hero{padding:40px 16px 0}
+ .page-body{padding:32px 16px 48px}
+ }
+ @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+ :focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:6px}
+ 
+    /* -- TEXT FADE-IN BY LINE ANIMATION -- */
+    .fade-line {
+      display: block;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 3.8s cubic-bezier(0.12, 1, 0.25, 1), transform 3.8s cubic-bezier(0.12, 1, 0.25, 1);
+      will-change: opacity, transform;
+    }
+    .fade-line.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* -- END TEXT ANIMATION -- */
+</style>
+</head>
+<body>
+
+ <!-- NAV -->
+ <header class="nav">
+ <div class="nav-inner">
+ <a href="index.html">
+ <div class="brand-name">People Connect Initiative</div>
+ <div class="brand-sub">APM 2027 Candidates</div>
+ </a>
+ <a href="index.html" class="nav-back">← Back to Home</a>
+ </div>
+ </header>
+
+ <!-- HERO -->
+ <section class="hero">
+ <div class="hero-inner">
+ <div class="hero-text">
+ <div class="hero-badge">🇳🇬 APM 2027 Presidential Candidate</div>
+ <div class="hero-role">President of the Federal Republic of Nigeria</div>
+ <h1 class="text-animate">Engr. Seyi Makinde</h1>
+ <p class="hero-sub text-animate">Engineer, entrepreneur and Governor of Oyo State &mdash; bringing real governance experience to Nigeria's presidential race under the Allied Peoples' Movement (APM).</p>
+ </div>
+ <div class="hero-photo">
+ <img src="apm1.jfif" alt="Engr. Seyi Makinde">
+ </div>
+ </div>
+ </section>
+
+ <!-- BODY -->
+ <main class="page-body">
+
+ <!-- STATS -->
+ <div class="stat-row">
+ <div class="stat-card">
+ <div class="stat-number text-animate">2019</div>
+ <div class="stat-label">Elected Governor, Oyo State</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number text-animate">2023</div>
+ <div class="stat-label">Re-elected — Landslide Victory</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number text-animate">35+</div>
+ <div class="stat-label">Years in Engineering & Business</div>
+ </div>
+ </div>
+
+ <!-- PROFILE -->
+ <div class="section-card">
+ <div class="section-eyebrow text-animate">About</div>
+ <div class="section-title text-animate">Profile</div>
+ <div class="section-body text-animate">
+ <p>Engineer Oluseyi Abiodun Makinde was born on 25 December 1967 in Ibadan, Oyo State. He studied Electrical Engineering at the University of Lagos, graduating in 1990, and went on to build a career in the oil and gas industry.</p>
+ <p>In 1997, he established Makon Engineering and Technical Services Limited, growing it into a successful indigenous engineering firm. He became Governor of Oyo State in 2019 and was re-elected in 2023, bringing real executive governance experience to the national stage as the APM presidential candidate for 2027.</p>
+ <p>As a member of the Allied Peoples' Movement (APM), Makinde's presidential candidacy draws on his background in engineering, business and state governance to address Nigeria's most pressing national challenges.</p>
+ <div class="quote-block">
+ <div class="quote-text text-animate">"Government exists to serve the people — not the other way around. Every policy, every naira of public money, must be felt in the lives of ordinary Nigerians."</div>
+ <div class="quote-attr">— Engr. Seyi Makinde</div>
+ </div>
+ </div>
+ </div>
+
+ <!-- ACHIEVEMENTS -->
+ <div class="section-card">
+ <div class="section-eyebrow text-animate">Track Record</div>
+ <div class="section-title text-animate">Key Achievements &amp; Governing Record</div>
+ <ul class="achieve-list text-animate">
+ <li class="achieve-item"><span><strong>Agriculture &amp; Economic Development:</strong> Launched the Fasola Agribusiness Transformation Centre and the Eruwa agribusiness project, supporting agricultural production, processing and economic activity across the state.</span></li>
+ <li class="achieve-item"><span><strong>Infrastructure &amp; Electricity:</strong> Delivered road rehabilitation projects and an 11 MW independent power project serving the Oyo State Secretariat and surrounding communities.</span></li>
+ <li class="achieve-item"><span><strong>Healthcare:</strong> Implemented the Omituntun Free Health Mission, improved primary healthcare facilities and recruited additional healthcare workers across the state.</span></li>
+ <li class="achieve-item"><span><strong>Education:</strong> Introduced education programmes and student support initiatives to improve access to learning and upgrade school infrastructure.</span></li>
+ <li class="achieve-item"><span><strong>Security:</strong> Supported security operations including Operation Amotekun and provided security patrol vehicles to protect communities across Oyo State.</span></li>
+ </ul>
+ </div>
+
+ <!-- ASPIRATION -->
+ <div class="aspiration-card text-animate">
+ <div class="section-eyebrow text-animate">2027 Vision</div>
+ <div class="section-title text-animate">Vision &amp; Aspirations for Nigeria</div>
+ <div class="section-body text-animate">
+ <p>Makinde's proposed <strong>Reset Nigeria Agenda</strong> identifies economic reform, education, national security, and governance as its core pillars. His vision is to translate the progress made in Oyo State into a national model of accountable, people-centred leadership.</p>
+ <p><strong>Economic Reform &amp; Job Creation:</strong> Promote productive industries, reduce avoidable business costs and create conditions that support investment and employment.</p>
+ <p><strong>Education &amp; Skills:</strong> Improve educational standards, teacher development and technical training to prepare young Nigerians for employment and entrepreneurship.</p>
+ <p><strong>National Security:</strong> Strengthen intelligence, early-warning systems and coordination among security agencies, including potential reforms to security responsibilities.</p>
+ <p><strong>Governance &amp; Accountability:</strong> Strengthen public institutions, improve transparency and promote more effective coordination between federal, state and local governments.</p>
+ <p><strong>Food Security:</strong> Support agricultural production, food processing, storage and distribution to improve food availability across Nigeria.</p>
+ <p><strong>National Unity:</strong> Promote inclusive governance and national dialogue, including a proposed four-year transitional Government of National Unity if elected.</p>
+ </div>
+ <div class="policy-grid">
+ <span class="policy-pill">Economic Reform</span>
+ <span class="policy-pill">Education &amp; Skills</span>
+ <span class="policy-pill">Food Security</span>
+ <span class="policy-pill">National Security</span>
+ <span class="policy-pill">Infrastructure</span>
+ <span class="policy-pill">Job Creation</span>
+ <span class="policy-pill">Accountable Governance</span>
+ <span class="policy-pill">National Unity</span>
+ </div>
+ </div>
+
+ </main>
+
+ <footer>
+ <div>&copy;  People Connect Initiative &mdash; APM 2027</div>
+ </footer>
+
+ <script>document.getElementById('yr').textContent = new Date().getFullYear();
+      /* -- TEXT FADE-IN BY LINE ANIMATION -- */
+      (function () {
+        function splitIntoLines(el) {
+          var isSimple = el.childElementCount === 0;
+          var lines;
+          if (isSimple) {
+            var words = el.textContent.trim().split(/\s+/);
+            var measurer = document.createElement('span');
+            measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:inherit;';
+            el.parentNode.insertBefore(measurer, el);
+            var lineGroups = [], currentLine = [], maxWidth = el.offsetWidth || 600;
+            words.forEach(function (word) {
+              currentLine.push(word);
+              measurer.textContent = currentLine.join(' ');
+              if (measurer.offsetWidth > maxWidth && currentLine.length > 1) {
+                currentLine.pop();
+                lineGroups.push(currentLine.join(' '));
+                currentLine = [word];
+              }
+            });
+            if (currentLine.length) lineGroups.push(currentLine.join(' '));
+            el.parentNode.removeChild(measurer);
+            lines = lineGroups;
+          } else {
+            lines = [el.innerHTML];
+          }
+          el.innerHTML = lines.map(function (line) {
+            return '<span class="fade-line">' + line + '</span>';
+          }).join(' ');
+        }
+        function initAnimations() {
+          var elements = document.querySelectorAll('.text-animate');
+          elements.forEach(function (el) { splitIntoLines(el); });
+          if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  var spans = entry.target.querySelectorAll('.fade-line');
+                  spans.forEach(function (span, i) {
+                    setTimeout(function () { span.classList.add('is-visible'); }, 250 + i * 650);
+                  });
+                  observer.unobserve(entry.target);
+                }
+              });
+            }, { threshold: 0.15 });
+            elements.forEach(function (el) { observer.observe(el); });
+          } else {
+            document.querySelectorAll('.fade-line').forEach(function (s) { s.classList.add('is-visible'); });
+          }
+        }
+        if (document.readyState === 'complete') { initAnimations(); }
+        else { window.addEventListener('load', initAnimations); }
+      })();
+      /* -- END TEXT ANIMATION -- */
+</script>
+</body>
+</html>

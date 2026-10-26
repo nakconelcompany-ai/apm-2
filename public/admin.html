@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCI Admin Dashboard — People Connect Initiative</title>
+  <meta name="description" content="Admin Dashboard for People Connect Initiative voter and membership registrations across Oyo State.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #081610;
+      --bg-card: #0f291e;
+      --surface: #143729;
+      --surface-border: rgba(16, 185, 129, 0.25);
+      --green-primary: #008751;
+      --green-accent: #10b981;
+      --green-light: #6ff8bb;
+      --blue-accent: #0052cc;
+      --blue-glow: #3b82f6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 135, 81, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 82, 204, 0.12) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Layout */
+    .admin-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Header */
+    .admin-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--surface-border);
+      margin-bottom: 28px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-primary), var(--green-accent));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+    }
+
+    .brand-titles h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-titles p {
+      font-size: 13px;
+      color: var(--green-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green-accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green-accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--green-primary), var(--green-accent));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--surface-border);
+      color: var(--green-light);
+    }
+
+    .btn-outline:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* KPI Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green-accent), var(--blue-glow));
+    }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .metric-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green-accent);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      font-family: 'Sora', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .metric-subtext {
+      font-size: 12.5px;
+      color: var(--green-light);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Filter & Controls Bar */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 11px 18px 11px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--green-accent);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .select-input {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .select-input:focus {
+      border-color: var(--green-accent);
+    }
+
+    /* Table Container */
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .table-header-bar {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-count {
+      background: rgba(16, 185, 129, 0.18);
+      color: var(--green-light);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+      color: #e5e7eb;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .user-name {
+      font-weight: 700;
+      color: #ffffff;
+      font-size: 15px;
+    }
+
+    .user-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-yes {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green-light);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-no {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-file {
+      background: rgba(0, 82, 204, 0.18);
+      color: #93c5fd;
+      border: 1px solid rgba(0, 82, 204, 0.35);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .badge-file:hover {
+      background: rgba(0, 82, 204, 0.3);
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .action-btn.delete {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .action-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      width: min(680px, 95vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      transform: translateY(15px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.is-active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: #ffffff;
+    }
+
+    .dossier-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dossier-item {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dossier-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .dossier-val {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .doc-preview-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .doc-preview-img {
+      max-width: 100%;
+      max-height: 380px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--green-accent);
+      color: #ffffff;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .admin-container {
+        padding: 16px;
+      }
+      .dossier-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="brand-section">
+        <div class="brand-logo">PCI</div>
+        <div class="brand-titles">
+          <h1>Grassroots Registration Dashboard</h1>
+          <p><span class="live-dot"></span> Real-Time Voter & Membership Sync</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="btn-refresh">
+          <span id="refresh-icon">SYNC</span> Refresh
+        </button>
+        <button class="btn btn-outline" id="btn-export">
+          Export CSV
+        </button>
+        <a href="index.html" class="btn btn-primary">
+          View Website
+        </a>
+      </div>
+    </header>
+
+    <!-- Metrics Cards -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Total Submissions</span>
+          <div class="metric-icon">MEMBERS</div>
+        </div>
+        <div class="metric-value" id="stat-total">0</div>
+        <div class="metric-subtext">Registered Citizens in Oyo State</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Voter Card Holders</span>
+          <div class="metric-icon">CARDS</div>
+        </div>
+        <div class="metric-value" id="stat-cards">0</div>
+        <div class="metric-subtext" id="stat-cards-pct">0% of total registrants</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Uploaded Cards / PDFs</span>
+          <div class="metric-icon">FILES</div>
+        </div>
+        <div class="metric-value" id="stat-uploads">0</div>
+        <div class="metric-subtext">Document uploads verified</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-title">Active LGAs</span>
+          <div class="metric-icon">LGAs</div>
+        </div>
+        <div class="metric-value" id="stat-lgas">0</div>
+        <div class="metric-subtext">Local Government Areas covered</div>
+      </div>
+    </section>
+
+    <!-- Filter & Controls -->
+    <section class="controls-panel">
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search by Name, Phone, Ward, Address...">
+      </div>
+
+      <div class="filter-group">
+        <select class="select-input" id="filter-voter">
+          <option value="all">All Voter Card Statuses</option>
+          <option value="yes-upload">Has Card (With Upload)</option>
+          <option value="yes">Has Card (Yes)</option>
+          <option value="no">No Voter Card</option>
+        </select>
+
+        <select class="select-input" id="filter-lga">
+          <option value="all">All 33 LGAs of Oyo State</option>
+          <option value="Afijio">Afijio</option>
+          <option value="Akinyele">Akinyele</option>
+          <option value="Atiba">Atiba</option>
+          <option value="Atisbo">Atisbo</option>
+          <option value="Egbeda">Egbeda</option>
+          <option value="Ibadan North">Ibadan North</option>
+          <option value="Ibadan North-East">Ibadan North-East</option>
+          <option value="Ibadan North-West">Ibadan North-West</option>
+          <option value="Ibadan South-East">Ibadan South-East</option>
+          <option value="Ibadan South-West">Ibadan South-West</option>
+          <option value="Ibarapa Central">Ibarapa Central</option>
+          <option value="Ibarapa East">Ibarapa East</option>
+          <option value="Ibarapa North">Ibarapa North</option>
+          <option value="Ido">Ido</option>
+          <option value="Irepo">Irepo</option>
+          <option value="Iseyin">Iseyin</option>
+          <option value="Itesiwaju">Itesiwaju</option>
+          <option value="Iwajowa">Iwajowa</option>
+          <option value="Kajola">Kajola</option>
+          <option value="Lagelu">Lagelu</option>
+          <option value="Ogbomoso North">Ogbomoso North</option>
+          <option value="Ogbomoso South">Ogbomoso South</option>
+          <option value="Ogo Oluwa">Ogo Oluwa</option>
+          <option value="Olorunsogo">Olorunsogo</option>
+          <option value="Oluyole">Oluyole</option>
+          <option value="Ona Ara">Ona Ara</option>
+          <option value="Oorelope">Oorelope</option>
+          <option value="Ori Ire">Ori Ire</option>
+          <option value="Oyo East">Oyo East</option>
+          <option value="Oyo West">Oyo West</option>
+          <option value="Saki East">Saki East</option>
+          <option value="Saki West">Saki West</option>
+          <option value="Surulere">Surulere</option>
+        </select>
+
+        <select class="select-input" id="sort-by">
+          <option value="newest">Sort: Newest First</option>
+          <option value="oldest">Sort: Oldest First</option>
+          <option value="name">Sort: Name A-Z</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Table Card -->
+    <section class="table-card">
+      <div class="table-header-bar">
+        <div class="table-title">
+          Registrations Database <span class="badge-count" id="filtered-count">0 Records</span>
+        </div>
+        <div style="font-size: 12.5px; color: var(--text-dim);" id="last-updated">
+          Auto-sync enabled
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date & Time</th>
+              <th>Full Name</th>
+              <th>Phone Number</th>
+              <th>LGA / Ward</th>
+              <th>Voter Card</th>
+              <th>Uploaded Document</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="8" class="empty-state">
+                Loading registrations...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Detail Dossier Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">Member Dossier & Document Verification</div>
+        <button class="close-btn" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-content">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notifications container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    (function () {
+      let allRegistrations = [];
+      let filteredData = [];
+
+      const tableBody = document.getElementById('table-body');
+      const searchInput = document.getElementById('search-input');
+      const filterVoter = document.getElementById('filter-voter');
+      const filterLga = document.getElementById('filter-lga');
+      const sortBy = document.getElementById('sort-by');
+      const btnRefresh = document.getElementById('btn-refresh');
+      const refreshIcon = document.getElementById('refresh-icon');
+      const btnExport = document.getElementById('btn-export');
+      const lastUpdatedEl = document.getElementById('last-updated');
+
+      const modal = document.getElementById('detail-modal');
+      const modalClose = document.getElementById('modal-close');
+      const modalContent = document.getElementById('modal-content');
+      let adminPassword = sessionStorage.getItem('pci_admin_password') || '';
+      let requiresAdminPassword = null;
+
+      async function adminFetch(url, options = {}) {
+        if (requiresAdminPassword === null) {
+          const modeResponse = await fetch('/api/admin/auth-mode');
+          const mode = await modeResponse.json();
+          requiresAdminPassword = mode.requiresPassword;
+        }
+
+        if (requiresAdminPassword && !adminPassword) {
+          adminPassword = window.prompt('Enter the admin password:') || '';
+          if (!adminPassword) throw new Error('Admin password is required.');
+          sessionStorage.setItem('pci_admin_password', adminPassword);
+        }
+
+        const headers = new Headers(options.headers || {});
+        if (adminPassword) headers.set('Authorization', `Bearer ${adminPassword}`);
+        const response = await fetch(url, { ...options, headers });
+
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          if (response.status === 401) {
+            adminPassword = '';
+            sessionStorage.removeItem('pci_admin_password');
+          }
+          throw new Error(body && body.message ? body.message : 'Admin request failed.');
+        }
+        return response;
+      }
+
+      async function fetchPrivateFile(id) {
+        const response = await adminFetch(`/api/admin/registrations/${encodeURIComponent(id)}/file`);
+        return response.blob();
+      }
+
+      window.openDocument = async function(id) {
+        const documentWindow = window.open('about:blank', '_blank');
+        if (!documentWindow) {
+          showToast('Allow pop-ups to view the voter card document.', true);
+          return;
+        }
+
+        try {
+          const file = await fetchPrivateFile(id);
+          documentWindow.location.href = URL.createObjectURL(file);
+        } catch (error) {
+          documentWindow.close();
+          showToast(error.message, true);
+        }
+      };
+
+      // Fetch data from API
+      function fetchRegistrations(isManual = false) {
+        if (isManual) refreshIcon.classList.add('spin');
+
+        adminFetch('/api/admin/registrations')
+          .then(res => res.json())
+          .then(res => {
+            if (res.success) {
+              allRegistrations = res.data || [];
+              updateMetrics(allRegistrations);
+              applyFilters();
+              lastUpdatedEl.textContent = 'Last synced: ' + new Date().toLocaleTimeString();
+              if (isManual) showToast('Data refreshed successfully!');
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            showToast(err.message || 'Failed to fetch data.', true);
+          })
+          .finally(() => {
+            if (isManual) refreshIcon.classList.remove('spin');
+          });
+      }
+
+      // Update KPI Cards
+      function updateMetrics(data) {
+        const total = data.length;
+        const cardHolders = data.filter(r => r.hasVoterCard === 'yes').length;
+        const uploads = data.filter(r => r.voterCardFile && r.voterCardFile.filename).length;
+        const uniqueLgas = new Set(data.map(r => r.lga).filter(Boolean)).size;
+
+        document.getElementById('stat-total').textContent = total.toLocaleString();
+        document.getElementById('stat-cards').textContent = cardHolders.toLocaleString();
+        document.getElementById('stat-cards-pct').textContent = total > 0 ? ((cardHolders / total) * 100).toFixed(1) + '% of total' : '0%';
+        document.getElementById('stat-uploads').textContent = uploads.toLocaleString();
+        document.getElementById('stat-lgas').textContent = uniqueLgas;
+      }
+
+      // Apply search, filters & sort
+      function applyFilters() {
+        const q = searchInput.value.toLowerCase().trim();
+        const vFilter = filterVoter.value;
+        const lgaFilter = filterLga.value;
+        const sortVal = sortBy.value;
+
+        filteredData = allRegistrations.filter(r => {
+          // Search query
+          const matchQuery = !q || 
+            (r.name && r.name.toLowerCase().includes(q)) ||
+            (r.phone && r.phone.toLowerCase().includes(q)) ||
+            (r.lga && r.lga.toLowerCase().includes(q)) ||
+            (r.ward && r.ward.toLowerCase().includes(q)) ||
+            (r.address && r.address.toLowerCase().includes(q));
+
+          // Voter card filter
+          let matchVoter = true;
+          if (vFilter === 'yes-upload') {
+            matchVoter = r.hasVoterCard === 'yes' && r.voterCardFile && r.voterCardFile.filename;
+          } else if (vFilter === 'yes') {
+            matchVoter = r.hasVoterCard === 'yes';
+          } else if (vFilter === 'no') {
+            matchVoter = r.hasVoterCard === 'no';
+          }
+
+          // LGA filter
+          let matchLga = (lgaFilter === 'all') || (r.lga === lgaFilter);
+
+          return matchQuery && matchVoter && matchLga;
+        });
+
+        // Sorting
+        if (sortVal === 'newest') {
+          filteredData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        } else if (sortVal === 'oldest') {
+          filteredData.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        } else if (sortVal === 'name') {
+          filteredData.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        }
+
+        renderTable(filteredData);
+      }
+
+      // Render Data Table
+      function renderTable(data) {
+        document.getElementById('filtered-count').textContent = data.length + ' Record' + (data.length === 1 ? '' : 's');
+
+        if (data.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="8" class="empty-state">
+                No registrations found matching your filters.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = data.map((r, idx) => {
+          const dateStr = r.createdAt ? new Date(r.createdAt).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
+          const hasFile = r.voterCardFile && r.voterCardFile.filename;
+          return `
+            <tr>
+              <td style="color:var(--text-dim); font-weight:600;">${idx + 1}</td>
+              <td style="white-space:nowrap; font-size:13px; color:var(--text-muted);">${dateStr}</td>
+              <td>
+                <div class="user-name">${escapeHtml(r.name || 'N/A')}</div>
+                <div class="user-sub">DOB: ${escapeHtml(r.dob || 'N/A')}</div>
+              </td>
+              <td style="font-weight:600; color:var(--green-light);">${escapeHtml(r.phone || 'N/A')}</td>
+              <td>
+                <div style="font-weight:600;">${escapeHtml(r.lga || 'N/A')}</div>
+                <div class="user-sub">Ward: ${escapeHtml(r.ward || 'N/A')}</div>
+              </td>
+              <td>
+                <span class="status-badge ${r.hasVoterCard === 'yes' ? 'badge-yes' : 'badge-no'}">
+                  ${r.hasVoterCard === 'yes' ? 'Has Voter Card' : 'No Voter Card'}
+                </span>
+              </td>
+              <td>
+                ${hasFile ? `
+                  <button type="button" onclick="openDocument('${escapeJsStr(r.id)}')" class="status-badge badge-file" title="Click to view file">
+                    View Document (${escapeHtml(r.voterCardFile.originalName || 'File')})
+                  </button>
+                ` : `<span style="color:var(--text-dim); font-size:13px;">None</span>`}
+              </td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <button class="action-btn" onclick="openDetail('${r.id}')">
+                    View
+                  </button>
+                  <button class="action-btn delete" onclick="deleteRecord('${r.id}', '${escapeJsStr(r.name)}')">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Open Modal Dossier
+      window.openDetail = function(id) {
+        const record = allRegistrations.find(r => r.id === id);
+        if (!record) return;
+
+        const hasFile = record.voterCardFile && record.voterCardFile.filename;
+        const isPdf = hasFile && record.voterCardFile.mimetype === 'application/pdf';
+
+        modalContent.innerHTML = `
+          <div class="dossier-grid">
+            <div class="dossier-item">
+              <div class="dossier-label">Full Name</div>
+              <div class="dossier-val">${escapeHtml(record.name || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Phone Number</div>
+              <div class="dossier-val" style="color:var(--green-light);">${escapeHtml(record.phone || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Date of Birth</div>
+              <div class="dossier-val">${escapeHtml(record.dob || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Local Government Area (LGA)</div>
+              <div class="dossier-val">${escapeHtml(record.lga || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Ward</div>
+              <div class="dossier-val">${escapeHtml(record.ward || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Voter's Card Choice</div>
+              <div class="dossier-val">${record.hasVoterCard === 'yes' ? 'Yes (Has Card)' : 'No'}</div>
+            </div>
+          </div>
+
+          <div class="dossier-item" style="margin-bottom:20px;">
+            <div class="dossier-label">Residential Address</div>
+            <div class="dossier-val">${escapeHtml(record.address || 'N/A')}</div>
+          </div>
+
+          <div class="dossier-item" style="margin-bottom:20px;">
+            <div class="dossier-label">Submission Date & Time</div>
+            <div class="dossier-val">${record.createdAt ? new Date(record.createdAt).toLocaleString() : 'N/A'}</div>
+          </div>
+
+          <div class="dossier-label" style="margin-bottom:8px;">Uploaded Voter's Card Document</div>
+          ${hasFile ? `
+            <div class="doc-preview-box">
+              ${isPdf ? `
+                <div style="padding:20px;">
+                  <div style="font-weight:700; margin-bottom:12px;">PDF Document: ${escapeHtml(record.voterCardFile.originalName)}</div>
+                  <button type="button" onclick="openDocument('${escapeJsStr(record.id)}')" class="btn btn-primary">Open / Download PDF</button>
+                </div>
+              ` : `
+                <img alt="Voter Card" class="doc-preview-img" data-registration-id="${escapeHtml(record.id)}">
+                <div style="margin-top:12px;">
+                  <button type="button" onclick="openDocument('${escapeJsStr(record.id)}')" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">View Full Image</button>
+                </div>
+              `}
+            </div>
+          ` : `
+            <div class="doc-preview-box" style="color:var(--text-dim); padding:24px;">
+              No voter card file uploaded for this registration.
+            </div>
+          `}
+        `;
+
+        modal.classList.add('is-active');
+        const preview = modalContent.querySelector('.doc-preview-img');
+        if (preview) {
+          fetchPrivateFile(record.id)
+            .then(file => { preview.src = URL.createObjectURL(file); })
+            .catch(error => showToast(error.message, true));
+        }
+      };
+
+      // Delete Record
+      window.deleteRecord = function(id, name) {
+        if (!confirm(`Are you sure you want to delete the registration for "${name}"?`)) return;
+
+        adminFetch(`/api/admin/registrations/${encodeURIComponent(id)}`, { method: 'DELETE' })
+          .then(res => res.json())
+          .then(res => {
+            if (res.success) {
+              showToast(res.message);
+              fetchRegistrations();
+            } else {
+              showToast(res.message || 'Failed to delete record.', true);
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            showToast('Error communicating with server.', true);
+          });
+      };
+
+      // Export to CSV
+      btnExport.addEventListener('click', function () {
+        if (allRegistrations.length === 0) {
+          showToast('No registration data available to export.', true);
+          return;
+        }
+
+        const headers = ['ID', 'Registration Date', 'Full Name', 'DOB', 'Phone', 'LGA', 'Ward', 'Address', 'Has Voter Card', 'File Uploaded'];
+        const csvRows = [headers.join(',')];
+
+        allRegistrations.forEach(r => {
+          const row = [
+            `"${r.id || ''}"`,
+            `"${r.createdAt || ''}"`,
+            `"${(r.name || '').replace(/"/g, '""')}"`,
+            `"${r.dob || ''}"`,
+            `"${r.phone || ''}"`,
+            `"${(r.lga || '').replace(/"/g, '""')}"`,
+            `"${(r.ward || '').replace(/"/g, '""')}"`,
+            `"${(r.address || '').replace(/"/g, '""')}"`,
+            `"${r.hasVoterCard || ''}"`,
+            `"${r.voterCardFile ? r.voterCardFile.filename : 'None'}"`
+          ];
+          csvRows.push(row.join(','));
+        });
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `PCI_Registrations_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('CSV export downloaded successfully!');
+      });
+
+      // Helpers
+      function escapeHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function escapeJsStr(str) {
+        return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+      }
+
+      function showToast(msg, isError = false) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        if (isError) toast.style.borderColor = 'var(--danger)';
+        toast.textContent = (isError ? 'Notice: ' : 'Success: ') + msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+
+      // Modal close handlers
+      modalClose.addEventListener('click', () => modal.classList.remove('is-active'));
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('is-active');
+      });
+
+      // Event listeners for search & filter
+      searchInput.addEventListener('input', applyFilters);
+      filterVoter.addEventListener('change', applyFilters);
+      filterLga.addEventListener('change', applyFilters);
+      sortBy.addEventListener('change', applyFilters);
+      btnRefresh.addEventListener('click', () => fetchRegistrations(true));
+
+      // Initial load & 10s auto-refresh
+      fetchRegistrations();
+      setInterval(fetchRegistrations, 10000);
+    })();
+  </script>
+</body>
+</html>
