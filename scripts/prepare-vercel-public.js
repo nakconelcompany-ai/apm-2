@@ -17,6 +17,8 @@ const files = [
   'apm10.jfif',
   'apm11.jfif',
   'apm logo.jfif',
+  'apm-oyo-fingerprint.png',
+  'apm-campaign-banner.png',
   'hero-mobile.jpg',
   'pci-team-2027.jpg'
 ];
