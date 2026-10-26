@@ -3,3 +3,4 @@ data/registrations.json
 data/uploads/
 .env
 *.log
+/public/

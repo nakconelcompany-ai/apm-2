@@ -2740,7 +2740,11 @@
             }
           })
           .catch(function () {
-            window.location.href = 'thankyou.html';
+            if (note) {
+              note.textContent = 'Could not submit your registration. Please try again later.';
+              note.style.color = '#fca5a5';
+            }
+            if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration'; }
           });
         });
       }

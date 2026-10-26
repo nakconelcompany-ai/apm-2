@@ -6,8 +6,8 @@
  *   POST /api/check-image-clarity — runs server-side clarity check on an uploaded image
  *
  * Storage:
- *   Text data  → data/registrations.json
- *   Uploaded files → data/uploads/<id>-votercard.<ext>
+ *   Local development → data/registrations.json and data/uploads/
+ *   Vercel             → Neon Postgres and private Vercel Blob
  */
 
 const express = require('express');
@@ -15,31 +15,38 @@ const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
 const multer  = require('multer');
+const crypto  = require('crypto');
+const { Readable } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
+const { neon } = require('@neondatabase/serverless');
+const { del, get, put } = require('@vercel/blob');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+const MAX_UPLOAD_BYTES = IS_VERCEL ? 4 * 1024 * 1024 : 10 * 1024 * 1024;
 
 // ─── Directories ──────────────────────────────────────────────────────────────
 const DATA_DIR    = path.join(__dirname, 'data');
 const UPLOAD_DIR  = path.join(DATA_DIR, 'uploads');
 const DATA_FILE   = path.join(DATA_DIR, 'registrations.json');
 
-[DATA_DIR, UPLOAD_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+if (!IS_VERCEL) {
+  [DATA_DIR, UPLOAD_DIR].forEach(dir => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  });
 
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
+  if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
+  }
 }
 
 // ─── Multer (file upload) ─────────────────────────────────────────────────────
-// We store to disk so files survive server restarts.
-// Filename = <timestamp-id>-votercard.<ext>  (no spaces, no path traversal)
+// Vercel uploads are buffered in memory before being sent to private Blob storage.
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
   filename: (_req, file, cb) => {
-    // Sanitise original extension: only allow image or pdf
     const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.pdf'];
     const ext = path.extname(file.originalname).toLowerCase();
     const safeExt = allowedExt.includes(ext) ? ext : '.bin';
@@ -59,10 +66,10 @@ function fileFilter(_req, file, cb) {
 }
 
 const upload = multer({
-  storage,
+  storage: IS_VERCEL ? multer.memoryStorage() : diskStorage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024,   // 10 MB max
+    fileSize: MAX_UPLOAD_BYTES,
     files: 1
   }
 });
@@ -71,16 +78,142 @@ const upload = multer({
 app.use(cors());
 
 // Static files (HTML, images, CSS, JS) — served from project root
+app.use('/data', (_req, res) => res.sendStatus(404));
 app.use(express.static(__dirname));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function readRegistrations() {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { return []; }
+let sqlClient;
+let schemaReady;
+
+function getDatabase() {
+  if (!process.env.DATABASE_URL) {
+    const error = new Error('Registration database is not configured. Add DATABASE_URL in Vercel project settings.');
+    error.code = 'STORAGE_NOT_CONFIGURED';
+    throw error;
+  }
+  if (!sqlClient) sqlClient = neon(process.env.DATABASE_URL);
+  return sqlClient;
 }
 
-function writeRegistrations(records) {
+async function ensureDatabaseSchema() {
+  if (!schemaReady) {
+    schemaReady = getDatabase()`
+      CREATE TABLE IF NOT EXISTS pci_registrations (
+        id TEXT PRIMARY KEY,
+        phone TEXT NOT NULL UNIQUE,
+        created_at TIMESTAMPTZ NOT NULL,
+        data JSONB NOT NULL
+      )
+    `.catch(error => {
+      schemaReady = null;
+      throw error;
+    });
+  }
+  await schemaReady;
+}
+
+async function readRegistrations() {
+  if (IS_VERCEL) {
+    await ensureDatabaseSchema();
+    const sql = getDatabase();
+    const rows = await sql`
+      SELECT data FROM pci_registrations ORDER BY created_at DESC
+    `;
+    return rows.map(row => row.data);
+  }
+
+  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+}
+
+async function saveRegistration(record) {
+  if (IS_VERCEL) {
+    await ensureDatabaseSchema();
+    const sql = getDatabase();
+    const rows = await sql`
+      INSERT INTO pci_registrations (id, phone, created_at, data)
+      VALUES (${record.id}, ${record.phone}, ${record.createdAt}, ${JSON.stringify(record)}::jsonb)
+      ON CONFLICT (phone) DO NOTHING
+      RETURNING id
+    `;
+    return rows.length > 0;
+  }
+
+  const records = await readRegistrations();
+  if (records.some(existing => existing.phone === record.phone)) return false;
+  records.push(record);
   fs.writeFileSync(DATA_FILE, JSON.stringify(records, null, 2), 'utf8');
+  return true;
+}
+
+async function deleteRegistration(id) {
+  if (IS_VERCEL) {
+    await ensureDatabaseSchema();
+    const sql = getDatabase();
+    const rows = await sql`
+      DELETE FROM pci_registrations WHERE id = ${id} RETURNING data
+    `;
+    return rows[0]?.data || null;
+  }
+
+  const records = await readRegistrations();
+  const index = records.findIndex(record => record.id === id);
+  if (index === -1) return null;
+  const [record] = records.splice(index, 1);
+  fs.writeFileSync(DATA_FILE, JSON.stringify(records, null, 2), 'utf8');
+  return record;
+}
+
+async function findRegistration(id) {
+  if (IS_VERCEL) {
+    await ensureDatabaseSchema();
+    const sql = getDatabase();
+    const rows = await sql`
+      SELECT data FROM pci_registrations WHERE id = ${id} LIMIT 1
+    `;
+    return rows[0]?.data || null;
+  }
+
+  const records = await readRegistrations();
+  return records.find(record => record.id === id) || null;
+}
+
+function getStorageErrorStatus(error) {
+  return error.code === 'STORAGE_NOT_CONFIGURED' ? 503 : 500;
+}
+
+function sendStorageError(res, error) {
+  if (res.headersSent) {
+    console.error('[STORAGE STREAM ERROR]', error);
+    res.destroy(error);
+    return;
+  }
+  if (getStorageErrorStatus(error) === 503) {
+    return res.status(503).json({ success: false, message: error.message });
+  }
+  console.error('[STORAGE ERROR]', error);
+  return res.status(500).json({ success: false, message: 'Storage operation failed. Please try again.' });
+}
+
+async function removeUploadedFile(fileInfo) {
+  if (!fileInfo) return;
+  if (fileInfo.storage === 'vercel-blob' && fileInfo.pathname) {
+    await del(fileInfo.pathname, { access: 'private' });
+    return;
+  }
+  if (fileInfo.filename) {
+    const filePath = path.join(UPLOAD_DIR, path.basename(fileInfo.filename));
+    if (fs.existsSync(filePath)) await fs.promises.unlink(filePath);
+  }
+}
+
+async function discardRequestUpload(file) {
+  if (file && file.path && fs.existsSync(file.path)) {
+    try {
+      await fs.promises.unlink(file.path);
+    } catch (error) {
+      console.error('[UPLOAD CLEANUP ERROR]', error);
+    }
+  }
 }
 
 function sanitise(str) {
@@ -91,18 +224,41 @@ function isValidPhone(phone) {
   return /^[0-9+\s\-]{7,15}$/.test(phone.trim());
 }
 
+function adminAuth(req, res, next) {
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected && !IS_VERCEL) return next();
+  if (!expected) {
+    return res.status(503).json({
+      success: false,
+      message: 'Admin access is not configured. Add ADMIN_PASSWORD in Vercel project settings.'
+    });
+  }
+
+  const provided = req.get('authorization') || '';
+  const token = provided.startsWith('Bearer ') ? provided.slice(7) : '';
+  const expectedBuffer = Buffer.from(expected);
+  const providedBuffer = Buffer.from(token);
+
+  if (expectedBuffer.length !== providedBuffer.length ||
+      !crypto.timingSafeEqual(expectedBuffer, providedBuffer)) {
+    return res.status(401).json({ success: false, message: 'Invalid admin password.' });
+  }
+
+  next();
+}
+
 // ─── POST /api/register ───────────────────────────────────────────────────────
 // Accepts multipart/form-data (because of optional file).
 // Fields: name, dob, phone, lga, ward, address, hasVoterCard
 // File  : voterCardFile (optional — only present when hasVoterCard === 'yes')
 
-app.post('/api/register', upload.single('voterCardFile'), (req, res) => {
+app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   const { name, dob, phone, lga, ward, address, hasVoterCard } = req.body || {};
+  let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
   if (!name || !dob || !phone) {
-    // Clean up any uploaded file if validation fails
-    if (req.file) fs.unlink(req.file.path, () => {});
+    await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
       message: 'Full name, date of birth, and phone number are required.'
@@ -110,7 +266,7 @@ app.post('/api/register', upload.single('voterCardFile'), (req, res) => {
   }
 
   if (!isValidPhone(phone)) {
-    if (req.file) fs.unlink(req.file.path, () => {});
+    await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
       message: 'Please enter a valid phone number.'
@@ -118,61 +274,94 @@ app.post('/api/register', upload.single('voterCardFile'), (req, res) => {
   }
 
   if (!['yes', 'no'].includes(sanitise(hasVoterCard).toLowerCase())) {
-    if (req.file) fs.unlink(req.file.path, () => {});
+    await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
       message: "Please answer whether you have a voter's card."
     });
   }
 
-  // ── Duplicate check ─────────────────────────────────────────────────────────
-  const records   = readRegistrations();
   const cleanPhone = sanitise(phone);
+  const recordId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
-  const duplicate = records.find(r => r.phone === cleanPhone);
-  if (duplicate) {
-    if (req.file) fs.unlink(req.file.path, () => {});
-    return res.status(409).json({
-      success: false,
-      message: 'This phone number is already registered.'
+  try {
+    if (req.file && IS_VERCEL) {
+      if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
+        const error = new Error('Private Vercel Blob storage is not configured for uploads.');
+        error.code = 'STORAGE_NOT_CONFIGURED';
+        throw error;
+      }
+
+      const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.pdf'];
+      const originalExt = path.extname(req.file.originalname).toLowerCase();
+      const extension = allowedExt.includes(originalExt) ? originalExt : '.bin';
+      const blob = await put(`${recordId}-votercard${extension}`, req.file.buffer, {
+        access: 'private',
+        contentType: req.file.mimetype,
+        addRandomSuffix: true
+      });
+
+      fileInfo = {
+        filename: blob.pathname,
+        pathname: blob.pathname,
+        storage: 'vercel-blob',
+        originalName: path.basename(req.file.originalname),
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      };
+    } else if (req.file) {
+      fileInfo = {
+        filename: req.file.filename,
+        originalName: path.basename(req.file.originalname),
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      };
+    }
+
+    const record = {
+      id: recordId,
+      name: sanitise(name),
+      dob: sanitise(dob),
+      phone: cleanPhone,
+      lga: sanitise(lga),
+      ward: sanitise(ward),
+      address: sanitise(address),
+      hasVoterCard: sanitise(hasVoterCard).toLowerCase(),
+      voterCardFile: fileInfo,
+      createdAt: new Date().toISOString()
+    };
+
+    if (!await saveRegistration(record)) {
+      await removeUploadedFile(fileInfo);
+      await discardRequestUpload(req.file);
+      return res.status(409).json({
+        success: false,
+        message: 'This phone number is already registered.'
+      });
+    }
+
+    const fileDescription = fileInfo
+      ? ` | card uploaded (${(fileInfo.size / 1024).toFixed(0)} KB)`
+      : ' | no card uploaded';
+
+    console.log(`[REGISTER] ${record.id}${fileDescription} | ${record.createdAt}`);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Registration successful.',
+      id: record.id
     });
+  } catch (error) {
+    await discardRequestUpload(req.file);
+    if (fileInfo && fileInfo.storage === 'vercel-blob') {
+      try {
+        await removeUploadedFile(fileInfo);
+      } catch (cleanupError) {
+        console.error('[BLOB CLEANUP ERROR]', cleanupError);
+      }
+    }
+    return sendStorageError(res, error);
   }
-
-  // ── Build record ─────────────────────────────────────────────────────────────
-  const record = {
-    id:           Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    name:         sanitise(name),
-    dob:          sanitise(dob),
-    phone:        cleanPhone,
-    lga:          sanitise(lga),
-    ward:         sanitise(ward),
-    address:      sanitise(address),
-    hasVoterCard: sanitise(hasVoterCard).toLowerCase(),
-    voterCardFile: req.file
-      ? {
-          filename:     req.file.filename,
-          originalName: path.basename(req.file.originalname),   // strip any path
-          mimetype:     req.file.mimetype,
-          size:         req.file.size
-        }
-      : null,
-    createdAt: new Date().toISOString()
-  };
-
-  records.push(record);
-  writeRegistrations(records);
-
-  const fileInfo = record.voterCardFile
-    ? ` | card: ${record.voterCardFile.filename} (${(record.voterCardFile.size / 1024).toFixed(0)} KB)`
-    : ' | no card uploaded';
-
-  console.log(`[REGISTER] ${record.name} | ${record.phone} | ${record.lga || 'N/A'}${fileInfo} | ${record.createdAt}`);
-
-  return res.status(201).json({
-    success: true,
-    message: 'Registration successful.',
-    id: record.id
-  });
 });
 
 // ─── POST /api/check-image-clarity ───────────────────────────────────────────
@@ -184,7 +373,7 @@ app.post('/api/register', upload.single('voterCardFile'), (req, res) => {
 
 const uploadTmp = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
   fileFilter
 });
 
@@ -232,50 +421,78 @@ app.post('/api/check-image-clarity', uploadTmp.single('image'), (req, res) => {
     message: 'Image looks good.' });
 });
 
-// ─── Serve Uploaded Files Statically ──────────────────────────────────────────
-app.use('/uploads', express.static(UPLOAD_DIR));
-
 // ─── ADMIN ENDPOINTS ─────────────────────────────────────────────────────────
+app.get('/api/admin/auth-mode', (_req, res) => {
+  res.json({ requiresPassword: Boolean(process.env.ADMIN_PASSWORD) });
+});
+
+app.use('/api/admin', adminAuth);
 
 // GET /api/admin/registrations — fetch all records sorted newest first
-app.get('/api/admin/registrations', (_req, res) => {
-  const records = readRegistrations();
-  // Sort descending by createdAt
-  const sorted = [...records].reverse();
-  res.json({
-    success: true,
-    total: sorted.length,
-    data: sorted
-  });
+app.get('/api/admin/registrations', async (_req, res) => {
+  try {
+    const records = await readRegistrations();
+    return res.json({
+      success: true,
+      total: records.length,
+      data: IS_VERCEL ? records : [...records].reverse()
+    });
+  } catch (error) {
+    return sendStorageError(res, error);
+  }
 });
 
 // DELETE /api/admin/registrations/:id — delete a registration record + its file
-app.delete('/api/admin/registrations/:id', (req, res) => {
-  const { id } = req.params;
-  let records = readRegistrations();
-  const index = records.findIndex(r => r.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ success: false, message: 'Record not found.' });
-  }
-
-  const [deletedRecord] = records.splice(index, 1);
-  writeRegistrations(records);
-
-  // If there was an uploaded file, delete it from disk
-  if (deletedRecord.voterCardFile && deletedRecord.voterCardFile.filename) {
-    const filePath = path.join(UPLOAD_DIR, deletedRecord.voterCardFile.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlink(filePath, () => {});
+app.delete('/api/admin/registrations/:id', async (req, res) => {
+  try {
+    const deletedRecord = await deleteRegistration(req.params.id);
+    if (!deletedRecord) {
+      return res.status(404).json({ success: false, message: 'Record not found.' });
     }
+
+    await removeUploadedFile(deletedRecord.voterCardFile);
+    console.log(`[DELETE] Registration ${req.params.id} removed by admin.`);
+
+    return res.json({
+      success: true,
+      message: `Registration for ${deletedRecord.name} deleted successfully.`
+    });
+  } catch (error) {
+    return sendStorageError(res, error);
   }
+});
 
-  console.log(`[DELETE] Registration ${id} (${deletedRecord.name}) removed by admin.`);
+app.get('/api/admin/registrations/:id/file', async (req, res) => {
+  try {
+    const record = await findRegistration(req.params.id);
+    const fileInfo = record && record.voterCardFile;
+    if (!fileInfo) {
+      return res.status(404).json({ success: false, message: 'File not found.' });
+    }
 
-  return res.json({
-    success: true,
-    message: `Registration for ${deletedRecord.name} deleted successfully.`
-  });
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Type', fileInfo.mimetype || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(fileInfo.originalName || 'voter-card')}`);
+
+    if (IS_VERCEL) {
+      if (!fileInfo.pathname) {
+        return res.status(404).json({ success: false, message: 'File not found.' });
+      }
+      const blob = await get(fileInfo.pathname, { access: 'private' });
+      if (!blob || blob.statusCode !== 200) {
+        return res.status(404).json({ success: false, message: 'File not found.' });
+      }
+      res.setHeader('Content-Type', blob.blob.contentType || fileInfo.mimetype || 'application/octet-stream');
+      return await pipeline(Readable.fromWeb(blob.stream), res);
+    }
+
+    if (!fileInfo.filename || path.basename(fileInfo.filename) !== fileInfo.filename) {
+      return res.status(404).json({ success: false, message: 'File not found.' });
+    }
+    return res.sendFile(path.join(UPLOAD_DIR, fileInfo.filename));
+  } catch (error) {
+    return sendStorageError(res, error);
+  }
 });
 
 // ─── Multer error handler ─────────────────────────────────────────────────────
@@ -283,14 +500,16 @@ app.delete('/api/admin/registrations/:id', (req, res) => {
 app.use((err, _req, res, next) => {
   if (err instanceof multer.MulterError) {
     const msg = err.code === 'LIMIT_FILE_SIZE'
-      ? 'File is too large. Maximum size is 10 MB.'
+      ? `File is too large. Maximum size is ${IS_VERCEL ? '4 MB on Vercel' : '10 MB'}.`
       : `Upload error: ${err.message}`;
     return res.status(400).json({ success: false, message: msg });
   }
   if (err && err.message) {
     return res.status(400).json({ success: false, message: err.message });
   }
-  next(err);
+  console.error('[REQUEST ERROR]', err);
+  if (res.headersSent) return res.destroy(err);
+  return res.status(500).json({ success: false, message: 'An unexpected server error occurred.' });
 });
 
 // ─── Admin Page Direct Route ──────────────────────────────────────────────────
@@ -304,8 +523,12 @@ app.get('*', (_req, res) => {
 });
 
 // ─── Start ────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🟢  PCI server running → http://localhost:${PORT}`);
-  console.log(`   Admin Dashboard   → http://localhost:${PORT}/admin.html`);
-  console.log(`   Uploads saved to   → ${UPLOAD_DIR}\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🟢  PCI server running → http://localhost:${PORT}`);
+    console.log(`   Admin Dashboard   → http://localhost:${PORT}/admin.html`);
+    console.log(`   Uploads saved to   → ${IS_VERCEL ? 'private Vercel Blob' : UPLOAD_DIR}\n`);
+  });
+}
+
+module.exports = app;

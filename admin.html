@@ -827,12 +827,63 @@
       const modal = document.getElementById('detail-modal');
       const modalClose = document.getElementById('modal-close');
       const modalContent = document.getElementById('modal-content');
+      let adminPassword = sessionStorage.getItem('pci_admin_password') || '';
+      let requiresAdminPassword = null;
+
+      async function adminFetch(url, options = {}) {
+        if (requiresAdminPassword === null) {
+          const modeResponse = await fetch('/api/admin/auth-mode');
+          const mode = await modeResponse.json();
+          requiresAdminPassword = mode.requiresPassword;
+        }
+
+        if (requiresAdminPassword && !adminPassword) {
+          adminPassword = window.prompt('Enter the admin password:') || '';
+          if (!adminPassword) throw new Error('Admin password is required.');
+          sessionStorage.setItem('pci_admin_password', adminPassword);
+        }
+
+        const headers = new Headers(options.headers || {});
+        if (adminPassword) headers.set('Authorization', `Bearer ${adminPassword}`);
+        const response = await fetch(url, { ...options, headers });
+
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          if (response.status === 401) {
+            adminPassword = '';
+            sessionStorage.removeItem('pci_admin_password');
+          }
+          throw new Error(body && body.message ? body.message : 'Admin request failed.');
+        }
+        return response;
+      }
+
+      async function fetchPrivateFile(id) {
+        const response = await adminFetch(`/api/admin/registrations/${encodeURIComponent(id)}/file`);
+        return response.blob();
+      }
+
+      window.openDocument = async function(id) {
+        const documentWindow = window.open('about:blank', '_blank');
+        if (!documentWindow) {
+          showToast('Allow pop-ups to view the voter card document.', true);
+          return;
+        }
+
+        try {
+          const file = await fetchPrivateFile(id);
+          documentWindow.location.href = URL.createObjectURL(file);
+        } catch (error) {
+          documentWindow.close();
+          showToast(error.message, true);
+        }
+      };
 
       // Fetch data from API
       function fetchRegistrations(isManual = false) {
         if (isManual) refreshIcon.classList.add('spin');
 
-        fetch('/api/admin/registrations')
+        adminFetch('/api/admin/registrations')
           .then(res => res.json())
           .then(res => {
             if (res.success) {
@@ -845,7 +896,7 @@
           })
           .catch(err => {
             console.error(err);
-            if (isManual) showToast('Failed to fetch data.', true);
+            showToast(err.message || 'Failed to fetch data.', true);
           })
           .finally(() => {
             if (isManual) refreshIcon.classList.remove('spin');
@@ -928,8 +979,6 @@
         tableBody.innerHTML = data.map((r, idx) => {
           const dateStr = r.createdAt ? new Date(r.createdAt).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
           const hasFile = r.voterCardFile && r.voterCardFile.filename;
-          const fileUrl = hasFile ? `/uploads/${r.voterCardFile.filename}` : '#';
-
           return `
             <tr>
               <td style="color:var(--text-dim); font-weight:600;">${idx + 1}</td>
@@ -950,9 +999,9 @@
               </td>
               <td>
                 ${hasFile ? `
-                  <a href="${fileUrl}" target="_blank" class="status-badge badge-file" title="Click to view file">
+                  <button type="button" onclick="openDocument('${escapeJsStr(r.id)}')" class="status-badge badge-file" title="Click to view file">
                     View Document (${escapeHtml(r.voterCardFile.originalName || 'File')})
-                  </a>
+                  </button>
                 ` : `<span style="color:var(--text-dim); font-size:13px;">None</span>`}
               </td>
               <td>
@@ -976,7 +1025,6 @@
         if (!record) return;
 
         const hasFile = record.voterCardFile && record.voterCardFile.filename;
-        const fileUrl = hasFile ? `/uploads/${record.voterCardFile.filename}` : '';
         const isPdf = hasFile && record.voterCardFile.mimetype === 'application/pdf';
 
         modalContent.innerHTML = `
@@ -1023,12 +1071,12 @@
               ${isPdf ? `
                 <div style="padding:20px;">
                   <div style="font-weight:700; margin-bottom:12px;">PDF Document: ${escapeHtml(record.voterCardFile.originalName)}</div>
-                  <a href="${fileUrl}" target="_blank" class="btn btn-primary">Open / Download PDF</a>
+                  <button type="button" onclick="openDocument('${escapeJsStr(record.id)}')" class="btn btn-primary">Open / Download PDF</button>
                 </div>
               ` : `
-                <img src="${fileUrl}" alt="Voter Card" class="doc-preview-img">
+                <img alt="Voter Card" class="doc-preview-img" data-registration-id="${escapeHtml(record.id)}">
                 <div style="margin-top:12px;">
-                  <a href="${fileUrl}" target="_blank" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">View Full Image</a>
+                  <button type="button" onclick="openDocument('${escapeJsStr(record.id)}')" class="btn btn-secondary" style="font-size:13px; padding:6px 14px;">View Full Image</button>
                 </div>
               `}
             </div>
@@ -1040,13 +1088,19 @@
         `;
 
         modal.classList.add('is-active');
+        const preview = modalContent.querySelector('.doc-preview-img');
+        if (preview) {
+          fetchPrivateFile(record.id)
+            .then(file => { preview.src = URL.createObjectURL(file); })
+            .catch(error => showToast(error.message, true));
+        }
       };
 
       // Delete Record
       window.deleteRecord = function(id, name) {
         if (!confirm(`Are you sure you want to delete the registration for "${name}"?`)) return;
 
-        fetch(`/api/admin/registrations/${id}`, { method: 'DELETE' })
+        adminFetch(`/api/admin/registrations/${encodeURIComponent(id)}`, { method: 'DELETE' })
           .then(res => res.json())
           .then(res => {
             if (res.success) {
