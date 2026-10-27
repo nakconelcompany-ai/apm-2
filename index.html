@@ -3586,8 +3586,14 @@
             var firstName = document.getElementById('f-name').value.trim().split(' ')[0];
             sessionStorage.setItem('pci_name',  firstName);
             sessionStorage.setItem('pci_phone', document.getElementById('f-phone').value.trim());
+            sessionStorage.setItem('pci_email', document.getElementById('f-email').value.trim());
             sessionStorage.setItem('pci_lga',   document.getElementById('f-lga').value.trim());
             sessionStorage.setItem('pci_ward',  document.getElementById('f-ward').value.trim());
+            sessionStorage.setItem('pci_unit',  document.getElementById('f-unit').value.trim());
+            sessionStorage.setItem('pci_bank_name', document.getElementById('f-bank-name').value.trim());
+            sessionStorage.setItem('pci_account_name', document.getElementById('f-account-name').value.trim());
+            sessionStorage.setItem('pci_account_last4', '•••• ' + document.getElementById('f-account-number').value.trim().slice(-4));
+            sessionStorage.setItem('pci_reference', document.getElementById('f-reference').value.trim());
             sessionStorage.setItem('pci_votercard',
               (selectedVoterMethod === 'scan' ? 'Scanned (' : 'Uploaded (')
                 + selectedVoterFile.name + ')'
