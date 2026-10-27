@@ -3,4 +3,5 @@ data/registrations.json
 data/uploads/
 .env
 *.log
-/public/
+/public/*
+!/public/slide [1-5].png
