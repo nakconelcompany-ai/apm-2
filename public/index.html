@@ -2963,13 +2963,6 @@
               </select>
             </div>
 
-            <div class="field">
-              <label for="f-reference">Reference <span aria-hidden="true">(optional)</span></label>
-              <input id="f-reference" name="reference" type="text" inputmode="text" autocomplete="off"
-                pattern="[A-Za-z0-9 -]+" maxlength="40" placeholder="e.g. APM-OYO-2027"
-                title="Use letters, numbers, spaces, or hyphens only.">
-            </div>
-
             <!-- ── Voter card scan or upload ─────────────────────── -->
             <div class="voter-card-block voter-card-offset">
               <p class="voter-card-question">Voter's card details</p>
@@ -3470,7 +3463,6 @@
           fd.append('ward',         document.getElementById('f-ward').value);
           fd.append('unit',         document.getElementById('f-unit').value);
           fd.append('lga',          document.getElementById('f-lga').value);
-          fd.append('reference',    document.getElementById('f-reference').value);
           fd.append('hasVoterCard', hasVoterInput.value);
 
           fd.append('voterCardFile', selectedVoterFile);
