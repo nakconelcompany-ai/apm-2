@@ -1336,9 +1336,19 @@
       }
 
       // Open Modal Dossier
-      window.openDetail = function(id) {
-        const record = allRegistrations.find(r => r.id === id);
-        if (!record) return;
+      window.openDetail = async function(id) {
+        let record;
+        try {
+          const response = await adminFetch(`/api/admin/registrations/${encodeURIComponent(id)}`);
+          const result = await response.json();
+          if (!response.ok || !result.success || !result.data) {
+            throw new Error(result.message || 'Unable to load registration details.');
+          }
+          record = result.data;
+        } catch (error) {
+          showToast(error.message || 'Unable to load registration details.', true);
+          return;
+        }
 
         const hasFile = record.voterCardFile && record.voterCardFile.filename;
         const isPdf = hasFile && record.voterCardFile.mimetype === 'application/pdf';
@@ -1352,6 +1362,22 @@
             <div class="dossier-item">
               <div class="dossier-label">Phone Number</div>
               <div class="dossier-val" style="color:var(--green-light);">${escapeHtml(record.phone || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Email Address</div>
+              <div class="dossier-val">${escapeHtml(record.email || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Bank Name</div>
+              <div class="dossier-val">${escapeHtml(record.bankName || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Account Name</div>
+              <div class="dossier-val">${escapeHtml(record.accountName || 'N/A')}</div>
+            </div>
+            <div class="dossier-item">
+              <div class="dossier-label">Account Number</div>
+              <div class="dossier-val">${escapeHtml(record.accountNumber || 'N/A')}</div>
             </div>
             <div class="dossier-item">
               <div class="dossier-label">Date of Birth</div>
@@ -1439,7 +1465,7 @@
           return;
         }
 
-        const headers = ['ID', 'Registration Date', 'Full Name', 'DOB', 'Phone', 'LGA', 'Ward', 'Address', 'Has Voter Card', 'File Uploaded'];
+        const headers = ['ID', 'Registration Date', 'Full Name', 'Phone', 'Email', 'Bank Name', 'Account Name', 'Account Number (last 4)', 'LGA', 'Ward', 'Unit', 'Reference', 'Has Voter Card', 'File Uploaded'];
         const csvRows = [headers.join(',')];
 
         allRegistrations.forEach(r => {
@@ -1447,11 +1473,15 @@
             `"${r.id || ''}"`,
             `"${r.createdAt || ''}"`,
             `"${(r.name || '').replace(/"/g, '""')}"`,
-            `"${r.dob || ''}"`,
             `"${r.phone || ''}"`,
+            `"${(r.email || '').replace(/"/g, '""')}"`,
+            `"${(r.bankName || '').replace(/"/g, '""')}"`,
+            `"${(r.accountName || '').replace(/"/g, '""')}"`,
+            `"${r.accountNumberLast4 || ''}"`,
             `"${(r.lga || '').replace(/"/g, '""')}"`,
             `"${(r.ward || '').replace(/"/g, '""')}"`,
-            `"${(r.address || '').replace(/"/g, '""')}"`,
+            `"${(r.unit || '').replace(/"/g, '""')}"`,
+            `"${(r.reference || '').replace(/"/g, '""')}"`,
             `"${r.hasVoterCard || ''}"`,
             `"${r.voterCardFile ? r.voterCardFile.filename : 'None'}"`
           ];

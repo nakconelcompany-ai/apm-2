@@ -20,14 +20,22 @@ registrations only when `DATABASE_URL` is absent.
    - `AWS_SECRET_ACCESS_KEY`
    - `AWS_REGION`
    - `NEON_STORAGE_BUCKET` (the private bucket name)
-4. Configure `ADMIN_USERNAME` and a strong, unique `ADMIN_PASSWORD`.
-5. Use Node.js 20 or newer and redeploy.
+4. Generate a 32-byte account-encryption key with
+   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+   Set it as `ACCOUNT_ENCRYPTION_KEY` in Vercel. Keep a secure backup of this
+   key: losing or changing it makes stored account numbers unreadable.
+5. Configure `ADMIN_USERNAME` and a strong, unique `ADMIN_PASSWORD`.
+6. Use Node.js 20 or newer and redeploy.
 
 The server creates the Postgres registration table when it is first needed.
 Voter-card files uploaded in production are written to the private Neon bucket,
 and the admin API streams those files only after successful admin
-authentication. Locally, set `DATABASE_URL` to use Neon for registration data;
-uploads remain in the local `data/uploads/` folder.
+authentication. Bank account numbers are encrypted with AES-256-GCM before
+they are saved; the admin API reveals them only when an authenticated admin
+opens a record. The registration API returns only the account-number suffix in
+the list response. Locally, set `DATABASE_URL` and `ACCOUNT_ENCRYPTION_KEY` to
+use Neon for registration data and encrypted account numbers; uploads remain
+in the local `data/uploads/` folder.
 
 Existing uploads stored in private Vercel Blob remain readable and deletable
 through the admin dashboard; they are not automatically copied to Neon. Keep
@@ -40,7 +48,8 @@ The `/admin` route is served directly by the app.
 
 ## Local development
 
-Create a git-ignored `.env` file in the project root and set `DATABASE_URL`.
-`npm start` and `npm run dev` load `.env` automatically. If you omit
-`DATABASE_URL`, local registrations use `data/registrations.json`. Never commit
-`.env` or storage credentials.
+Create a git-ignored `.env` file in the project root and set `DATABASE_URL` and
+`ACCOUNT_ENCRYPTION_KEY` (a 64-character hexadecimal key). `npm start` and
+`npm run dev` load `.env` automatically. If you omit `DATABASE_URL`, local
+registrations use `data/registrations.json`. Never commit `.env` or storage
+credentials.

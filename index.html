@@ -2906,8 +2906,25 @@
               </div>
             </div>
 
+            <div class="field-row">
+              <div class="field">
+                <label for="f-account-number">Account Number</label>
+                <input id="f-account-number" name="accountNumber" type="text" inputmode="numeric"
+                  pattern="[0-9]{10}" maxlength="10" placeholder="10-digit account number" autocomplete="off" required>
+              </div>
+              <div class="field">
+                <label for="f-account-name">Account Name</label>
+                <input id="f-account-name" name="accountName" type="text" autocomplete="name" placeholder="Name on the account" required>
+              </div>
+            </div>
+
             <div class="field">
-              <label for="f-lga">Local government</label>
+              <label for="f-bank-name">Bank Name</label>
+              <input id="f-bank-name" name="bankName" type="text" placeholder="e.g. First Bank" required>
+            </div>
+
+            <div class="field">
+              <label for="f-lga">Local Government</label>
               <select id="f-lga" name="lga" required>
                 <option value="" disabled selected>Select Local Government Area</option>
                 <option value="Afijio">Afijio</option>
@@ -3003,7 +3020,7 @@
 
             <label class="check check-consent" style="color:#e2f7ec; font-size:14.5px; display:flex; gap:12px; cursor:pointer; margin-top:4px;">
               <input type="checkbox" name="confirm" required style="margin-top:0; flex:none; width:18px; height:18px; accent-color:#10b981;">
-              <span>I confirm that the information provided is accurate and I consent to joining PCI.</span>
+              <span>I confirm that these details are accurate and consent to PCI using my contact, voting and bank details to administer the voter-benefit program. My account number is encrypted in storage and is used only for benefit administration and payment.</span>
             </label>
 
             <div class="registration-submit" style="text-align:center; margin-top:8px;">
@@ -3447,6 +3464,9 @@
           fd.append('name',         document.getElementById('f-name').value);
           fd.append('phone',        document.getElementById('f-phone').value);
           fd.append('email',        document.getElementById('f-email').value);
+          fd.append('accountNumber', document.getElementById('f-account-number').value);
+          fd.append('accountName',  document.getElementById('f-account-name').value);
+          fd.append('bankName',     document.getElementById('f-bank-name').value);
           fd.append('ward',         document.getElementById('f-ward').value);
           fd.append('unit',         document.getElementById('f-unit').value);
           fd.append('lga',          document.getElementById('f-lga').value);

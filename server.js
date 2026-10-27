@@ -126,6 +126,40 @@ function getDatabase() {
   return sqlClient;
 }
 
+function getAccountEncryptionKey() {
+  const key = process.env.ACCOUNT_ENCRYPTION_KEY;
+  if (!key || !/^[a-f0-9]{64}$/i.test(key)) {
+    const error = new Error('Secure account storage is not configured. Set ACCOUNT_ENCRYPTION_KEY in the deployment environment.');
+    error.code = 'STORAGE_NOT_CONFIGURED';
+    throw error;
+  }
+  return Buffer.from(key, 'hex');
+}
+
+function encryptAccountNumber(accountNumber) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', getAccountEncryptionKey(), iv);
+  const ciphertext = Buffer.concat([cipher.update(accountNumber, 'utf8'), cipher.final()]);
+  return {
+    iv: iv.toString('hex'),
+    authTag: cipher.getAuthTag().toString('hex'),
+    ciphertext: ciphertext.toString('hex')
+  };
+}
+
+function decryptAccountNumber(encrypted) {
+  const decipher = crypto.createDecipheriv(
+    'aes-256-gcm',
+    getAccountEncryptionKey(),
+    Buffer.from(encrypted.iv, 'hex')
+  );
+  decipher.setAuthTag(Buffer.from(encrypted.authTag, 'hex'));
+  return Buffer.concat([
+    decipher.update(Buffer.from(encrypted.ciphertext, 'hex')),
+    decipher.final()
+  ]).toString('utf8');
+}
+
 async function ensureDatabaseSchema() {
   if (!schemaReady) {
     schemaReady = getDatabase()`
@@ -300,11 +334,11 @@ function constantTimeEqual(expected, provided) {
 // File  : voterCardFile (required — scan or upload)
 
 app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
-  const { name, phone, email, ward, unit, lga, reference, hasVoterCard } = req.body || {};
+  const { name, phone, email, accountNumber, accountName, bankName, ward, unit, lga, reference, hasVoterCard } = req.body || {};
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || !phone || !email || !ward || !unit || !lga) {
+  if (!name || !phone || !email || !accountNumber || !accountName || !bankName || !ward || !unit || !lga) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
@@ -329,6 +363,15 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     });
   }
 
+  const cleanAccountNumber = String(accountNumber).trim();
+  if (!/^\d{10}$/.test(cleanAccountNumber)) {
+    await discardRequestUpload(req.file);
+    return res.status(400).json({
+      success: false,
+      message: 'Please enter a valid 10-digit account number.'
+    });
+  }
+
   const cleanReference = sanitise(reference);
   if (cleanReference && !/^[A-Za-z0-9 -]{1,40}$/.test(cleanReference)) {
     await discardRequestUpload(req.file);
@@ -350,6 +393,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   const recordId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
   try {
+    const encryptedAccountNumber = encryptAccountNumber(cleanAccountNumber);
     if (req.file && IS_VERCEL) {
       const { client, bucket } = getObjectStorage();
 
@@ -387,6 +431,10 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
       name: sanitise(name),
       phone: cleanPhone,
       email: cleanEmail,
+      accountNumberEncrypted: encryptedAccountNumber,
+      accountNumberLast4: cleanAccountNumber.slice(-4),
+      accountName: sanitise(accountName),
+      bankName: sanitise(bankName),
       ward: sanitise(ward),
       unit: sanitise(unit),
       lga: sanitise(lga),
@@ -502,8 +550,22 @@ app.get('/api/admin/registrations', async (_req, res) => {
     return res.json({
       success: true,
       total: records.length,
-      data: USE_NEON_DATABASE ? records : [...records].reverse()
+      data: (USE_NEON_DATABASE ? records : [...records].reverse()).map(({ accountNumberEncrypted, ...record }) => record)
     });
+  } catch (error) {
+    return sendStorageError(res, error);
+  }
+});
+
+app.get('/api/admin/registrations/:id', async (req, res) => {
+  try {
+    const record = await findRegistration(req.params.id);
+    if (!record) return res.status(404).json({ success: false, message: 'Record not found.' });
+    const accountNumber = record.accountNumberEncrypted
+      ? decryptAccountNumber(record.accountNumberEncrypted)
+      : '';
+    const { accountNumberEncrypted, ...details } = record;
+    return res.json({ success: true, data: { ...details, accountNumber } });
   } catch (error) {
     return sendStorageError(res, error);
   }
