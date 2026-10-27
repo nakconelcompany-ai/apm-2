@@ -935,18 +935,62 @@
 
     .hero-image-slider {
       position: relative;
-      width: min(100%, 860px);
+      width: min(100%, 940px);
       margin: 0 auto clamp(20px, 3vw, 30px);
       overflow: hidden;
-      border: 1px solid rgba(0, 82, 204, .15);
+      border: 1px solid rgba(0, 82, 204, .2);
       border-radius: clamp(14px, 2vw, 22px);
-      background: #003d80;
+      background: #ffffff;
       box-shadow: 0 20px 38px rgba(3, 38, 83, .18);
+    }
+
+    .leadership-slider-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(230px, .9fr);
+      align-items: end;
+      gap: clamp(14px, 3vw, 28px);
+      padding: clamp(20px, 3.4vw, 34px);
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 100% 0, rgba(24, 182, 123, .32), transparent 42%),
+        linear-gradient(120deg, #062f72 0%, #0052cc 58%, #007dc4 100%);
+    }
+
+    .leadership-slider-kicker {
+      margin: 0 0 6px;
+      color: #9df5cf;
+      font-family: "Manrope", sans-serif;
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .leadership-slider-intro h2 {
+      margin: 0;
+      color: #ffffff;
+      font-family: "Barlow Condensed", Impact, sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: .015em;
+      line-height: .94;
+      text-transform: uppercase;
+    }
+
+    .leadership-slider-intro > p {
+      margin: 0;
+      color: rgba(255, 255, 255, .9);
+      font-size: clamp(.88rem, 1.5vw, 1rem);
+      font-weight: 600;
+      line-height: 1.55;
     }
 
     .hero-image-slides {
       position: relative;
-      aspect-ratio: 3 / 2;
+      aspect-ratio: 4 / 3;
+      background:
+        radial-gradient(circle at 50% 15%, rgba(11, 119, 200, .12), transparent 43%),
+        linear-gradient(135deg, #f8fbff, #e8f3ff);
     }
 
     .hero-image-slide {
@@ -954,19 +998,50 @@
       inset: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: center;
       opacity: 0;
       transition: opacity .6s ease;
     }
 
     .hero-image-slide.is-active { opacity: 1; }
 
-    .hero-image-controls {
-      position: absolute;
-      z-index: 1;
-      inset: auto 0 12px;
+    .leadership-slider-footer {
       display: flex;
-      justify-content: center;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 64px;
+      padding: 12px clamp(16px, 3vw, 26px);
+      border-top: 1px solid rgba(0, 82, 204, .13);
+      background: #ffffff;
+    }
+
+    .leadership-slide-caption {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      min-width: 0;
+      margin: 0;
+      color: #183d71;
+      font-family: "Manrope", sans-serif;
+      font-size: clamp(.78rem, 1.35vw, .94rem);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .leadership-slide-count {
+      flex: none;
+      color: #009b5a;
+      font-family: "Barlow Condensed", Impact, sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .hero-image-controls {
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
@@ -974,13 +1049,35 @@
       width: 10px;
       height: 10px;
       padding: 0;
-      border: 1px solid #ffffff;
+      border: 1px solid #9bb5d5;
       border-radius: 50%;
-      background: rgba(255,255,255,.55);
+      background: #d7e3f2;
       cursor: pointer;
     }
 
-    .hero-image-dot[aria-current="true"] { background: #ffffff; }
+    .hero-image-dot[aria-current="true"] {
+      border-color: #009b5a;
+      background: #009b5a;
+      box-shadow: 0 0 0 3px rgba(0, 155, 90, .16);
+    }
+
+    .hero-image-dot:focus-visible {
+      outline: 3px solid #0052cc;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 600px) {
+      .leadership-slider-intro {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .leadership-slider-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
 
     @media (prefers-reduced-motion: reduce) {
       .hero-image-slide { transition: none; }
@@ -2742,20 +2839,38 @@
             </ul>
           </section>
 
-          <section class="hero-image-slider text-animate" aria-label="Community photo slideshow" aria-roledescription="carousel">
-            <div class="hero-image-slides" aria-live="off">
-              <img class="hero-image-slide is-active" src="slide%201.png" alt="APM community campaign, slide 1" fetchpriority="high">
-              <img class="hero-image-slide" src="slide%202.png" alt="APM community campaign, slide 2" loading="lazy">
-              <img class="hero-image-slide" src="slide%203.png" alt="APM community campaign, slide 3" loading="lazy">
-              <img class="hero-image-slide" src="slide%204.png" alt="APM community campaign, slide 4" loading="lazy">
-              <img class="hero-image-slide" src="slide%205.png" alt="APM community campaign, slide 5" loading="lazy">
+          <section class="hero-image-slider text-animate" aria-labelledby="leadership-slider-title" aria-roledescription="carousel">
+            <div class="leadership-slider-intro">
+              <div>
+                <p class="leadership-slider-kicker">APM for Oyo State 2027</p>
+                <h2 id="leadership-slider-title">Meet the leadership team</h2>
+              </div>
+              <p>Explore the APM candidates featured across the presidential, governorship, senatorial, federal and state representation races.</p>
             </div>
-            <div class="hero-image-controls" aria-label="Choose a slide">
-              <button class="hero-image-dot" type="button" aria-label="Show slide 1" aria-current="true"></button>
-              <button class="hero-image-dot" type="button" aria-label="Show slide 2" aria-current="false"></button>
-              <button class="hero-image-dot" type="button" aria-label="Show slide 3" aria-current="false"></button>
-              <button class="hero-image-dot" type="button" aria-label="Show slide 4" aria-current="false"></button>
-              <button class="hero-image-dot" type="button" aria-label="Show slide 5" aria-current="false"></button>
+            <div class="hero-image-slides" aria-live="off">
+              <img class="hero-image-slide is-active" src="apm-oyo-leadership-team.png" width="3501" height="2524" alt="APM leadership team featuring presidential, governorship and senatorial candidates" data-caption="Presidential, governorship and senatorial candidates" fetchpriority="high">
+              <img class="hero-image-slide" src="apm-oyo-full-team.png" width="3501" height="2490" alt="APM 2027 leadership team including federal House of Representatives candidates" data-caption="APM candidates across Oyo State" loading="lazy">
+              <img class="hero-image-slide" src="apm-oyo-senate-team.png" width="3520" height="2481" alt="APM senatorial candidates for Oyo South, Oyo North and Oyo Central" data-caption="Senatorial candidates for Oyo South, North and Central" loading="lazy">
+              <img class="hero-image-slide" src="apm-oyo-house-team.png" width="3520" height="2481" alt="APM House of Representatives candidates across Oyo State" data-caption="House of Representatives candidates across Oyo State" loading="lazy">
+              <img class="hero-image-slide" src="apm-shina-peller.jpeg" width="810" height="1080" alt="Honourable Shina Peller campaign poster for Oyo North Senatorial District" data-caption="Hon. Shina Peller — Oyo North Senatorial District" loading="lazy">
+              <img class="hero-image-slide" src="apm-kolawole-adedeji.jpeg" width="843" height="1264" alt="Honourable Kolawole Sheu Adedeji campaign poster for Ido and Ibarapa East Federal Constituency" data-caption="Hon. Kolawole Sheu Adedeji — Ido/Ibarapa East Federal Constituency" loading="lazy">
+              <img class="hero-image-slide" src="apm-bimbo-open-salawu.jpeg" width="867" height="1080" alt="Bimbo Adekanmbi and Muftau Open Salawu campaign poster for Oyo State" data-caption="Bimbo Adekanmbi and Muftau Open Salawu — Oyo State" loading="lazy">
+              <img class="hero-image-slide" src="apm-salaudeen-adebayo.jpeg" width="835" height="1222" alt="Honourable Salaudeen Kabeer Adebayo campaign poster for Saki West State House of Assembly" data-caption="Hon. Salaudeen Kabeer Adebayo — Saki West State House of Assembly" loading="lazy">
+              <img class="hero-image-slide" src="apm-omituntun.jpeg" width="1280" height="1600" alt="Bimbo Adekanmbi and Muftau Open Salawu campaign poster for Oyo State" data-caption="Bimbo Adekanmbi and Muftau Open Salawu — Oyo State" loading="lazy">
+            </div>
+            <div class="leadership-slider-footer">
+              <p class="leadership-slide-caption" id="leadership-slide-caption" aria-live="off"><span class="leadership-slide-count">01 / 09</span><span>Presidential, governorship and senatorial candidates</span></p>
+              <div class="hero-image-controls" aria-label="Choose a leadership slide">
+                <button class="hero-image-dot" type="button" aria-label="Show leadership overview" aria-current="true"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show statewide APM candidates" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show senatorial candidates" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show House of Representatives candidates" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show Shina Peller campaign poster" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show Kolawole Sheu Adedeji campaign poster" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show Bimbo Adekanmbi and Muftau Open Salawu campaign poster" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show Salaudeen Kabeer Adebayo campaign poster" aria-current="false"></button>
+                <button class="hero-image-dot" type="button" aria-label="Show Bimbo Adekanmbi and Muftau Open Salawu poster" aria-current="false"></button>
+              </div>
             </div>
           </section>
         </div>
@@ -3537,21 +3652,28 @@
 
       var slideImages = Array.prototype.slice.call(document.querySelectorAll('.hero-image-slide'));
       var slideDots = Array.prototype.slice.call(document.querySelectorAll('.hero-image-dot'));
+      var leadershipSlider = document.querySelector('.hero-image-slider');
+      var leadershipCaption = document.getElementById('leadership-slide-caption');
       if (slideImages.length && slideDots.length === slideImages.length) {
         var activeSlide = 0;
         var slideTimer;
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         function showSlide(index) {
           slideImages[activeSlide].classList.remove('is-active');
           slideDots[activeSlide].setAttribute('aria-current', 'false');
           activeSlide = index;
           slideImages[activeSlide].classList.add('is-active');
           slideDots[activeSlide].setAttribute('aria-current', 'true');
+          if (leadershipCaption) {
+            leadershipCaption.innerHTML = '<span class="leadership-slide-count">' + String(activeSlide + 1).padStart(2, '0') + ' / ' + String(slideImages.length).padStart(2, '0') + '</span><span>' + slideImages[activeSlide].getAttribute('data-caption') + '</span>';
+          }
         }
         function startSlideTimer() {
+          if (prefersReducedMotion) return;
           window.clearInterval(slideTimer);
           slideTimer = window.setInterval(function () {
             showSlide((activeSlide + 1) % slideImages.length);
-          }, 5000);
+          }, 3000);
         }
         slideDots.forEach(function (dot, index) {
           dot.addEventListener('click', function () {
@@ -3559,6 +3681,12 @@
             startSlideTimer();
           });
         });
+        if (leadershipSlider) {
+          leadershipSlider.addEventListener('mouseenter', function () { window.clearInterval(slideTimer); });
+          leadershipSlider.addEventListener('mouseleave', startSlideTimer);
+          leadershipSlider.addEventListener('focusin', function () { window.clearInterval(slideTimer); });
+          leadershipSlider.addEventListener('focusout', function () { startSlideTimer(); });
+        }
         startSlideTimer();
       }
 </script>
