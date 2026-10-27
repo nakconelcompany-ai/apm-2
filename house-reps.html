@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meet the APM House of Representatives candidates for Oyo State's federal constituencies.">
+  <title>APM Oyo 2027 — House of Representatives Candidates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --blue: #0052cc;
+      --blue-deep: #073f86;
+      --green: #008751;
+      --green-light: #dff5e9;
+      --ink: #172b45;
+      --muted: #596b80;
+      --line: #dce6f0;
+      --surface: #ffffff;
+      --page: #f3f7fb;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.65 "Manrope", sans-serif;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px max(20px, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .96);
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .brand img { width: 42px; height: 42px; object-fit: contain; }
+    .brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 600; }
+    .home-link {
+      padding: 8px 16px;
+      border: 1px solid var(--blue);
+      border-radius: 999px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .home-link:hover, .home-link:focus-visible { background: #edf4ff; }
+
+    .page-wrap { width: min(1120px, calc(100% - 36px)); margin-inline: auto; }
+    .page-hero {
+      padding: clamp(42px, 8vw, 82px) 18px;
+      color: #fff;
+      text-align: center;
+      background:
+        radial-gradient(circle at 85% 0, rgba(42, 189, 133, .4), transparent 36%),
+        linear-gradient(125deg, #073f86 0%, #0052cc 65%, #087b9e 100%);
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #b7f4d5;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    .page-hero h1 {
+      margin-bottom: 12px;
+      font: 800 clamp(2.4rem, 7vw, 4.7rem)/.98 "Barlow Condensed", sans-serif;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .page-hero > p:last-child { max-width: 720px; margin: 0 auto; color: #e6f0ff; }
+    .district-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: -22px auto 28px;
+      position: relative;
+    }
+    .district-nav a {
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(10, 48, 91, .08);
+      color: var(--blue-deep);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .district-nav a:hover, .district-nav a:focus-visible { border-color: var(--green); color: var(--green); }
+    .profile-note {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+    .district-heading {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 36px 0 16px;
+      color: var(--blue-deep);
+      font: 800 clamp(1.7rem, 4vw, 2.4rem)/1.05 "Barlow Condensed", sans-serif;
+      text-transform: uppercase;
+      scroll-margin-top: 96px;
+    }
+    .district-heading::after { height: 1px; flex: 1; background: var(--line); content: ""; }
+    .candidate-card {
+      display: grid;
+      grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(22px, 4vw, 40px);
+      margin-bottom: 22px;
+      padding: clamp(18px, 3.5vw, 30px);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 12px 32px rgba(20, 54, 91, .07);
+      scroll-margin-top: 96px;
+    }
+    .candidate-photo {
+      position: sticky;
+      top: 94px;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #eaf2fb, #dcebe5);
+    }
+    .candidate-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 24%; }
+    .photo-placeholder {
+      display: grid;
+      place-content: center;
+      gap: 10px;
+      padding: 20px;
+      color: var(--blue-deep);
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, .9), transparent 40%),
+        linear-gradient(145deg, #eaf2fb, #dcebe5);
+    }
+    .photo-placeholder strong { font: 800 2.7rem/1 "Barlow Condensed", sans-serif; }
+    .photo-placeholder span { font-size: 12px; font-weight: 800; }
+    .district-label {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--green-light);
+      color: #05613d;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .candidate-content h3.candidate-name {
+      margin: 12px 0 5px;
+      color: var(--blue-deep);
+      font: 800 clamp(1.75rem, 4vw, 2.45rem)/1.04 "Barlow Condensed", sans-serif;
+      text-transform: uppercase;
+    }
+    .candidate-role { margin: 0 0 18px; color: var(--green); font-size: 14px; font-weight: 800; }
+    .candidate-content h4 {
+      margin: 20px 0 7px;
+      color: var(--blue-deep);
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .candidate-content p { margin-bottom: 10px; color: #3d5067; font-size: 14px; }
+    .candidate-content ul { margin: 8px 0 0; padding-left: 20px; color: #3d5067; font-size: 14px; }
+    .candidate-content li { margin: 0 0 7px; padding-left: 3px; }
+    .summary {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      background: #effaf4;
+      color: #214f3a;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .record-note { color: var(--muted) !important; font-size: 12px !important; }
+    .page-footer {
+      margin-top: 36px;
+      padding: 22px 18px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .site-header { padding: 10px 14px; }
+      .brand img { width: 36px; height: 36px; }
+      .page-wrap { width: min(100% - 24px, 600px); }
+      .candidate-card { grid-template-columns: 1fr; gap: 20px; padding: 18px; }
+      .candidate-photo { position: static; width: min(100%, 300px); margin-inline: auto; aspect-ratio: 4 / 4.5; }
+    }
+    @media (max-width: 380px) {
+      .home-link { padding: 7px 10px; font-size: 11px; }
+      .district-nav { gap: 7px; }
+      .district-nav a { padding: 8px 11px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html#home">
+      <img src="apm%20logo.jfif" alt="">
+      <span>APM4OYO<small>APM 2027</small></span>
+    </a>
+    <a class="home-link" href="index.html">Back to home</a>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <p class="eyebrow">APM Oyo State 2027</p>
+      <h1>House of Representatives Candidates</h1>
+      <p>Meet the APM candidates contesting Oyo State's 14 federal constituencies, with profiles and reported public-service records.</p>
+    </section>
+
+    <nav class="district-nav page-wrap" aria-label="Senatorial districts">
+      <a href="#oyo-central">Oyo Central · 5</a>
+      <a href="#oyo-south">Oyo South · 3</a>
+      <a href="#oyo-north">Oyo North · 6</a>
+    </nav>
+
+    <div class="page-wrap">
+      <p class="profile-note">Achievements and figures below are presented as reported in the supplied profiles and public or campaign reporting; they have not been independently verified here. Proposed priorities are identified as the candidates' stated agendas.</p>
+
+      <h2 class="district-heading" id="oyo-central">Oyo Central</h2>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-abass-adigun.jpg" alt="Hon. Abass Adigun Agboworin">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ibadan North-East / Ibadan South-East</span>
+          <h3 class="candidate-name">Hon. Abass Adigun Agboworin</h3>
+          <p class="candidate-role">APM candidate, Ibadan North-East/Ibadan South-East Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Agboworin is a two-term House of Representatives member, first elected in 2019 and re-elected in 2023. He is seeking a third term on the APM platform. His profile describes more than a decade of service in the United States Navy and education in business management and administration.</p>
+          <h4>Reported achievements and areas of record</h4>
+          <ul>
+            <li>Education support includes classroom blocks, learning materials, scholarships and examination assistance, including support for pupils at the Blind School, Orita-Aperin.</li>
+            <li>Reported youth and women programmes include vocational and agricultural training, equipment, startup support, ICT training and laptops.</li>
+            <li>Reported constituency projects include roads, boreholes and more than 1,100 solar streetlights across 24 wards.</li>
+            <li>Health and security interventions include medical outreaches, mobile clinics, community security infrastructure and facilitation of a modern police station at Alafara-Atipe.</li>
+            <li>His legislative focus includes drug abuse, youth development, social welfare and community security.</li>
+          </ul>
+          <div class="summary">In brief: His reported record centres on education, youth and women empowerment, infrastructure, health and community security.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-folajimi-oyekunle.jpg" alt="Hon. Folajimi Oyekunle, known as DON">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ibadan North</span>
+          <h3 class="candidate-name">Hon. Folajimi Oyekunle (DON)</h3>
+          <p class="candidate-role">APM candidate, Ibadan North Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Oyekunle, popularly known as DON, won the August 2025 Ibadan North bye-election and was sworn into the House in October 2025. He previously represented Ibadan North Constituency I in the Oyo State House of Assembly and served as Deputy Chief of Staff to the governor.</p>
+          <h4>Reported achievements and areas of record</h4>
+          <ul>
+            <li>Sponsored bills to establish a Federal Vocational and Skills Acquisition College and a Federal College of Nursing and Midwifery in Ibadan North; both passed First Reading.</li>
+            <li>His office reports 349 solar streetlights, five solar-powered boreholes, food support and a health-insurance scheme.</li>
+            <li>His reported civic-engagement work includes a One-Day Representative Programme and service on the House Committee on Public Accounts.</li>
+            <li>His stated priorities include skills acquisition, education, employment, youth and women empowerment.</li>
+          </ul>
+          <p class="record-note">He entered the National Assembly in late 2025, so several initiatives described in his profile are at bill, implementation or early-project stages.</p>
+          <div class="summary">In brief: His early federal work focuses on skills development, education, healthcare, community infrastructure and constituent engagement.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-akin-fagbemi.jpg" alt="Mogaji Dr. Akin Stephen Fagbemi">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ibadan North-West / Ibadan South-West</span>
+          <h3 class="candidate-name">Mogaji Dr. Akin Stephen Fagbemi</h3>
+          <p class="candidate-role">APM candidate, Ibadan North-West/Ibadan South-West Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Fagbemi, LL.B, Ph.D, is a public administrator and former senior regulatory expert with NAFDAC, where his profile describes more than a decade of federal-level experience. In Oyo State, he served as Executive Chairman of OYRTMA and Chairman of the Oyo State Hospitals Management Board. He emerged as the APM candidate in 2026.</p>
+          <h4>Reported public-service record</h4>
+          <ul>
+            <li>At OYRTMA, his reported work included traffic-management reforms, officer training, operational structures and road-safety education.</li>
+            <li>At the Hospitals Management Board, his stated focus included hospital administration, efficiency and coordination of healthcare services.</li>
+            <li>His NAFDAC experience involved federal regulation and public administration.</li>
+          </ul>
+          <h4>Stated 2027 priorities</h4>
+          <p>Youth employment and empowerment, women and elderly welfare, healthcare, education, digital economy, infrastructure, security advocacy, entrepreneurship, job creation and attracting federal projects.</p>
+          <div class="summary">In brief: Fagbemi's career is in public administration, traffic management, healthcare administration and federal regulation rather than previous National Assembly service.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-toheeb-adegoke.jpg" alt="Engr. Toheeb Adegoke, known as ADLAT">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Akinyele / Lagelu</span>
+          <h3 class="candidate-name">Engr. Toheeb Adegoke (ADLAT)</h3>
+          <p class="candidate-role">APM candidate, Akinyele/Lagelu Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Adegoke, popularly known as ADLAT, is a production and industrial engineer, entrepreneur and financial-technology professional from Akinyele. He holds a B.Eng. from the University of Benin and an M.Sc. in Financial Technology from the University of Salford, with professional certifications associated with CFA Institute, AWS and Cisco.</p>
+          <h4>Experience and stated priorities</h4>
+          <ul>
+            <li>His profile describes more than seven years across finance, strategy, technology and business leadership, including fintech, logistics, consulting and luxury retail.</li>
+            <li>Recent political engagement has included consultations with ward stakeholders and community leaders across Akinyele and Lagelu.</li>
+            <li>He identifies youth empowerment, economic opportunities, effective representation and constituency development as priorities.</li>
+          </ul>
+          <p class="record-note">The supplied profile documents his professional background and recent grassroots engagement more extensively than a history of elected public office.</p>
+          <div class="summary">In brief: Adegoke brings engineering, technology, finance and entrepreneurship experience to the Akinyele/Lagelu contest.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-ezekiel-oladimeji.jpg" alt="Hon. Chief Dr. Ezekiel Temitope Oladimeji, known as OTOPE">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Egbeda / Ona-Ara</span>
+          <h3 class="candidate-name">Hon. Chief (Dr.) Ezekiel Temitope Oladimeji (OTOPE)</h3>
+          <p class="candidate-role">APM candidate, Egbeda/Ona-Ara Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Oladimeji, known as OTOPE, is a businessman, philanthropist and political figure from Ajia in Ona-Ara. His profile lists qualifications in banking and finance, business and data analytics, and work as an IT analyst specializing in cybersecurity. He founded the OTOPE Foundation, which supports education, youth empowerment, healthcare and community development.</p>
+          <h4>Reported achievements</h4>
+          <ul>
+            <li>Education support for more than 400 students with NECO GCE and JAMB registration, tutorials and assistance; 30,000 exercise books were reportedly donated to 30 public schools.</li>
+            <li>A three-month vocational training programme for young people in Egbeda and Ona-Ara.</li>
+            <li>A free medical outreach reportedly benefiting more than 500 retirees and older residents, plus support for more than 100 widows and vulnerable residents.</li>
+            <li>Supported renovation of the Ona-Ara NUT Teachers' House, solar-powered lighting and free-fuel relief reportedly reaching more than 500 commercial transport operators.</li>
+          </ul>
+          <div class="summary">In brief: His reported community initiatives focus on education, youth skills, healthcare, social welfare and grassroots empowerment through the OTOPE Foundation.</div>
+        </div>
+      </article>
+
+      <h2 class="district-heading" id="oyo-south">Oyo South</h2>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-akeem-olatunji.jpg" alt="Engr. Akeem Olatunji">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Oluyole</span>
+          <h3 class="candidate-name">Engr. Akeem Olatunji, FNSE</h3>
+          <p class="candidate-role">APM candidate, Oluyole Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Olatunji is a civil engineer and grassroots politician who serves as Executive Chairman of Oluyole Local Government. He previously served as the Oyo State PDP Publicity Secretary and is the APM candidate for Oluyole Federal Constituency.</p>
+          <h4>Reported achievements</h4>
+          <ul>
+            <li>Reconstruction of the Grade A Customary Court at Idi-Ayunre and rehabilitation of community roads, including the Taska–Olugbemi road.</li>
+            <li>Reported empowerment and vocational training for more than 500 people, free medical and eye-care outreaches, and holiday coaching across four centres.</li>
+            <li>Infrastructure reports include boreholes, electricity improvements, administrative buildings and an Amotekun security base.</li>
+            <li>His administration has also been associated with agricultural and livestock initiatives, including groundwork for a veterinary facility.</li>
+          </ul>
+          <p class="record-note">The supplied profile says his local-government administration received a 2025 Radio Nigeria South-West Zonal Office award; endorsements cited there represent the views of those groups.</p>
+          <div class="summary">In brief: His campaign emphasizes taking local-government experience in community development, infrastructure and empowerment to the federal level.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-anthony-adepoju.jpg" alt="Hon. Dr. Anthony Adebayo Adepoju, known as Ibarapakan">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ibarapa Central / Ibarapa North</span>
+          <h3 class="candidate-name">Hon. (Dr.) Anthony Adebayo Adepoju (Ibarapakan)</h3>
+          <p class="candidate-role">APM candidate, Ibarapa Central/Ibarapa North Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Adepoju, popularly known as Ibarapakan, is a businessman, project-management professional, philanthropist and federal legislator. He has represented the constituency in the 10th National Assembly since 2023 and serves as Deputy Chairman of the House Committee on Federal Character. He previously chaired the Oyo State Water Corporation.</p>
+          <h4>Reported achievements and legislative work</h4>
+          <ul>
+            <li>Scholarships, holiday coaching and learning materials reportedly reaching more than 1,000 students; close to 100 employment opportunities were also reported.</li>
+            <li>Facilitated classroom construction, road works, solar-powered boreholes and six electricity transformers across the constituency.</li>
+            <li>His profile reports more than ₦5 million in personal medical assistance and support for farmers, youths, widows and traders.</li>
+            <li>Legislative work includes motions on infrastructure and employment, a One-Day House Member initiative and advocacy for the World Twins Festival and Idere Hills.</li>
+          </ul>
+          <div class="summary">In brief: His reported record spans education, employment, water, electricity, roads, healthcare, youth development and community empowerment.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-kolawole-sheu.jpg" alt="Engr. Adedeji Kolawole Sheu, known as KSA">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ibarapa East / Ido</span>
+          <h3 class="candidate-name">Engr. Adedeji Kolawole Sheu (KSA)</h3>
+          <p class="candidate-role">APM candidate, Ibarapa East/Ido Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Sheu, popularly known as KSA, is a professional engineer, businessman and grassroots development advocate contesting the 2027 House of Representatives seat on the APM platform.</p>
+          <h4>Reported achievements and engagement</h4>
+          <ul>
+            <li>Reports attribute more than 70 self-funded community projects to him across Ido and Ibarapa East, including drainage and road-related work.</li>
+            <li>He reportedly assisted more than 10 communities with transformer repairs; in June 2026 he donated ₦5.3 million toward local drainage, security-gate, solar-lighting and transformer projects.</li>
+            <li>His consultations have reportedly reached more than 200 communities, engaging traditional, religious, trade and youth groups.</li>
+            <li>His community-development activities are described as including youth, trader and community-group economic empowerment.</li>
+          </ul>
+          <div class="summary">In brief: His reported work centres on community infrastructure, electricity, drainage, security, youth empowerment and grassroots engagement.</div>
+        </div>
+      </article>
+
+      <h2 class="district-heading" id="oyo-north">Oyo North</h2>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-seun-ashamu.jpg" alt="Barrister Seun Temilolu Nurudeen Ashamu, known as TNA">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Afijio / Oyo East / Oyo West / Atiba</span>
+          <h3 class="candidate-name">Barr. Seun Temilolu Nurudeen Ashamu (TNA)</h3>
+          <p class="candidate-role">APM candidate, Afijio/Atiba/Oyo East/Oyo West Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Ashamu is a lawyer, public administrator and politician. He studied law at the University of Kent and holds an LL.M. from University College London. He entered Oyo State public service in 2019 and served as Commissioner for Energy and Mineral Resources, Environment and Natural Resources, and Budget and Economic Planning.</p>
+          <h4>Reported achievements and interventions</h4>
+          <ul>
+            <li>Involvement in the Light Up Oyo initiative and energy-sector interventions.</li>
+            <li>Reports credit solar interventions in 21 primary health centres across Oyo State, including facilities in the four constituency local governments.</li>
+            <li>Reported education, agribusiness and community initiatives include student awards and training/start-up support.</li>
+            <li>In September 2026, he reportedly donated three motorcycles and ₦1.5 million to commercial motorcycle associations in Oyo.</li>
+          </ul>
+          <p class="record-note">Some mentorship and political-development claims in the supplied profile are primarily attributed to supporters.</p>
+          <div class="summary">In brief: Ashamu combines legal training and private-sector experience with executive government work in energy, environment and economic planning.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-adeniyi-adebisi.jpg" alt="Hon. Adeniyi Olabode Adebisi">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Saki East / Saki West / Atisbo</span>
+          <h3 class="candidate-name">Hon. Adeniyi Olabode Adebisi</h3>
+          <p class="candidate-role">APM candidate, Saki East/Saki West/Atisbo Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Adebisi is a Saki-born businessman, politician and public administrator. He holds a degree in Technical Education and a diploma in Project Management Essentials, has been active in politics since 1999, and previously served as Oyo State Commissioner for Trade, Industry, Investment and Cooperatives.</p>
+          <h4>Reported achievements and areas of experience</h4>
+          <ul>
+            <li>His public-service portfolio focused on trade and business development, investment promotion, cooperative development and support for traders and artisans.</li>
+            <li>He led stakeholder engagements and initiatives involving market associations and business groups.</li>
+            <li>His profile also cites involvement in public-private energy initiatives and a solar-energy exhibition.</li>
+            <li>He has held party leadership and grassroots-mobilisation roles at local-government, senatorial-district and state levels.</li>
+          </ul>
+          <div class="summary">In brief: His documented public-service experience centres on trade, investment, cooperatives, small-business support and grassroots mobilisation.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo photo-placeholder" role="img" aria-label="Individual portrait not supplied for Hon. Abiodun Ali">
+          <strong>AA</strong>
+          <span>Individual portrait not supplied</span>
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Irepo / Olorunsogo / Oorelope</span>
+          <h3 class="candidate-name">Hon. Abiodun Ali</h3>
+          <p class="candidate-role">APM candidate, Irepo/Olorunsogo/Oorelope Federal Constituency</p>
+          <h4>Profile and public record</h4>
+          <p>Ali is an APM candidate for Irepo/Olorunsogo/Oorelope Federal Constituency in the 2027 election. The supplied profile confirms his participation in APM's Oyo North coordination activities.</p>
+          <p class="record-note">Publicly available information in the supplied profile is limited; it did not identify sufficiently reliable sources for specific completed projects or measurable achievements. An individual portrait was not present in the supplied campaign artwork or confirmed project assets, so this card uses a labeled placeholder rather than another candidate's image.</p>
+          <div class="summary">In brief: More authoritative information about Ali's background, public-service record and individual portrait would help complete this profile.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-najimdeen-oyedeji.jpg" alt="Hon. Najimdeen Oyeshina Oyedeji, known as O'Shine">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Iseyin / Itesiwaju / Kajola / Iwajowa</span>
+          <h3 class="candidate-name">Hon. Najimdeen Oyeshina Oyedeji (O'Shine)</h3>
+          <p class="candidate-role">APM candidate, Iseyin/Itesiwaju/Kajola/Iwajowa Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Oyedeji, popularly known as O'Shine, is an educationist and federal legislator who has served in the 10th House of Representatives since 2023. He holds an M.Ed. and is seeking another term on the APM platform.</p>
+          <h4>Reported achievements and interventions</h4>
+          <ul>
+            <li>Awarded 42 scholarships at SAF Polytechnic, Iseyin, and reportedly trained 80 youths in software engineering and mobile-app development, providing laptops to participants.</li>
+            <li>Supported entrepreneurs with CAC registration and startup capital, and farmers with subsidised tractor services, fertilisers and herbicides.</li>
+            <li>Facilitated rural-road grading and 117 solar-powered streetlights; a three-classroom block was commissioned in Okeho in July 2026.</li>
+            <li>His profile also cites food support, water-system rehabilitation and an interest-free cooperative initiative with reported startup funding of ₦2.5 million.</li>
+          </ul>
+          <div class="summary">In brief: His reported constituency work focuses on education, youth digital skills, agriculture, entrepreneurship, infrastructure and social welfare.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-john-adisa-oke.jpg" alt="Hon. Dr. John Abisoye Adisa-Oke, known as Oke LEGACY">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ogbomoso North / Ogbomoso South / Oriire</span>
+          <h3 class="candidate-name">Hon. Dr. John Abisoye Adisa-Oke (Oke LEGACY)</h3>
+          <p class="candidate-role">APM candidate, Ogbomoso North/Ogbomoso South/Oriire Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Adisa-Oke is a businessman, educationist, philanthropist and politician from Ogbomoso. He holds a B.Tech in Pure and Applied Chemistry from LAUTECH and a master's degree in Oil and Gas Management from Coventry University. He previously served on the Oyo State Local Government Service Commission; his APM candidacy was ratified in May 2026.</p>
+          <h4>Reported achievements</h4>
+          <ul>
+            <li>His profile cites scholarships, including nine full scholarships awarded in September 2026 and a reported ₦34.4 million scholarship programme for 86 students in 2020.</li>
+            <li>Earlier reports cite educational support for more than 50 youths and examination fees for about 100 young people.</li>
+            <li>Reported skills programmes reached about 500 youths and widows; employment through his business interests is reported at more than 250 people.</li>
+            <li>His work also includes agricultural and business initiatives and recent road-safety training and fuel support for commercial motorcyclists.</li>
+          </ul>
+          <div class="summary">In brief: His reported record centres on education, scholarships, youth empowerment, employment, agriculture and grassroots support.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card">
+        <div class="candidate-photo">
+          <img src="house-sunday-makanjuola.jpg" alt="Hon. Sunday Ojo Makanjuola, known as SMATO">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Ogo-Oluwa / Surulere</span>
+          <h3 class="candidate-name">Hon. Sunday Ojo Makanjuola (SMATO)</h3>
+          <p class="candidate-role">APM candidate, Ogo-Oluwa/Surulere Federal Constituency</p>
+          <h4>Profile</h4>
+          <p>Makanjuola, popularly known as SMATO, is a politician and educationist with a B.Sc. in Education. He has served as Surulere Local Government Chairman and as a member of the House of Representatives. He currently serves in the 10th National Assembly and is identified as Vice Chairman of the House Committee on Solid Minerals.</p>
+          <h4>Reported achievements</h4>
+          <ul>
+            <li>Water projects include 20 new or rehabilitated borehole locations and repairs to more than 40 existing boreholes.</li>
+            <li>Education initiatives include six classroom blocks, a library/ICT centre, JAMB support for 100 students and a digital library and CBT centre at Arolu Community High School.</li>
+            <li>His profile cites transformer and rural-electrification projects, about 2 km of asphalt roads in Oko Town and solar streetlights.</li>
+            <li>Reported programmes include support for about 3,000 farmers, grants or equipment for more than 200 older residents, youth skills training and job placements.</li>
+          </ul>
+          <div class="summary">In brief: His reported constituency work spans education, water, electricity, roads, agriculture, youth empowerment, employment and social support.</div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="page-footer">APM4OYO · APM 2027</footer>
+</body>
+</html>
