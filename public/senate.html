@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meet the APM senatorial candidates for Oyo Central, Oyo North and Oyo South.">
+  <title>APM Oyo 2027 — Senatorial Candidates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --blue: #0052cc;
+      --blue-deep: #073f86;
+      --green: #008751;
+      --green-light: #dff5e9;
+      --ink: #172b45;
+      --muted: #596b80;
+      --line: #dce6f0;
+      --surface: #ffffff;
+      --page: #f3f7fb;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font: 16px/1.65 "Manrope", sans-serif;
+    }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px max(20px, calc((100vw - 1180px) / 2));
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .96);
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .brand img { width: 42px; height: 42px; object-fit: contain; }
+    .brand small { display: block; color: var(--muted); font-size: 10px; font-weight: 600; }
+    .home-link {
+      padding: 8px 16px;
+      border: 1px solid var(--blue);
+      border-radius: 999px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .home-link:hover, .home-link:focus-visible { background: #edf4ff; }
+
+    .page-wrap { width: min(1120px, calc(100% - 36px)); margin-inline: auto; }
+    .page-hero {
+      padding: clamp(42px, 8vw, 82px) 18px;
+      color: #ffffff;
+      text-align: center;
+      background:
+        radial-gradient(circle at 85% 0, rgba(42, 189, 133, .4), transparent 36%),
+        linear-gradient(125deg, #073f86 0%, #0052cc 65%, #087b9e 100%);
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #b7f4d5;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    .page-hero h1 {
+      margin-bottom: 12px;
+      font: 800 clamp(2.4rem, 7vw, 4.7rem)/.98 "Barlow Condensed", sans-serif;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+    .page-hero > p:last-child { max-width: 680px; margin: 0 auto; color: #e6f0ff; }
+    .district-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: -22px auto 34px;
+      position: relative;
+    }
+    .district-nav a {
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(10, 48, 91, .08);
+      color: var(--blue-deep);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .district-nav a:hover, .district-nav a:focus-visible { border-color: var(--green); color: var(--green); }
+    .profile-note {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .candidate-card {
+      display: grid;
+      grid-template-columns: minmax(240px, 330px) minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(22px, 4vw, 46px);
+      margin-bottom: 26px;
+      padding: clamp(18px, 3.5vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 12px 32px rgba(20, 54, 91, .07);
+      scroll-margin-top: 90px;
+    }
+    .candidate-photo {
+      position: sticky;
+      top: 94px;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #eaf2fb, #dcebe5);
+    }
+    .candidate-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .candidate-photo img.ajadi-photo { object-position: 45% 36%; }
+    .district-label {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--green-light);
+      color: #05613d;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .candidate-content h2 {
+      margin: 12px 0 5px;
+      color: var(--blue-deep);
+      font: 800 clamp(1.8rem, 4vw, 2.7rem)/1.04 "Barlow Condensed", sans-serif;
+      text-transform: uppercase;
+    }
+    .candidate-role { margin: 0 0 18px; color: var(--green); font-size: 14px; font-weight: 800; }
+    .candidate-content h3 {
+      margin: 22px 0 8px;
+      color: var(--blue-deep);
+      font-size: 15px;
+      line-height: 1.35;
+    }
+    .candidate-content p { margin-bottom: 10px; color: #3d5067; font-size: 14px; }
+    .candidate-content ul { margin: 8px 0 0; padding-left: 20px; color: #3d5067; font-size: 14px; }
+    .candidate-content li { margin: 0 0 7px; padding-left: 3px; }
+    .summary {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      background: #effaf4;
+      color: #214f3a;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .record-note { color: var(--muted) !important; font-size: 12px !important; }
+    .page-footer {
+      margin-top: 36px;
+      padding: 22px 18px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .site-header { padding: 10px 14px; }
+      .brand img { width: 36px; height: 36px; }
+      .page-wrap { width: min(100% - 24px, 600px); }
+      .candidate-card { grid-template-columns: 1fr; gap: 20px; padding: 18px; }
+      .candidate-photo { position: static; width: min(100%, 300px); margin-inline: auto; aspect-ratio: 4 / 4.5; }
+    }
+    @media (max-width: 380px) {
+      .home-link { padding: 7px 10px; font-size: 11px; }
+      .district-nav { gap: 7px; }
+      .district-nav a { padding: 8px 11px; font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html#home">
+      <img src="apm%20logo.jfif" alt="">
+      <span>APM4OYO<small>APM 2027</small></span>
+    </a>
+    <a class="home-link" href="index.html">Back to home</a>
+  </header>
+
+  <main>
+    <section class="page-hero">
+      <p class="eyebrow">APM Oyo State 2027</p>
+      <h1>Senatorial Candidates</h1>
+      <p>Meet the candidates for Oyo Central, Oyo North and Oyo South, with their backgrounds, reported public-service records and stated priorities.</p>
+    </section>
+
+    <nav class="district-nav page-wrap" aria-label="Senatorial districts">
+      <a href="#oyo-central">Oyo Central</a>
+      <a href="#oyo-north">Oyo North</a>
+      <a href="#oyo-south">Oyo South</a>
+    </nav>
+
+    <div class="page-wrap">
+      <p class="profile-note">Achievements described as campaign-reported are presented as reported information; proposed priorities are the candidates' stated plans.</p>
+
+      <article class="candidate-card" id="oyo-central">
+        <div class="candidate-photo">
+          <img class="ajadi-photo" src="apm-olufemi-ajadi.jpg" width="540" height="800" alt="Ambassador Olufemi Ajadi Oguntoyinbo">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Oyo Central</span>
+          <h2>Ambassador Olufemi Ajadi Oguntoyinbo</h2>
+          <p class="candidate-role">APM candidate, Oyo Central Senatorial District</p>
+          <h3>Profile</h3>
+          <p>Olufemi Ajadi Oguntoyinbo is a businessman, entrepreneur, philanthropist and political activist with roots in Egbeda Local Government, Oyo State. His biography describes a business career that began at a young age and later expanded into security, hospitality, entertainment, finance and other ventures. He has also held youth and community leadership positions.</p>
+          <p>He has been active in political advocacy, including youth participation and democratic reform. He has described his move into politics as a way to bring activism and philanthropy into institutional governance. In May 2026, he emerged as the APM consensus candidate for Oyo Central following the party's consensus primary.</p>
+          <h3>Reported achievements and areas of record</h3>
+          <ul>
+            <li><strong>Entrepreneurship:</strong> His official biography describes building and managing businesses across several sectors.</li>
+            <li><strong>Youth mobilisation:</strong> A record of youth and community organising dating back to his younger years.</li>
+            <li><strong>Philanthropy:</strong> His organisation and supporters cite scholarships, youth empowerment, humanitarian assistance and job-creation initiatives.</li>
+            <li><strong>Grassroots engagement:</strong> Recent engagements across Oluyole, Akinyele/Lagelu and Egbeda/Ona-Ara, which make up Oyo Central.</li>
+            <li><strong>Community infrastructure:</strong> Recent reports cite support for local infrastructure, including rehabilitation of an inner road in the Temidire/Mosfala area.</li>
+          </ul>
+          <h3>Stated priorities for the Senate</h3>
+          <p>Youth empowerment, women's inclusion, infrastructure, education, economic development and people-centred representation.</p>
+          <div class="summary">In brief: Ajadi's profile centres on entrepreneurship, philanthropy, youth mobilisation and grassroots political activism.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card" id="oyo-north">
+        <div class="candidate-photo">
+          <img src="apm-shina-peller.jpeg" width="810" height="1080" alt="Hon. Shina Abiola Peller">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Oyo North</span>
+          <h2>Hon. Shina Abiola Peller</h2>
+          <p class="candidate-role">APM candidate, Oyo North Senatorial District</p>
+          <h3>Profile</h3>
+          <p>Shina Peller is an entrepreneur and former federal legislator from Iseyin/Oke-Ogun. He holds a Chemical Engineering degree from Ladoke Akintola University of Technology (LAUTECH) and an MBA. He founded and leads the Aquila Group of Companies, with reported interests in real estate, hospitality, energy, financial services, entertainment and international trade.</p>
+          <p>He represented Iseyin/Itesiwaju/Kajola/Iwajowa Federal Constituency in the House of Representatives from 2019 to 2023. He sought the Oyo North Senate seat in 2023 and is returning to the contest under APM for 2027.</p>
+          <h3>Legislative record and advocacy</h3>
+          <ul>
+            <li>Motion addressing rape and sexual offences, associated in his published record with the subsequent establishment of Nigeria's National Sexual Offence Register.</li>
+            <li>Advocacy for the Federal Polytechnic, Iseyin, and a bill seeking amendment of the Universal Basic Education Act.</li>
+            <li>A bill to amend the National Orientation Agency Act.</li>
+            <li>Advocacy for resuscitation of Ikere-Gorge Dam and development of Ado-Awaye Suspended Lake.</li>
+            <li>Interventions concerning the Iseyin/Oyo and Okeho/Iganna roads, the Basic Health Care Provision Fund and the Nigeria Security and Civil Defence Corps.</li>
+          </ul>
+          <h3>Reported constituency projects</h3>
+          <ul>
+            <li>18 boreholes, a six-classroom block at Muslim Grammar School in Iseyin, street-light projects and health-centre interventions.</li>
+            <li>Ambulances and medical equipment; support for widows and older residents.</li>
+            <li>Farmer empowerment involving more than 1,500 farmers, community programmes and town-hall engagements.</li>
+            <li>Educational initiatives, including a quiz competition for public secondary schools in his constituency.</li>
+          </ul>
+          <p class="record-note">Peller announced his intention to contest Oyo North Senate under APM in August 2026, describing it as a new phase of public service.</p>
+          <div class="summary">In brief: Peller's profile combines private-sector entrepreneurship, four years in the House of Representatives and a constituency record spanning legislation, infrastructure, education, healthcare and agriculture.</div>
+        </div>
+      </article>
+
+      <article class="candidate-card" id="oyo-south">
+        <div class="candidate-photo">
+          <img src="apm9.jfif" width="629" height="486" alt="Hon. Adedeji Dhikrullahi Stanley Olajide, also known as Odidi-Omo">
+        </div>
+        <div class="candidate-content">
+          <span class="district-label">Oyo South</span>
+          <h2>Hon. Adedeji Dhikrullahi Stanley Olajide</h2>
+          <p class="candidate-role">APM candidate, Oyo South Senatorial District · “Odidi-Omo”</p>
+          <h3>Profile</h3>
+          <p>Adedeji Dhikrullahi Stanley Olajide, popularly known as Odidi-Omo, is a lawyer and legislator who has represented Ibadan North-West/Ibadan South-West Federal Constituency in the House of Representatives since 2019. He is seeking to move from the House to the Senate representing Oyo South in 2027.</p>
+          <h3>Legislative work and reported achievements</h3>
+          <p>His public profile highlights his work as Chairman of the House Committee on ICT and Cybersecurity, with a stated focus on digital governance, cybersecurity and Nigeria's technology ecosystem.</p>
+          <ul>
+            <li><strong>Federal Institute of Information Communication Technology Bill (HB 783):</strong> Sponsored in 2025, proposing an ICT institution in Idanre, Ondo State.</li>
+            <li><strong>Digital Economy and Governance Bill (HB 1599):</strong> Sponsored in 2025 to propose a framework for digital governance and development of Nigeria's digital economy.</li>
+            <li><strong>Constituency figures:</strong> His campaign reports 14+ constituency projects, 4,000+ youths empowered, 1,000+ people trained in ICT skills and 2+ bills or motions passed.</li>
+          </ul>
+          <p>His broader constituency programme is described as including education, healthcare, empowerment, infrastructure and community development.</p>
+          <h3>Proposed Oyo South Senate agenda</h3>
+          <p><strong>“Light-Up Oyo South”</strong> proposes 100 street-light poles in each of the 99 wards across the district's nine local government areas: 9,900 poles in total. The stated aim is to improve security, extend evening economic activity and support local commerce.</p>
+          <ul>
+            <li>One ICT hub in each of the nine local government areas.</li>
+            <li>Technical and vocational education, digital and AI training for teachers, and ICT and science-laboratory interventions.</li>
+            <li>Technology and entrepreneurship grants, jobs and skills development.</li>
+            <li>Agriculture, healthcare and infrastructure.</li>
+          </ul>
+          <div class="summary">In brief: Olajide's profile centres on legislative experience, technology and digital-economy advocacy, youth empowerment and constituency development.</div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="page-footer">APM4OYO · APM 2027</footer>
+</body>
+</html>
