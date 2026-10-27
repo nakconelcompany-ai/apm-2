@@ -224,6 +224,10 @@ function isValidPhone(phone) {
   return /^[0-9+\s\-]{7,15}$/.test(phone.trim());
 }
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
 function adminAuth(req, res, next) {
   const expectedUsername = process.env.ADMIN_USERNAME;
   const expectedPassword = process.env.ADMIN_PASSWORD;
@@ -256,19 +260,19 @@ function constantTimeEqual(expected, provided) {
 
 // ─── POST /api/register ───────────────────────────────────────────────────────
 // Accepts multipart/form-data (because of optional file).
-// Fields: name, phone, lga, ward, address, reference, hasVoterCard
+// Fields: name, phone, email, ward, unit, lga, hasVoterCard
 // File  : voterCardFile (required — scan or upload)
 
 app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
-  const { name, phone, lga, ward, address, reference, hasVoterCard } = req.body || {};
+  const { name, phone, email, ward, unit, lga, hasVoterCard } = req.body || {};
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || !phone) {
+  if (!name || !phone || !email || !ward || !unit || !lga) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
-      message: 'Full name and phone number are required.'
+      message: 'Please complete all required registration details.'
     });
   }
 
@@ -280,12 +284,12 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     });
   }
 
-  const cleanReference = sanitise(reference);
-  if (cleanReference && !/^[A-Za-z0-9 -]{1,40}$/.test(cleanReference)) {
+  const cleanEmail = sanitise(email).toLowerCase();
+  if (!isValidEmail(cleanEmail)) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
-      message: 'Reference can contain letters, numbers, spaces, and hyphens only.'
+      message: 'Please enter a valid email address.'
     });
   }
 
@@ -338,10 +342,10 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
       id: recordId,
       name: sanitise(name),
       phone: cleanPhone,
-      lga: sanitise(lga),
+      email: cleanEmail,
       ward: sanitise(ward),
-      address: sanitise(address),
-      reference: cleanReference,
+      unit: sanitise(unit),
+      lga: sanitise(lga),
       hasVoterCard: sanitise(hasVoterCard).toLowerCase(),
       voterCardFile: fileInfo,
       createdAt: new Date().toISOString()

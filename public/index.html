@@ -2886,70 +2886,69 @@
             </div>
 
             <div class="field">
-              <label for="f-phone">Phone number</label>
+              <label for="f-phone">Telephone number</label>
               <input id="f-phone" name="phone" type="tel" placeholder="080X XXX XXXX" required>
             </div>
 
-              <div class="field">
-                <label for="f-lga">Local government</label>
-                <select id="f-lga" name="lga" required>
-                  <option value="" disabled selected>Select Local Government Area</option>
-                  <option value="Afijio">Afijio</option>
-                  <option value="Akinyele">Akinyele</option>
-                  <option value="Atiba">Atiba</option>
-                  <option value="Atisbo">Atisbo</option>
-                  <option value="Egbeda">Egbeda</option>
-                  <option value="Ibadan North">Ibadan North</option>
-                  <option value="Ibadan North-East">Ibadan North-East</option>
-                  <option value="Ibadan North-West">Ibadan North-West</option>
-                  <option value="Ibadan South-East">Ibadan South-East</option>
-                  <option value="Ibadan South-West">Ibadan South-West</option>
-                  <option value="Ibarapa Central">Ibarapa Central</option>
-                  <option value="Ibarapa East">Ibarapa East</option>
-                  <option value="Ibarapa North">Ibarapa North</option>
-                  <option value="Ido">Ido</option>
-                  <option value="Irepo">Irepo</option>
-                  <option value="Iseyin">Iseyin</option>
-                  <option value="Itesiwaju">Itesiwaju</option>
-                  <option value="Iwajowa">Iwajowa</option>
-                  <option value="Kajola">Kajola</option>
-                  <option value="Lagelu">Lagelu</option>
-                  <option value="Ogbomoso North">Ogbomoso North</option>
-                  <option value="Ogbomoso South">Ogbomoso South</option>
-                  <option value="Ogo Oluwa">Ogo Oluwa</option>
-                  <option value="Olorunsogo">Olorunsogo</option>
-                  <option value="Oluyole">Oluyole</option>
-                  <option value="Ona Ara">Ona Ara</option>
-                  <option value="Oorelope">Oorelope</option>
-                  <option value="Ori Ire">Ori Ire</option>
-                  <option value="Oyo East">Oyo East</option>
-                  <option value="Oyo West">Oyo West</option>
-                  <option value="Saki East">Saki East</option>
-                  <option value="Saki West">Saki West</option>
-                  <option value="Surulere">Surulere</option>
-                </select>
-              </div>
+            <div class="field">
+              <label for="f-email">Email address</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="field-row">
               <div class="field">
                 <label for="f-ward">Ward</label>
-                <input id="f-ward" name="ward" type="text" placeholder="e.g. Ward 4">
+                <input id="f-ward" name="ward" type="text" placeholder="e.g. Ward 4" required>
+              </div>
+              <div class="field">
+                <label for="f-unit">Unit</label>
+                <input id="f-unit" name="unit" type="text" placeholder="e.g. Polling Unit 012" required>
               </div>
             </div>
 
-            <div class="field field-centered">
-              <label for="f-address">Residential address</label>
-              <input id="f-address" name="address" type="text" placeholder="Street, area">
-            </div>
-
-            <div class="field field-centered">
-              <label for="f-reference">Reference <span aria-hidden="true">(optional)</span></label>
-              <input id="f-reference" name="reference" type="text" inputmode="text" autocomplete="off"
-                pattern="[A-Za-z0-9 -]+" maxlength="40" placeholder="e.g. APM-OYO-2027"
-                title="Use letters, numbers, spaces, or hyphens only.">
+            <div class="field">
+              <label for="f-lga">Local government</label>
+              <select id="f-lga" name="lga" required>
+                <option value="" disabled selected>Select Local Government Area</option>
+                <option value="Afijio">Afijio</option>
+                <option value="Akinyele">Akinyele</option>
+                <option value="Atiba">Atiba</option>
+                <option value="Atisbo">Atisbo</option>
+                <option value="Egbeda">Egbeda</option>
+                <option value="Ibadan North">Ibadan North</option>
+                <option value="Ibadan North-East">Ibadan North-East</option>
+                <option value="Ibadan North-West">Ibadan North-West</option>
+                <option value="Ibadan South-East">Ibadan South-East</option>
+                <option value="Ibadan South-West">Ibadan South-West</option>
+                <option value="Ibarapa Central">Ibarapa Central</option>
+                <option value="Ibarapa East">Ibarapa East</option>
+                <option value="Ibarapa North">Ibarapa North</option>
+                <option value="Ido">Ido</option>
+                <option value="Irepo">Irepo</option>
+                <option value="Iseyin">Iseyin</option>
+                <option value="Itesiwaju">Itesiwaju</option>
+                <option value="Iwajowa">Iwajowa</option>
+                <option value="Kajola">Kajola</option>
+                <option value="Lagelu">Lagelu</option>
+                <option value="Ogbomoso North">Ogbomoso North</option>
+                <option value="Ogbomoso South">Ogbomoso South</option>
+                <option value="Ogo Oluwa">Ogo Oluwa</option>
+                <option value="Olorunsogo">Olorunsogo</option>
+                <option value="Oluyole">Oluyole</option>
+                <option value="Ona Ara">Ona Ara</option>
+                <option value="Oorelope">Oorelope</option>
+                <option value="Ori Ire">Ori Ire</option>
+                <option value="Oyo East">Oyo East</option>
+                <option value="Oyo West">Oyo West</option>
+                <option value="Saki East">Saki East</option>
+                <option value="Saki West">Saki West</option>
+                <option value="Surulere">Surulere</option>
+              </select>
             </div>
 
             <!-- ── Voter card scan or upload ─────────────────────── -->
             <div class="voter-card-block voter-card-offset">
-              <p class="voter-card-question">Add your voter's card</p>
+              <p class="voter-card-question">Voter's card details</p>
               <div class="voter-method-row" role="group" aria-label="Choose how to add your voter's card">
                 <button type="button" class="voter-method-card" id="voter-scan-btn" aria-pressed="false">
                   <span class="voter-method-icon" aria-hidden="true">▣</span>
@@ -3440,10 +3439,10 @@
           var fd = new FormData();
           fd.append('name',         document.getElementById('f-name').value);
           fd.append('phone',        document.getElementById('f-phone').value);
-          fd.append('lga',          document.getElementById('f-lga').value);
+          fd.append('email',        document.getElementById('f-email').value);
           fd.append('ward',         document.getElementById('f-ward').value);
-          fd.append('address',      document.getElementById('f-address').value);
-          fd.append('reference',    document.getElementById('f-reference').value);
+          fd.append('unit',         document.getElementById('f-unit').value);
+          fd.append('lga',          document.getElementById('f-lga').value);
           fd.append('hasVoterCard', hasVoterInput.value);
 
           fd.append('voterCardFile', selectedVoterFile);
