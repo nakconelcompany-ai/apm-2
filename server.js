@@ -260,11 +260,11 @@ function constantTimeEqual(expected, provided) {
 
 // ─── POST /api/register ───────────────────────────────────────────────────────
 // Accepts multipart/form-data (because of optional file).
-// Fields: name, phone, email, ward, unit, lga, hasVoterCard
+// Fields: name, phone, email, ward, unit, lga, reference, hasVoterCard
 // File  : voterCardFile (required — scan or upload)
 
 app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
-  const { name, phone, email, ward, unit, lga, hasVoterCard } = req.body || {};
+  const { name, phone, email, ward, unit, lga, reference, hasVoterCard } = req.body || {};
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
@@ -290,6 +290,15 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     return res.status(400).json({
       success: false,
       message: 'Please enter a valid email address.'
+    });
+  }
+
+  const cleanReference = sanitise(reference);
+  if (cleanReference && !/^[A-Za-z0-9 -]{1,40}$/.test(cleanReference)) {
+    await discardRequestUpload(req.file);
+    return res.status(400).json({
+      success: false,
+      message: 'Reference can contain letters, numbers, spaces, and hyphens only.'
     });
   }
 
@@ -346,6 +355,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
       ward: sanitise(ward),
       unit: sanitise(unit),
       lga: sanitise(lga),
+      reference: cleanReference,
       hasVoterCard: sanitise(hasVoterCard).toLowerCase(),
       voterCardFile: fileInfo,
       createdAt: new Date().toISOString()
