@@ -6,9 +6,11 @@
  *   POST /api/check-image-clarity — runs server-side clarity check on an uploaded image
  *
  * Storage:
- *   Local development → data/registrations.json and data/uploads/
- *   Vercel             → Neon Postgres and private Vercel Blob
+ *   Local development → Neon Postgres when DATABASE_URL is set, otherwise JSON; uploads use disk
+ *   Vercel             → Neon Postgres and private Neon Object Storage
  */
+
+require('dotenv').config();
 
 const express = require('express');
 const cors    = require('cors');
@@ -19,11 +21,18 @@ const crypto  = require('crypto');
 const { Readable } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
 const { neon } = require('@neondatabase/serverless');
-const { del, get, put } = require('@vercel/blob');
+const { del, get } = require('@vercel/blob');
+const {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client
+} = require('@aws-sdk/client-s3');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+const USE_NEON_DATABASE = IS_VERCEL || Boolean(process.env.DATABASE_URL);
 const MAX_UPLOAD_BYTES = IS_VERCEL ? 4 * 1024 * 1024 : 10 * 1024 * 1024;
 
 // ─── Directories ──────────────────────────────────────────────────────────────
@@ -42,7 +51,7 @@ if (!IS_VERCEL) {
 }
 
 // ─── Multer (file upload) ─────────────────────────────────────────────────────
-// Vercel uploads are buffered in memory before being sent to private Blob storage.
+// Vercel uploads are buffered in memory before being sent to private object storage.
 
 const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
@@ -84,6 +93,28 @@ app.use(express.static(__dirname));
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 let sqlClient;
 let schemaReady;
+let objectStorageClient;
+
+function getObjectStorage() {
+  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_ENDPOINT_URL_S3, AWS_REGION, NEON_STORAGE_BUCKET } = process.env;
+  if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY || !AWS_ENDPOINT_URL_S3 || !AWS_REGION || !NEON_STORAGE_BUCKET) {
+    const error = new Error('Neon Object Storage is not configured. Set its endpoint, credentials, region, and bucket.');
+    error.code = 'STORAGE_NOT_CONFIGURED';
+    throw error;
+  }
+  if (!objectStorageClient) {
+    objectStorageClient = new S3Client({
+      region: AWS_REGION,
+      endpoint: AWS_ENDPOINT_URL_S3,
+      credentials: {
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY
+      },
+      forcePathStyle: true
+    });
+  }
+  return { client: objectStorageClient, bucket: NEON_STORAGE_BUCKET };
+}
 
 function getDatabase() {
   if (!process.env.DATABASE_URL) {
@@ -113,7 +144,7 @@ async function ensureDatabaseSchema() {
 }
 
 async function readRegistrations() {
-  if (IS_VERCEL) {
+  if (USE_NEON_DATABASE) {
     await ensureDatabaseSchema();
     const sql = getDatabase();
     const rows = await sql`
@@ -126,7 +157,7 @@ async function readRegistrations() {
 }
 
 async function saveRegistration(record) {
-  if (IS_VERCEL) {
+  if (USE_NEON_DATABASE) {
     await ensureDatabaseSchema();
     const sql = getDatabase();
     const rows = await sql`
@@ -146,7 +177,7 @@ async function saveRegistration(record) {
 }
 
 async function deleteRegistration(id) {
-  if (IS_VERCEL) {
+  if (USE_NEON_DATABASE) {
     await ensureDatabaseSchema();
     const sql = getDatabase();
     const rows = await sql`
@@ -164,7 +195,7 @@ async function deleteRegistration(id) {
 }
 
 async function findRegistration(id) {
-  if (IS_VERCEL) {
+  if (USE_NEON_DATABASE) {
     await ensureDatabaseSchema();
     const sql = getDatabase();
     const rows = await sql`
@@ -196,6 +227,11 @@ function sendStorageError(res, error) {
 
 async function removeUploadedFile(fileInfo) {
   if (!fileInfo) return;
+  if (fileInfo.storage === 'neon-object-storage' && fileInfo.key) {
+    const { client, bucket } = getObjectStorage();
+    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: fileInfo.key }));
+    return;
+  }
   if (fileInfo.storage === 'vercel-blob' && fileInfo.pathname) {
     await del(fileInfo.pathname, { access: 'private' });
     return;
@@ -315,25 +351,24 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
 
   try {
     if (req.file && IS_VERCEL) {
-      if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
-        const error = new Error('Private Vercel Blob storage is not configured for uploads.');
-        error.code = 'STORAGE_NOT_CONFIGURED';
-        throw error;
-      }
+      const { client, bucket } = getObjectStorage();
 
       const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.pdf'];
       const originalExt = path.extname(req.file.originalname).toLowerCase();
       const extension = allowedExt.includes(originalExt) ? originalExt : '.bin';
-      const blob = await put(`${recordId}-votercard${extension}`, req.file.buffer, {
-        access: 'private',
-        contentType: req.file.mimetype,
-        addRandomSuffix: true
-      });
+      const key = `${recordId}/votercard${extension}`;
+      await client.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+        ContentDisposition: 'attachment'
+      }));
 
       fileInfo = {
-        filename: blob.pathname,
-        pathname: blob.pathname,
-        storage: 'vercel-blob',
+        filename: key,
+        key,
+        storage: 'neon-object-storage',
         originalName: path.basename(req.file.originalname),
         mimetype: req.file.mimetype,
         size: req.file.size
@@ -383,11 +418,11 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     });
   } catch (error) {
     await discardRequestUpload(req.file);
-    if (fileInfo && fileInfo.storage === 'vercel-blob') {
+    if (fileInfo && (fileInfo.storage === 'neon-object-storage' || fileInfo.storage === 'vercel-blob')) {
       try {
         await removeUploadedFile(fileInfo);
       } catch (cleanupError) {
-        console.error('[BLOB CLEANUP ERROR]', cleanupError);
+        console.error('[UPLOAD CLEANUP ERROR]', cleanupError);
       }
     }
     return sendStorageError(res, error);
@@ -467,7 +502,7 @@ app.get('/api/admin/registrations', async (_req, res) => {
     return res.json({
       success: true,
       total: records.length,
-      data: IS_VERCEL ? records : [...records].reverse()
+      data: USE_NEON_DATABASE ? records : [...records].reverse()
     });
   } catch (error) {
     return sendStorageError(res, error);
@@ -506,10 +541,17 @@ app.get('/api/admin/registrations/:id/file', async (req, res) => {
     res.setHeader('Content-Type', fileInfo.mimetype || 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(fileInfo.originalName || 'voter-card')}`);
 
-    if (IS_VERCEL) {
-      if (!fileInfo.pathname) {
+    if (fileInfo.storage === 'neon-object-storage' && fileInfo.key) {
+      const { client, bucket } = getObjectStorage();
+      const object = await client.send(new GetObjectCommand({ Bucket: bucket, Key: fileInfo.key }));
+      if (!object.Body) {
         return res.status(404).json({ success: false, message: 'File not found.' });
       }
+      res.setHeader('Content-Type', object.ContentType || fileInfo.mimetype || 'application/octet-stream');
+      return await pipeline(object.Body, res);
+    }
+
+    if (IS_VERCEL && fileInfo.storage === 'vercel-blob' && fileInfo.pathname) {
       const blob = await get(fileInfo.pathname, { access: 'private' });
       if (!blob || blob.statusCode !== 200) {
         return res.status(404).json({ success: false, message: 'File not found.' });

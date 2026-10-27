@@ -1,29 +1,46 @@
 # Vercel deployment setup
 
-This project uses local JSON files while running on a computer. On Vercel, it
-uses Neon Postgres for registrations and a private Vercel Blob store for voter
-card uploads because function filesystems are not persistent.
+The app stores registration records in Neon Postgres whenever `DATABASE_URL` is
+configured. In production, new voter-card files are stored in a private Neon
+Object Storage bucket. Locally, card files use disk storage; JSON is used for
+registrations only when `DATABASE_URL` is absent.
 
-1. In the Vercel project, install the Neon Postgres Marketplace integration and
-   connect it to the project. Make sure `DATABASE_URL` is available to the
+## Production environment
+
+1. Connect the Vercel project to Neon and make `DATABASE_URL` available to the
    deployment.
-2. From the project's **Storage** tab, create a Vercel Blob store with **Private**
-   access and connect it to the project. Enable it for Production and Preview.
-   Vercel should provide `BLOB_STORE_ID` (or configure the store's read/write
-   token for the deployment).
-3. Add `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables to the
-   project. Set the username to `apm4oyo` and use a strong, unique password.
-   Do not use `apm4oyo` as the password: the dashboard contains private
-   registration details and uploaded voter-card files. Set the same environment
-   variables locally before starting the server if you need to use the admin
-   dashboard during development.
-4. Use Node.js 20 or newer in the Vercel project settings, then redeploy.
+2. In the same Neon project and production branch, enable Object Storage and
+   create a bucket with **private** access. Neon currently documents 5 GB of
+   free object storage per project, separate from PostgreSQL storage.
+3. Create a Neon credential with `storage:read` and `storage:write` scopes.
+   Configure these Vercel environment variables using the Neon Storage
+   connection details:
+   - `AWS_ENDPOINT_URL_S3`
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
+   - `AWS_REGION`
+   - `NEON_STORAGE_BUCKET` (the private bucket name)
+4. Configure `ADMIN_USERNAME` and a strong, unique `ADMIN_PASSWORD`.
+5. Use Node.js 20 or newer and redeploy.
 
-The build script copies the root-level site pages and images into `public/` for
-Vercel's static asset delivery. Keep the generated `public/` files committed so
-the static assets are included even when the Vercel project does not run a build
-command. Vercel's clean-URL setting also lets visitors open the admin dashboard
-at `/admin` instead of `/admin.html`.
-Registration data and voter card files are not stored on the Vercel function's
-local filesystem. Uploads are limited to 4 MB on Vercel to stay within the
-function request-body limit; local development retains the 10 MB limit.
+The server creates the Postgres registration table when it is first needed.
+Voter-card files uploaded in production are written to the private Neon bucket,
+and the admin API streams those files only after successful admin
+authentication. Locally, set `DATABASE_URL` to use Neon for registration data;
+uploads remain in the local `data/uploads/` folder.
+
+Existing uploads stored in private Vercel Blob remain readable and deletable
+through the admin dashboard; they are not automatically copied to Neon. Keep
+the existing Vercel Blob credentials available until those files are migrated
+or removed.
+
+The build script copies the root site pages and assets into `public/`; keep the
+generated files committed when the Vercel project does not run a build command.
+The `/admin` route is served directly by the app.
+
+## Local development
+
+Create a git-ignored `.env` file in the project root and set `DATABASE_URL`.
+`npm start` and `npm run dev` load `.env` automatically. If you omit
+`DATABASE_URL`, local registrations use `data/registrations.json`. Never commit
+`.env` or storage credentials.
