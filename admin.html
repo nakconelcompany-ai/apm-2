@@ -84,6 +84,7 @@
       font-size: 20px;
       color: #fff;
       box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+      text-decoration: none;
     }
 
     .brand-titles h1 {
@@ -637,7 +638,7 @@
     <!-- Header -->
     <header class="admin-header">
       <div class="brand-section">
-        <div class="brand-logo">PCI</div>
+        <a href="/#register" class="brand-logo" aria-label="Go to the Voters Benefit Form">PCI</a>
         <div class="brand-titles">
           <h1>Grassroots Registration Dashboard</h1>
           <p><span class="live-dot"></span> Real-Time Voter & Membership Sync</p>
@@ -827,30 +828,42 @@
       const modal = document.getElementById('detail-modal');
       const modalClose = document.getElementById('modal-close');
       const modalContent = document.getElementById('modal-content');
+      let adminUsername = sessionStorage.getItem('pci_admin_username') || '';
       let adminPassword = sessionStorage.getItem('pci_admin_password') || '';
-      let requiresAdminPassword = null;
+      let adminCredentialsConfigured = null;
 
       async function adminFetch(url, options = {}) {
-        if (requiresAdminPassword === null) {
+        if (adminCredentialsConfigured === null) {
           const modeResponse = await fetch('/api/admin/auth-mode');
+          if (!modeResponse.ok) throw new Error('Unable to check admin login configuration.');
           const mode = await modeResponse.json();
-          requiresAdminPassword = mode.requiresPassword;
+          adminCredentialsConfigured = mode.configured;
         }
 
-        if (requiresAdminPassword && !adminPassword) {
+        if (!adminCredentialsConfigured) {
+          throw new Error('Admin login is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD in the deployment environment.');
+        }
+
+        if (!adminUsername || !adminPassword) {
+          adminUsername = window.prompt('Enter the admin username:', 'apm4oyo') || '';
+          if (!adminUsername) throw new Error('Admin username is required.');
           adminPassword = window.prompt('Enter the admin password:') || '';
           if (!adminPassword) throw new Error('Admin password is required.');
+          sessionStorage.setItem('pci_admin_username', adminUsername);
           sessionStorage.setItem('pci_admin_password', adminPassword);
         }
 
         const headers = new Headers(options.headers || {});
-        if (adminPassword) headers.set('Authorization', `Bearer ${adminPassword}`);
+        headers.set('X-Admin-Username', adminUsername);
+        headers.set('Authorization', `Bearer ${adminPassword}`);
         const response = await fetch(url, { ...options, headers });
 
         if (!response.ok) {
           const body = await response.json().catch(() => null);
           if (response.status === 401) {
+            adminUsername = '';
             adminPassword = '';
+            sessionStorage.removeItem('pci_admin_username');
             sessionStorage.removeItem('pci_admin_password');
           }
           throw new Error(body && body.message ? body.message : 'Admin request failed.');

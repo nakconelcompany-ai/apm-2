@@ -225,26 +225,33 @@ function isValidPhone(phone) {
 }
 
 function adminAuth(req, res, next) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected && !IS_VERCEL) return next();
-  if (!expected) {
+  const expectedUsername = process.env.ADMIN_USERNAME;
+  const expectedPassword = process.env.ADMIN_PASSWORD;
+  if (!expectedUsername || !expectedPassword) {
     return res.status(503).json({
       success: false,
-      message: 'Admin access is not configured. Add ADMIN_PASSWORD in Vercel project settings.'
+      message: 'Admin access is not configured. Set ADMIN_USERNAME and ADMIN_PASSWORD in the deployment environment.'
     });
   }
 
-  const provided = req.get('authorization') || '';
-  const token = provided.startsWith('Bearer ') ? provided.slice(7) : '';
-  const expectedBuffer = Buffer.from(expected);
-  const providedBuffer = Buffer.from(token);
+  const providedUsername = req.get('x-admin-username') || '';
+  const authorization = req.get('authorization') || '';
+  const providedPassword = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  const usernameMatches = constantTimeEqual(expectedUsername, providedUsername);
+  const passwordMatches = constantTimeEqual(expectedPassword, providedPassword);
 
-  if (expectedBuffer.length !== providedBuffer.length ||
-      !crypto.timingSafeEqual(expectedBuffer, providedBuffer)) {
-    return res.status(401).json({ success: false, message: 'Invalid admin password.' });
+  if (!usernameMatches || !passwordMatches) {
+    return res.status(401).json({ success: false, message: 'Invalid admin username or password.' });
   }
 
   next();
+}
+
+function constantTimeEqual(expected, provided) {
+  const expectedBuffer = Buffer.from(expected);
+  const providedBuffer = Buffer.from(provided);
+  return expectedBuffer.length === providedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, providedBuffer);
 }
 
 // ─── POST /api/register ───────────────────────────────────────────────────────
@@ -423,7 +430,9 @@ app.post('/api/check-image-clarity', uploadTmp.single('image'), (req, res) => {
 
 // ─── ADMIN ENDPOINTS ─────────────────────────────────────────────────────────
 app.get('/api/admin/auth-mode', (_req, res) => {
-  res.json({ requiresPassword: Boolean(process.env.ADMIN_PASSWORD) });
+  res.json({
+    configured: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD)
+  });
 });
 
 app.use('/api/admin', adminAuth);
@@ -526,7 +535,7 @@ app.get('*', (_req, res) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`\n🟢  PCI server running → http://localhost:${PORT}`);
-    console.log(`   Admin Dashboard   → http://localhost:${PORT}/admin.html`);
+    console.log(`   Admin Dashboard   → http://localhost:${PORT}/admin`);
     console.log(`   Uploads saved to   → ${IS_VERCEL ? 'private Vercel Blob' : UPLOAD_DIR}\n`);
   });
 }
