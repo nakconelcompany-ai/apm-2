@@ -2312,8 +2312,29 @@
     }
 
     .hero-campaign-cta {
+      position: relative;
       margin-top: 18px;
       margin-bottom: 0;
+    }
+
+    .hero-campaign-cta::after {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      border: 2px solid rgba(0, 135, 81, .48);
+      border-radius: inherit;
+      pointer-events: none;
+      animation: voters-benefit-pulse 2.8s ease-out infinite;
+    }
+
+    @keyframes voters-benefit-pulse {
+      0%, 68% { opacity: 0; transform: scale(.96); }
+      76% { opacity: .62; }
+      100% { opacity: 0; transform: scale(1.18); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-campaign-cta::after { animation: none; }
     }
 
     /* Campaign artwork placed directly below the APM for Oyo label. */
