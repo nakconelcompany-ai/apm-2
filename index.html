@@ -933,6 +933,59 @@
       display: block;
     }
 
+    .hero-image-slider {
+      position: relative;
+      width: min(100%, 860px);
+      margin: 0 auto clamp(20px, 3vw, 30px);
+      overflow: hidden;
+      border: 1px solid rgba(0, 82, 204, .15);
+      border-radius: clamp(14px, 2vw, 22px);
+      background: #003d80;
+      box-shadow: 0 20px 38px rgba(3, 38, 83, .18);
+    }
+
+    .hero-image-slides {
+      position: relative;
+      aspect-ratio: 3 / 2;
+    }
+
+    .hero-image-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity .6s ease;
+    }
+
+    .hero-image-slide.is-active { opacity: 1; }
+
+    .hero-image-controls {
+      position: absolute;
+      z-index: 1;
+      inset: auto 0 12px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .hero-image-dot {
+      width: 10px;
+      height: 10px;
+      padding: 0;
+      border: 1px solid #ffffff;
+      border-radius: 50%;
+      background: rgba(255,255,255,.55);
+      cursor: pointer;
+    }
+
+    .hero-image-dot[aria-current="true"] { background: #ffffff; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-image-slide { transition: none; }
+    }
+
     .hero-registration-perks {
       width: min(100%, 980px);
       margin: 0 auto;
@@ -1001,7 +1054,7 @@
       font-weight: 600;
     }
 
-    /* ---------- VOTER CARD QUESTION ---------- */
+    /* ---------- VOTER CARD SCAN / UPLOAD ---------- */
     .voter-card-block {
       display: grid;
       gap: 14px;
@@ -1015,49 +1068,61 @@
     .voter-card-question {
       font-family: "Manrope", sans-serif;
       font-weight: 700;
-      font-size: 15.5px;
+      font-size: 17px;
       color: #ffffff;
       margin: 0;
     }
 
-    .voter-yn-row {
-      display: flex;
+    .voter-method-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
-    .voter-yn-btn {
-      flex: 1;
+    .voter-method-card {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       justify-content: center;
-      gap: 8px;
-      min-height: 52px;
-      border-radius: 999px;
+      gap: 6px;
+      min-height: 124px;
+      padding: 18px;
+      border-radius: 16px;
       border: 2px solid rgba(255,255,255,.3);
       background: rgba(255,255,255,.1);
       color: #e2f7ec;
       font: inherit;
       font-family: "Manrope", sans-serif;
-      font-weight: 700;
-      font-size: 15px;
       cursor: pointer;
       transition: background .15s, border-color .15s, color .15s;
       -webkit-tap-highlight-color: transparent;
+      text-align: left;
     }
 
-    .voter-yn-btn:active {
+    .voter-method-card:active {
       transform: scale(.97);
     }
 
-    .voter-yn-btn[aria-pressed="true"] {
-      background: #ffffff;
-      border-color: #ffffff;
-      color: #0b3c26;
+    .voter-method-card[aria-pressed="true"] {
+      background: rgba(255,255,255,.2);
+      border-color: #6ff8bb;
+      box-shadow: 0 0 0 2px rgba(111,248,187,.12);
     }
 
-    .voter-yn-icon {
-      font-size: 17px;
-      line-height: 1;
+    .voter-method-card strong {
+      color: #ffffff;
+      font-size: 15px;
+    }
+
+    .voter-method-card span:last-child {
+      color: #a7f3d0;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .voter-method-icon {
+      font-size: 23px;
+      line-height: 1.2;
     }
 
     /* Upload panel */
@@ -1068,6 +1133,48 @@
     }
     .voter-upload-panel.active {
       display: flex;
+    }
+
+    .camera-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .camera-panel[hidden] { display: none; }
+    .camera-preview {
+      display: block;
+      width: 100%;
+      max-height: 420px;
+      background: #061b12;
+      border-radius: 14px;
+      object-fit: contain;
+    }
+    .camera-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .camera-action {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      color: #ffffff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .camera-action-primary {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #0b3c26;
+    }
+    .camera-status {
+      min-height: 20px;
+      margin: 0;
+      color: #a7f3d0;
+      font-size: 13.5px;
     }
 
     .upload-label {
@@ -1170,20 +1277,19 @@
     .clarity-text strong { display: block; font-family: "Manrope", sans-serif; font-weight: 700; margin-bottom: 3px; }
     /* ---------- END CLARITY FEEDBACK ---------- */
 
-    @media (max-width: 768px) {
-      .voter-yn-btn {
-        min-height: 54px;
-        font-size: 15.5px;
-      }
-    }
-
     @media (max-width: 480px) {
       .voter-card-block {
         padding: 16px 16px;
       }
+      .voter-method-row {
+        grid-template-columns: 1fr;
+      }
+      .voter-method-card {
+        min-height: 100px;
+      }
     }
 
-    /* ---------- END VOTER CARD QUESTION ---------- */
+    /* ---------- END VOTER CARD SCAN / UPLOAD ---------- */
 
     @media (max-width:560px) {
       .field-row {
@@ -2569,7 +2675,7 @@
             <span class="hl-yellow">2027</span>
           </span>
 
-          <img class="hero-artwork text-animate" src="/apm-oyo-fingerprint.png?v=20261026"
+          <img class="hero-artwork text-animate" src="apm-oyo-fingerprint.png?v=20261026"
             width="1760" height="893" fetchpriority="high" decoding="async"
             alt="Allied Peoples' Movement Oyo logo with a fingerprint">
 
@@ -2587,8 +2693,8 @@
 
           <figure class="hero-campaign-banner text-animate">
             <picture>
-              <source media="(max-width: 768px)" srcset="/apm-campaign-poster-mobile.png?v=20261026">
-              <img src="/apm-campaign-banner.png?v=20261026" width="1672" height="941" decoding="async"
+              <source media="(max-width: 768px)" srcset="apm-campaign-poster-mobile.png?v=20261026">
+              <img src="apm-campaign-banner.png?v=20261026" width="1672" height="941" decoding="async"
                 alt="APM campaign banner featuring Seyi Makinde and Bimbo Adekanmbi">
             </picture>
           </figure>
@@ -2601,6 +2707,23 @@
               <li><strong>Make your voice count</strong>Share the priorities of your community and help ensure the issues that matter are heard.</li>
               <li><strong>Stay in the know</strong>Receive invitations to local conversations, civic events and relevant opportunities near you.</li>
             </ul>
+          </section>
+
+          <section class="hero-image-slider text-animate" aria-label="Community photo slideshow" aria-roledescription="carousel">
+            <div class="hero-image-slides" aria-live="off">
+              <img class="hero-image-slide is-active" src="slide%201.png" alt="APM community campaign, slide 1" fetchpriority="high">
+              <img class="hero-image-slide" src="slide%202.png" alt="APM community campaign, slide 2" loading="lazy">
+              <img class="hero-image-slide" src="slide%203.png" alt="APM community campaign, slide 3" loading="lazy">
+              <img class="hero-image-slide" src="slide%204.png" alt="APM community campaign, slide 4" loading="lazy">
+              <img class="hero-image-slide" src="slide%205.png" alt="APM community campaign, slide 5" loading="lazy">
+            </div>
+            <div class="hero-image-controls" aria-label="Choose a slide">
+              <button class="hero-image-dot" type="button" aria-label="Show slide 1" aria-current="true"></button>
+              <button class="hero-image-dot" type="button" aria-label="Show slide 2" aria-current="false"></button>
+              <button class="hero-image-dot" type="button" aria-label="Show slide 3" aria-current="false"></button>
+              <button class="hero-image-dot" type="button" aria-label="Show slide 4" aria-current="false"></button>
+              <button class="hero-image-dot" type="button" aria-label="Show slide 5" aria-current="false"></button>
+            </div>
           </section>
 
           <a class="hero-tag text-animate" href="#register">Fill the Registration Form</a>
@@ -2721,8 +2844,8 @@
         <div class="form-wrap">
           <div class="form-head">
             <p class="eyebrow">Join the APM4Oyo Network</p>
-            <h2>Register your details</h2>
-            <p class="lede">Scan the code on your card or fill the form below to join the APM4Oyo network in your ward.</p>
+            <h2>Voters benefit form</h2>
+            <p class="lede">Scan or upload your voter's card, then fill in your details to join the APM4Oyo network in your ward.</p>
           </div>
 
           <form class="reg-form" id="pci-form">
@@ -2792,39 +2915,51 @@
               <input id="f-address" name="address" type="text" placeholder="Street, area">
             </div>
 
-            <!-- ── Voter card question ───────────────────────────── -->
+            <!-- ── Voter card scan or upload ─────────────────────── -->
             <div class="voter-card-block">
-              <p class="voter-card-question">Do you have a voter's card?</p>
-              <div class="voter-yn-row" role="group" aria-label="Do you have a voter's card?">
-                <button type="button" class="voter-yn-btn" id="voter-yes" aria-pressed="false">
-                  Yes
+              <p class="voter-card-question">Add your voter's card</p>
+              <div class="voter-method-row" role="group" aria-label="Choose how to add your voter's card">
+                <button type="button" class="voter-method-card" id="voter-scan-btn" aria-pressed="false">
+                  <span class="voter-method-icon" aria-hidden="true">▣</span>
+                  <strong>Scan voter card</strong>
+                  <span>Use your device camera to capture the card</span>
                 </button>
-                <button type="button" class="voter-yn-btn" id="voter-no" aria-pressed="false">
-                  No
+                <button type="button" class="voter-method-card" id="voter-upload-btn" aria-pressed="false">
+                  <span class="voter-method-icon" aria-hidden="true">↑</span>
+                  <strong>Upload voter card</strong>
+                  <span>Choose an image or PDF from your device</span>
                 </button>
               </div>
               <input type="hidden" id="f-has-voter-card" name="hasVoterCard" value="">
 
-              <!-- Upload panel — shown only when Yes is chosen -->
-              <div class="voter-upload-panel" id="voter-upload-panel" aria-hidden="true">
+              <div class="camera-panel" id="voter-camera-panel" hidden>
+                <video class="camera-preview" id="voter-camera-preview" autoplay playsinline muted
+                  aria-label="Live camera view for scanning voter card"></video>
+                <p class="camera-status" id="voter-camera-status" role="status" aria-live="polite"></p>
+                <div class="camera-actions">
+                  <button type="button" class="camera-action camera-action-primary" id="voter-capture-btn">Capture card</button>
+                  <button type="button" class="camera-action" id="voter-camera-close-btn">Close camera</button>
+                </div>
+              </div>
+
+              <div class="voter-upload-panel" id="voter-upload-panel">
                 <label for="f-voter-card-file" class="upload-label">
                   <span class="upload-text">
-                    <strong>Upload your voter's card</strong>
-                    <span>Tap to choose a photo or PDF</span>
+                    <strong>Choose a card image or PDF</strong>
+                    <span>JPG, PNG, HEIC, or PDF</span>
                   </span>
                   <input
                     id="f-voter-card-file"
                     name="voterCardFile"
                     type="file"
                     accept="image/*,.pdf"
-                    capture="environment"
                     class="upload-input">
                 </label>
-                <div class="upload-preview" id="upload-preview" aria-live="polite"></div>
-                <div class="clarity-result" id="clarity-result" role="status" aria-live="polite">
-                  <span class="clarity-icon" aria-hidden="true" id="clarity-icon"></span>
-                  <div class="clarity-text" id="clarity-text"></div>
-                </div>
+              </div>
+              <div class="upload-preview" id="upload-preview" aria-live="polite"></div>
+              <div class="clarity-result" id="clarity-result" role="status" aria-live="polite">
+                <span class="clarity-icon" aria-hidden="true" id="clarity-icon"></span>
+                <div class="clarity-text" id="clarity-text"></div>
               </div>
             </div>
 
@@ -3012,32 +3147,49 @@
       var pciForm = document.getElementById('pci-form');
       if (pciForm) {
 
-        /* -- Voter card Yes / No toggle --------------------------------- */
-        var btnVoterYes    = document.getElementById('voter-yes');
-        var btnVoterNo     = document.getElementById('voter-no');
+        /* -- Voter card scan / upload ------------------------------------ */
+        var btnVoterScan   = document.getElementById('voter-scan-btn');
+        var btnVoterUpload = document.getElementById('voter-upload-btn');
         var uploadPanel    = document.getElementById('voter-upload-panel');
         var hasVoterInput  = document.getElementById('f-has-voter-card');
         var voterFileInput = document.getElementById('f-voter-card-file');
         var uploadPreview  = document.getElementById('upload-preview');
+        var cameraPanel    = document.getElementById('voter-camera-panel');
+        var cameraPreview  = document.getElementById('voter-camera-preview');
+        var cameraStatus   = document.getElementById('voter-camera-status');
+        var captureButton  = document.getElementById('voter-capture-btn');
+        var cameraStream   = null;
+        var selectedVoterFile = null;
+        var selectedVoterMethod = '';
 
-        function setVoterChoice(choice) {
-          hasVoterInput.value = choice;
-          btnVoterYes.setAttribute('aria-pressed', choice === 'yes' ? 'true' : 'false');
-          btnVoterNo.setAttribute('aria-pressed',  choice === 'no'  ? 'true' : 'false');
-          if (choice === 'yes') {
-            uploadPanel.classList.add('active');
-            uploadPanel.setAttribute('aria-hidden', 'false');
-          } else {
-            uploadPanel.classList.remove('active');
-            uploadPanel.setAttribute('aria-hidden', 'true');
-            voterFileInput.value = '';
-            uploadPreview.textContent = '';
-            uploadPreview.className = 'upload-preview';
+        function stopVoterCamera() {
+          if (cameraStream) {
+            cameraStream.getTracks().forEach(function (track) { track.stop(); });
+            cameraStream = null;
           }
+          cameraPreview.srcObject = null;
         }
 
-        btnVoterYes.addEventListener('click', function () { setVoterChoice('yes'); });
-        btnVoterNo.addEventListener('click',  function () { setVoterChoice('no');  });
+        function clearSelectedVoterFile() {
+          selectedVoterFile = null;
+          voterFileInput.value = '';
+          uploadPreview.textContent = '';
+          uploadPreview.className = 'upload-preview';
+          clearClarityState();
+        }
+
+        function selectVoterMethod(method) {
+          if (selectedVoterMethod !== method) {
+            clearSelectedVoterFile();
+            if (method !== 'scan') stopVoterCamera();
+          }
+          selectedVoterMethod = method;
+          hasVoterInput.value = 'yes';
+          btnVoterScan.setAttribute('aria-pressed', method === 'scan' ? 'true' : 'false');
+          btnVoterUpload.setAttribute('aria-pressed', method === 'upload' ? 'true' : 'false');
+          uploadPanel.classList.toggle('active', method === 'upload');
+          cameraPanel.hidden = method !== 'scan' || !cameraStream;
+        }
 
         /* Show selected filename + run clarity check */
         var clarityResult = document.getElementById('clarity-result');
@@ -3058,6 +3210,129 @@
           clarityText.innerHTML   = '';
           imageIsClear = false;
         }
+
+        function processVoterFile(file) {
+          if (!file) return;
+          selectedVoterFile = file;
+          var name = file.name;
+          var size = (file.size / 1024).toFixed(0) + ' KB';
+          uploadPreview.textContent = name + ' (' + size + ')';
+          uploadPreview.className = 'upload-preview has-file';
+          clearClarityState();
+
+          if (file.type === 'application/pdf') {
+            setClarityState('checking', '', 'PDF uploaded',
+              'PDF will be verified on submission.');
+            imageIsClear = true;
+            return;
+          }
+
+          setClarityState('checking', '', 'Checking image quality…',
+            'Please wait while we check your voter\'s card clarity.');
+
+          estimateSharpness(file, function (variance) {
+            if (selectedVoterFile !== file) return;
+            var THRESHOLD = 60;
+            if (variance < 0) {
+              setClarityState('blurry', '', 'Could not read image',
+                'Please try a different file format (JPG or PNG recommended).');
+              return;
+            }
+            if (variance < THRESHOLD) {
+              setClarityState('blurry', '', 'Image is too blurry',
+                'Please upload a clearer photo of your voter\'s card. Make sure it is well-lit, in focus, and all text is readable.');
+              imageIsClear = false;
+              return;
+            }
+            var fd2 = new FormData();
+            fd2.append('image', file);
+            fetch('/api/check-image-clarity', { method: 'POST', body: fd2 })
+              .then(function (r) { return r.json(); })
+              .then(function (j) {
+                if (selectedVoterFile !== file) return;
+                if (j.clear === false) {
+                  setClarityState('blurry', '', 'Image quality issue detected',
+                    j.message || 'Please upload a clearer photo of your voter\'s card.');
+                } else {
+                  setClarityState('clear', '', 'Image looks good!',
+                    'Your voter\'s card image is clear and readable.');
+                }
+              })
+              .catch(function () {
+                setClarityState('clear', '', 'Image looks good!',
+                  'Your voter\'s card image is clear and readable.');
+              });
+          });
+        }
+
+        btnVoterScan.addEventListener('click', function () {
+          selectVoterMethod('scan');
+          stopVoterCamera();
+          cameraPanel.hidden = false;
+          cameraStatus.textContent = 'Requesting camera access…';
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cameraStatus.textContent = 'Camera access is unavailable. Use Upload voter card instead.';
+            return;
+          }
+          navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: { facingMode: { ideal: 'environment' } }
+          }).then(function (stream) {
+            cameraStream = stream;
+            cameraPreview.srcObject = stream;
+            cameraStatus.textContent = 'Position the card in the frame, then capture it.';
+            return cameraPreview.play();
+          }).catch(function (error) {
+            stopVoterCamera();
+            cameraPanel.hidden = false;
+            cameraStatus.textContent = error.name === 'NotAllowedError'
+              ? 'Camera permission was denied. Allow camera access or use Upload voter card instead.'
+              : 'Could not start the camera. Use Upload voter card instead.';
+          });
+        });
+
+        document.getElementById('voter-camera-close-btn').addEventListener('click', function () {
+          stopVoterCamera();
+          cameraPanel.hidden = true;
+          if (selectedVoterMethod === 'scan' && !selectedVoterFile) {
+            selectedVoterMethod = '';
+            hasVoterInput.value = '';
+            btnVoterScan.setAttribute('aria-pressed', 'false');
+          }
+        });
+
+        captureButton.addEventListener('click', function () {
+          if (!cameraStream || !cameraPreview.videoWidth || !cameraPreview.videoHeight) {
+            cameraStatus.textContent = 'The camera is not ready yet. Please try again.';
+            return;
+          }
+          var canvas = document.createElement('canvas');
+          var scale = Math.min(1, 1920 / Math.max(cameraPreview.videoWidth, cameraPreview.videoHeight));
+          canvas.width = Math.round(cameraPreview.videoWidth * scale);
+          canvas.height = Math.round(cameraPreview.videoHeight * scale);
+          canvas.getContext('2d').drawImage(cameraPreview, 0, 0);
+          captureButton.disabled = true;
+          canvas.toBlob(function (blob) {
+            captureButton.disabled = false;
+            if (!blob) {
+              cameraStatus.textContent = 'Could not capture the card. Please try again.';
+              return;
+            }
+            var file = new File([blob], 'voter-card-scan-' + Date.now() + '.jpg', {
+              type: 'image/jpeg'
+            });
+            processVoterFile(file);
+            stopVoterCamera();
+            cameraPanel.hidden = true;
+          }, 'image/jpeg', 0.88);
+        });
+
+        btnVoterUpload.addEventListener('click', function () {
+          selectVoterMethod('upload');
+          voterFileInput.click();
+        });
+
+        window.addEventListener('beforeunload', stopVoterCamera);
 
         /* Client-side sharpness estimate using Canvas Laplacian variance */
         function estimateSharpness(file, callback) {
@@ -3096,64 +3371,7 @@
 
         voterFileInput.addEventListener('change', function () {
           var file = this.files && this.files[0];
-          if (!file) {
-            uploadPreview.textContent = '';
-            uploadPreview.className = 'upload-preview';
-            clearClarityState();
-            return;
-          }
-
-          var name = file.name;
-          var size = (file.size / 1024).toFixed(0) + ' KB';
-          uploadPreview.textContent = name + ' (' + size + ')';
-          uploadPreview.className = 'upload-preview has-file';
-          clearClarityState();
-
-          // PDFs skip client-side check — server will verify
-          if (file.type === 'application/pdf') {
-            setClarityState('checking', '', 'PDF uploaded',
-              'PDF will be verified on submission.');
-            imageIsClear = true;
-            return;
-          }
-
-          // Show checking state
-          setClarityState('checking', '', 'Checking image quality…',
-            'Please wait while we check your voter\'s card clarity.');
-
-          estimateSharpness(file, function (variance) {
-            var THRESHOLD = 60; // tuned for typical voter card photos
-            if (variance < 0) {
-              setClarityState('blurry', '', 'Could not read image',
-                'Please try a different file format (JPG or PNG recommended).');
-              return;
-            }
-            if (variance < THRESHOLD) {
-              setClarityState('blurry', '', 'Image is too blurry',
-                'Please upload a clearer photo of your voter\'s card. Make sure it is well-lit, in focus, and all text is readable.');
-              imageIsClear = false;
-              return;
-            }
-            // Canvas says OK — also ask the server for a second opinion
-            var fd2 = new FormData();
-            fd2.append('image', file);
-            fetch('/api/check-image-clarity', { method: 'POST', body: fd2 })
-              .then(function(r){ return r.json(); })
-              .then(function(j){
-                if (j.clear === false) {
-                  setClarityState('blurry', '', 'Image quality issue detected',
-                    j.message || 'Please upload a clearer photo of your voter\'s card.');
-                } else {
-                  setClarityState('clear', '', 'Image looks good!',
-                    'Your voter\'s card image is clear and readable.');
-                }
-              })
-              .catch(function(){
-                // Server unreachable — trust the canvas result
-                setClarityState('clear', '', 'Image looks good!',
-                  'Your voter\'s card image is clear and readable.');
-              });
-          });
+          if (file) processVoterFile(file);
         });
 
         /* -- Form submit ------------------------------------------------- */
@@ -3162,19 +3380,18 @@
           var note = document.getElementById('form-status');
           var btn  = pciForm.querySelector('.submit-btn');
 
-          /* Validate voter card answer */
-          if (!hasVoterInput.value) {
+          /* Require a card image from either scan or upload. */
+          if (!hasVoterInput.value || !selectedVoterFile) {
             if (note) {
-              note.textContent = "Please answer whether you have a voter's card.";
+              note.textContent = "Please scan or upload your voter's card.";
               note.style.color = '#fca5a5';
             }
-            document.getElementById('voter-yes').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('voter-scan-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
           }
 
-          /* Block submit if image was uploaded but failed clarity check */
-          if (hasVoterInput.value === 'yes' && voterFileInput.files[0]
-              && voterFileInput.files[0].type !== 'application/pdf'
+          /* Block submit if the selected image failed the clarity check. */
+          if (selectedVoterFile.type !== 'application/pdf'
               && !imageIsClear) {
             if (note) {
               note.textContent = 'Please upload a clearer photo of your voter\'s card before submitting.';
@@ -3197,9 +3414,7 @@
           fd.append('address',      document.getElementById('f-address').value);
           fd.append('hasVoterCard', hasVoterInput.value);
 
-          if (hasVoterInput.value === 'yes' && voterFileInput.files[0]) {
-            fd.append('voterCardFile', voterFileInput.files[0]);
-          }
+          fd.append('voterCardFile', selectedVoterFile);
 
           /* Store key fields for thankyou.html summary */
           try {
@@ -3209,9 +3424,8 @@
             sessionStorage.setItem('pci_lga',   document.getElementById('f-lga').value.trim());
             sessionStorage.setItem('pci_ward',  document.getElementById('f-ward').value.trim());
             sessionStorage.setItem('pci_votercard',
-              hasVoterInput.value === 'yes'
-                ? (voterFileInput.files[0] ? 'Uploaded (' + voterFileInput.files[0].name + ')' : 'Yes')
-                : 'No'
+              (selectedVoterMethod === 'scan' ? 'Scanned (' : 'Uploaded (')
+                + selectedVoterFile.name + ')'
             );
           } catch(err) {}
 
@@ -3269,6 +3483,33 @@
           if (mobCandTrigger) mobCandTrigger.setAttribute('aria-expanded', 'false');
         });
       });
+
+      var slideImages = Array.prototype.slice.call(document.querySelectorAll('.hero-image-slide'));
+      var slideDots = Array.prototype.slice.call(document.querySelectorAll('.hero-image-dot'));
+      if (slideImages.length && slideDots.length === slideImages.length) {
+        var activeSlide = 0;
+        var slideTimer;
+        function showSlide(index) {
+          slideImages[activeSlide].classList.remove('is-active');
+          slideDots[activeSlide].setAttribute('aria-current', 'false');
+          activeSlide = index;
+          slideImages[activeSlide].classList.add('is-active');
+          slideDots[activeSlide].setAttribute('aria-current', 'true');
+        }
+        function startSlideTimer() {
+          window.clearInterval(slideTimer);
+          slideTimer = window.setInterval(function () {
+            showSlide((activeSlide + 1) % slideImages.length);
+          }, 5000);
+        }
+        slideDots.forEach(function (dot, index) {
+          dot.addEventListener('click', function () {
+            showSlide(index);
+            startSlideTimer();
+          });
+        });
+        startSlideTimer();
+      }
 </script>
 </body>
 

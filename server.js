@@ -250,7 +250,7 @@ function adminAuth(req, res, next) {
 // ─── POST /api/register ───────────────────────────────────────────────────────
 // Accepts multipart/form-data (because of optional file).
 // Fields: name, dob, phone, lga, ward, address, hasVoterCard
-// File  : voterCardFile (optional — only present when hasVoterCard === 'yes')
+// File  : voterCardFile (required — scan or upload)
 
 app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   const { name, dob, phone, lga, ward, address, hasVoterCard } = req.body || {};
@@ -273,11 +273,11 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     });
   }
 
-  if (!['yes', 'no'].includes(sanitise(hasVoterCard).toLowerCase())) {
+  if (sanitise(hasVoterCard).toLowerCase() !== 'yes' || !req.file) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
-      message: "Please answer whether you have a voter's card."
+      message: "Please scan or upload your voter's card."
     });
   }
 

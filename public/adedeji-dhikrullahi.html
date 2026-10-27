@@ -17,7 +17,10 @@
  img{display:block;max-width:100%}
  .nav{position:sticky;top:0;z-index:99;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
  .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;max-width:1100px;margin-inline:auto;width:100%}
- .brand-name{font-family:"Sora",sans-serif;font-weight:700;font-size:14px;color:var(--navy);letter-spacing:-.02em}
+ .nav-brand{display:flex;align-items:center;gap:10px;min-width:0}
+ .nav-brand img{width:40px;height:40px;flex:none;border-radius:10px;object-fit:contain}
+ .nav-brand-copy{min-width:0}
+ .brand-name{font-family:"Sora",sans-serif;font-weight:700;font-size:14px;color:var(--navy);letter-spacing:-.02em;line-height:1.2}
  .brand-sub{font-size:10.5px;color:var(--muted);font-style:italic}
  .nav-back{display:inline-flex;align-items:center;gap:6px;font-family:"Sora",sans-serif;font-weight:700;font-size:13px;color:var(--navy);border:1.5px solid var(--navy);border-radius:999px;padding:7px 16px;white-space:nowrap;min-height:38px;transition:background .15s}
  .nav-back:hover{background:#eff6ff}
@@ -29,7 +32,7 @@
  .hero h1{font-family:"Sora",sans-serif;font-weight:800;font-size:clamp(2rem,4.5vw,3.2rem);line-height:1.1;letter-spacing:-.03em;margin-bottom:16px}
  .hero-sub{font-size:15.5px;color:#ddd6fe;line-height:1.6;max-width:42ch}
  .hero-photo{width:100%;max-width:420px;margin-inline:auto;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.25);background:rgba(255,255,255,.08);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center}
- .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
+ .hero-photo img{width:100%;height:100%;flex:none;object-fit:cover;object-position:center top}
  .photo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.4);font-size:13px;text-align:center;padding:24px;height:100%;width:100%}
  .photo-placeholder .initials{width:100px;height:100px;background:rgba(255,255,255,.15);border-radius:50%;display:grid;place-items:center;font-family:"Sora",sans-serif;font-weight:800;font-size:36px;color:rgba(255,255,255,.7)}
  .page-body{flex:1;max-width:1100px;margin-inline:auto;width:100%;padding:48px 20px 64px;display:flex;flex-direction:column;gap:48px}
@@ -56,8 +59,44 @@
  .quote-text{font-size:16px;font-style:italic;color:var(--green-deep);line-height:1.65;font-weight:500}
  .quote-attr{margin-top:8px;font-size:13px;font-weight:700;color:var(--green);letter-spacing:.03em}
  footer{background:var(--white);border-top:1px solid var(--line);padding:20px;text-align:center;font-size:12.5px;color:var(--muted)}
+ .footer-brand{display:flex;align-items:center;justify-content:center;gap:12px}
+ .footer-brand img{width:42px;height:42px;border-radius:10px;object-fit:contain}
+ .footer-brand-copy{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1;text-align:left}
+ .footer-brand-name{font-family:\"Sora\",sans-serif;font-weight:700;font-size:14px;color:var(--navy);letter-spacing:-.02em}
+ .footer-brand-sub{font-size:10.5px;color:var(--muted);font-style:italic}
  @media(max-width:768px){.hero-inner{grid-template-columns:1fr;gap:32px}.hero-photo{max-width:280px;border-radius:20px 20px 0 0}.hero-text{padding-bottom:0}.stat-row{grid-template-columns:1fr 1fr}.section-card,.aspiration-card{padding:24px 20px}}
- @media(max-width:480px){.stat-row{grid-template-columns:1fr}.hero{padding:40px 16px 0}.page-body{padding:32px 16px 48px}}
+ @media(max-width:480px){
+ .nav-inner{padding:10px 14px;gap:8px}
+ .nav-brand img{width:36px;height:36px}
+ .brand-name{font-size:12px}
+ .brand-sub{font-size:10px}
+ .nav-back{padding:7px 10px;font-size:11px}
+ .hero{padding:30px 16px 28px}
+ .hero-inner{gap:22px}
+ .hero-text{text-align:center}
+ .hero-badge{justify-content:center;max-width:100%;font-size:10px;line-height:1.4;padding:6px 12px}
+ .hero-role{font-size:11px;line-height:1.5}
+ .hero h1{font-size:clamp(1.8rem,8vw,2.3rem);line-height:1.12}
+ .hero-sub{margin-inline:auto;font-size:14px}
+ .hero-photo{top:0;margin-bottom:0;max-width:min(58vw,220px);border-radius:20px;aspect-ratio:4/5}
+ .page-body{padding:24px 14px 40px;gap:24px}
+ .stat-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .stat-card{padding:14px 8px;border-radius:14px}
+ .stat-number{font-size:clamp(16px,4.5vw,21px);line-height:1.2;overflow-wrap:anywhere}
+ .stat-label{font-size:10.5px;line-height:1.4}
+ .section-card{padding:20px 16px;border-radius:16px}
+ .aspiration-card{padding:24px 18px;border-radius:16px}
+ .section-title{font-size:1.2rem;margin-bottom:14px}
+ .section-body{font-size:14.5px}
+ .achieve-list{gap:12px}
+ .achieve-item{gap:10px;font-size:14px}
+ .achieve-dot{width:30px;height:30px}
+ .quote-block{padding:14px 15px}
+ .quote-text{font-size:14.5px}
+ .policy-grid{gap:8px}
+ .policy-pill{padding:6px 11px;font-size:12px}
+ .fade-line{transition-duration:.6s}
+ }
  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
  :focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:6px}
  
@@ -80,9 +119,12 @@
 
  <header class="nav">
  <div class="nav-inner">
- <a href="index.html">
- <div class="brand-name">People Connect Initiative</div>
- <div class="brand-sub">APM 2027 Candidates</div>
+ <a href="index.html" class="nav-brand">
+ <img src="apm%20logo.jfif" alt="">
+ <span class="nav-brand-copy">
+ <span class="brand-name">APM4OYO</span>
+ <span class="brand-sub">APM 2027</span>
+ </span>
  </a>
  <a href="index.html" class="nav-back">← Back to Home</a>
  </div>
@@ -98,7 +140,6 @@
  </div>
  <div class="hero-photo">
  <img src="apm9.jfif" alt="Adedeji Dhikrullahi">
- 
  </div>
  </section>
 
@@ -168,10 +209,16 @@
  </main>
 
  <footer>
- <div>&copy;  People Connect Initiative &mdash; APM 2027</div>
+ <div class=\"footer-brand\">
+  <img src=\"apm%20logo.jfif\" alt=\"APM4OYO logo\">
+  <div class=\"footer-brand-copy\">
+   <span class=\"footer-brand-name\">APM4OYO</span>
+   <span class=\"footer-brand-sub\">APM 2027</span>
+  </div>
+ </div>
  </footer>
 
- <script>document.getElementById('yr').textContent = new Date().getFullYear();
+ <script>var yearElement = document.getElementById('yr'); if (yearElement) yearElement.textContent = new Date().getFullYear();
       /* -- TEXT FADE-IN BY LINE ANIMATION -- */
       (function () {
         function splitIntoLines(el) {
@@ -204,7 +251,7 @@
         }
         function initAnimations() {
           var elements = document.querySelectorAll('.text-animate');
-          elements.forEach(function (el) { splitIntoLines(el); });
+          elements.forEach(function (el) { if (el.isConnected) splitIntoLines(el); });
           if ('IntersectionObserver' in window) {
             var observer = new IntersectionObserver(function (entries) {
               entries.forEach(function (entry) {
