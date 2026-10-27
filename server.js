@@ -256,19 +256,19 @@ function constantTimeEqual(expected, provided) {
 
 // ─── POST /api/register ───────────────────────────────────────────────────────
 // Accepts multipart/form-data (because of optional file).
-// Fields: name, dob, phone, lga, ward, address, hasVoterCard
+// Fields: name, phone, lga, ward, address, hasVoterCard
 // File  : voterCardFile (required — scan or upload)
 
 app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
-  const { name, dob, phone, lga, ward, address, hasVoterCard } = req.body || {};
+  const { name, phone, lga, ward, address, hasVoterCard } = req.body || {};
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || !dob || !phone) {
+  if (!name || !phone) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
-      message: 'Full name, date of birth, and phone number are required.'
+      message: 'Full name and phone number are required.'
     });
   }
 
@@ -328,7 +328,6 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     const record = {
       id: recordId,
       name: sanitise(name),
-      dob: sanitise(dob),
       phone: cleanPhone,
       lga: sanitise(lga),
       ward: sanitise(ward),

@@ -1065,6 +1065,10 @@
       border: 1px solid rgba(255,255,255,.12);
     }
 
+    .voter-card-offset {
+      margin-top: clamp(24px, 4vw, 40px);
+    }
+
     .voter-card-question {
       font-family: "Manrope", sans-serif;
       font-weight: 700;
@@ -2881,15 +2885,9 @@
               <input id="f-name" name="name" type="text" placeholder="e.g. Adebayo Kayode Johnson" required>
             </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="f-dob">Date of birth</label>
-                <input id="f-dob" name="dob" type="date" required>
-              </div>
-              <div class="field">
-                <label for="f-phone">Phone number</label>
-                <input id="f-phone" name="phone" type="tel" placeholder="080X XXX XXXX" required>
-              </div>
+            <div class="field">
+              <label for="f-phone">Phone number</label>
+              <input id="f-phone" name="phone" type="tel" placeholder="080X XXX XXXX" required>
             </div>
 
               <div class="field">
@@ -2943,7 +2941,7 @@
             </div>
 
             <!-- ── Voter card scan or upload ─────────────────────── -->
-            <div class="voter-card-block">
+            <div class="voter-card-block voter-card-offset">
               <p class="voter-card-question">Add your voter's card</p>
               <div class="voter-method-row" role="group" aria-label="Choose how to add your voter's card">
                 <button type="button" class="voter-method-card" id="voter-scan-btn" aria-pressed="false">
@@ -3434,7 +3432,6 @@
           /* Build FormData -- supports file + text fields */
           var fd = new FormData();
           fd.append('name',         document.getElementById('f-name').value);
-          fd.append('dob',          document.getElementById('f-dob').value);
           fd.append('phone',        document.getElementById('f-phone').value);
           fd.append('lga',          document.getElementById('f-lga').value);
           fd.append('ward',         document.getElementById('f-ward').value);
