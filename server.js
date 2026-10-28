@@ -617,9 +617,17 @@ app.get('/api/admin/registrations/export', async (_req, res) => {
       const accountNumber = record.accountNumberEncrypted
         ? decryptAccountNumber(record.accountNumberEncrypted)
         : '';
+      const registrationDate = record.createdAt
+        ? new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Africa/Lagos',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        }).format(new Date(record.createdAt))
+        : '';
       return [
         index + 1,
-        record.createdAt,
+        registrationDate,
         record.name,
         record.phone,
         record.email,
