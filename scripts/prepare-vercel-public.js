@@ -13,6 +13,7 @@ const files = [
   'seyi-makinde.html',
   'senate.html',
   'house-reps.html',
+  'robots.txt',
   'apm1.jfif',
   'apm7.jfif',
   'apm9.jfif',

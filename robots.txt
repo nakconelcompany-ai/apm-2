@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /ultimate
+Disallow: /admin
+Disallow: /admin.html

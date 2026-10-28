@@ -105,6 +105,7 @@ app.use((_req, res, next) => {
 // Static files (HTML, images, CSS, JS) — served from project root
 app.use('/data', (_req, res) => res.sendStatus(404));
 app.use('/vendor', express.static(path.join(__dirname, 'public', 'vendor')));
+app.use(['/admin', '/admin.html'], (_req, res) => res.sendStatus(404));
 app.use(express.static(__dirname));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -742,7 +743,8 @@ app.use((err, _req, res, next) => {
 });
 
 // ─── Admin Page Direct Route ──────────────────────────────────────────────────
-app.get('/admin', (_req, res) => {
+app.get('/ultimate', (_req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
@@ -755,7 +757,7 @@ app.get('*', (_req, res) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`\n🟢  PCI server running → http://localhost:${PORT}`);
-    console.log(`   Admin Dashboard   → http://localhost:${PORT}/admin`);
+    console.log(`   Admin Dashboard   → http://localhost:${PORT}/ultimate`);
     console.log(`   Uploads saved to   → ${IS_VERCEL ? 'private Vercel Blob' : UPLOAD_DIR}\n`);
   });
 }
