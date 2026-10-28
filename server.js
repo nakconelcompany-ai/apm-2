@@ -382,7 +382,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || !phone || !email || !accountNumber || !accountName || !bankName || !lga) {
+  if (!name || !phone || !email || !lga) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
@@ -407,8 +407,8 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
     });
   }
 
-  const cleanAccountNumber = String(accountNumber).trim();
-  if (!/^\d{10}$/.test(cleanAccountNumber)) {
+  const cleanAccountNumber = String(accountNumber || '').trim();
+  if (cleanAccountNumber && !/^\d{10}$/.test(cleanAccountNumber)) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
@@ -436,7 +436,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
         message: 'The uploaded file is not a supported voter-card image. Please upload a valid JPG, PNG, or WebP image no larger than 3 MB.'
       });
     }
-    const encryptedAccountNumber = encryptAccountNumber(cleanAccountNumber);
+    const encryptedAccountNumber = cleanAccountNumber ? encryptAccountNumber(cleanAccountNumber) : null;
 
     if (IS_VERCEL) {
       const { client, bucket } = getObjectStorage();
@@ -476,7 +476,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
       phone: cleanPhone,
       email: cleanEmail,
       accountNumberEncrypted: encryptedAccountNumber,
-      accountNumberLast4: cleanAccountNumber.slice(-4),
+      accountNumberLast4: cleanAccountNumber ? cleanAccountNumber.slice(-4) : '',
       accountName: sanitise(accountName),
       bankName: sanitise(bankName),
       ward: sanitise(ward),
@@ -593,6 +593,50 @@ app.get('/api/admin/registrations', async (_req, res) => {
       total: records.length,
       data: (USE_NEON_DATABASE ? records : [...records].reverse()).map(({ accountNumberEncrypted, dob, ...record }) => record)
     });
+  } catch (error) {
+    return sendStorageError(res, error);
+  }
+});
+
+// GET /api/admin/registrations/export — authenticated CSV with full account numbers
+app.get('/api/admin/registrations/export', async (_req, res) => {
+  try {
+    const records = await readRegistrations();
+    const orderedRecords = USE_NEON_DATABASE ? records : [...records].reverse();
+    const escapeCsvValue = value => {
+      const text = String(value ?? '');
+      // Prevent spreadsheet applications from treating registrant data as formulas.
+      const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
+      return `"${safeText.replace(/"/g, '""')}"`;
+    };
+    const headers = [
+      'ID', 'Registration Date', 'Full Name', 'Phone', 'Email', 'Bank Name',
+      'Account Name', 'Account Number', 'LGA', 'Ward', 'Unit', 'Has Voter Card', 'File Uploaded'
+    ];
+    const rows = orderedRecords.map((record, index) => {
+      const accountNumber = record.accountNumberEncrypted
+        ? decryptAccountNumber(record.accountNumberEncrypted)
+        : '';
+      return [
+        index + 1,
+        record.createdAt,
+        record.name,
+        record.phone,
+        record.email,
+        record.bankName,
+        record.accountName,
+        accountNumber,
+        record.lga,
+        record.ward,
+        record.unit,
+        record.hasVoterCard,
+        record.voterCardFile?.originalName || ''
+      ].map(escapeCsvValue).join(',');
+    });
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent('apm4oyo registration.csv')}`);
+    return res.send(`\uFEFF${[headers.map(escapeCsvValue).join(','), ...rows].join('\n')}`);
   } catch (error) {
     return sendStorageError(res, error);
   }

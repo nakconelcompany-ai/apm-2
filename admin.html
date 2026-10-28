@@ -991,16 +991,7 @@
 
       <div class="metric-card">
         <div class="metric-header">
-          <span class="metric-title">Uploaded Cards / PDFs</span>
-          <div class="metric-icon">FILES</div>
-        </div>
-        <div class="metric-value" id="stat-uploads">0</div>
-        <div class="metric-subtext">Document uploads verified</div>
-      </div>
-
-      <div class="metric-card">
-        <div class="metric-header">
-          <span class="metric-title">Active LGAs</span>
+          <span class="metric-title">LGAs Covered</span>
           <div class="metric-icon">LGAs</div>
         </div>
         <div class="metric-value" id="stat-lgas">0</div>
@@ -1225,13 +1216,11 @@
       function updateMetrics(data) {
         const total = data.length;
         const cardHolders = data.filter(r => r.hasVoterCard === 'yes').length;
-        const uploads = data.filter(r => r.voterCardFile && r.voterCardFile.filename).length;
         const uniqueLgas = new Set(data.map(r => r.lga).filter(Boolean)).size;
 
         document.getElementById('stat-total').textContent = total.toLocaleString();
         document.getElementById('stat-cards').textContent = cardHolders.toLocaleString();
         document.getElementById('stat-cards-pct').textContent = total > 0 ? ((cardHolders / total) * 100).toFixed(1) + '% of total' : '0%';
-        document.getElementById('stat-uploads').textContent = uploads.toLocaleString();
         document.getElementById('stat-lgas').textContent = uniqueLgas;
       }
 
@@ -1450,45 +1439,23 @@
           });
       };
 
-      // Export to CSV
-      btnExport.addEventListener('click', function () {
-        if (allRegistrations.length === 0) {
-          showToast('No registration data available to export.', true);
-          return;
+      // Export to CSV. The server decrypts account numbers only for this authenticated download.
+      btnExport.addEventListener('click', async function () {
+        try {
+          const response = await adminFetch('/api/admin/registrations/export');
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'apm4oyo registration.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          showToast('CSV export downloaded successfully!');
+        } catch (error) {
+          showToast(error.message || 'Unable to export registrations.', true);
         }
-
-        const headers = ['ID', 'Registration Date', 'Full Name', 'Phone', 'Email', 'Bank Name', 'Account Name', 'Account Number (last 4)', 'LGA', 'Ward', 'Unit', 'Reference', 'Has Voter Card', 'File Uploaded'];
-        const csvRows = [headers.join(',')];
-
-        allRegistrations.forEach(r => {
-          const row = [
-            `"${r.id || ''}"`,
-            `"${r.createdAt || ''}"`,
-            `"${(r.name || '').replace(/"/g, '""')}"`,
-            `"${r.phone || ''}"`,
-            `"${(r.email || '').replace(/"/g, '""')}"`,
-            `"${(r.bankName || '').replace(/"/g, '""')}"`,
-            `"${(r.accountName || '').replace(/"/g, '""')}"`,
-            `"${r.accountNumberLast4 || ''}"`,
-            `"${(r.lga || '').replace(/"/g, '""')}"`,
-            `"${(r.ward || '').replace(/"/g, '""')}"`,
-            `"${(r.unit || '').replace(/"/g, '""')}"`,
-            `"${(r.reference || '').replace(/"/g, '""')}"`,
-            `"${r.hasVoterCard || ''}"`,
-            `"${r.voterCardFile ? r.voterCardFile.filename : 'None'}"`
-          ];
-          csvRows.push(row.join(','));
-        });
-
-        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `PCI_Registrations_${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('CSV export downloaded successfully!');
       });
 
       // Helpers
