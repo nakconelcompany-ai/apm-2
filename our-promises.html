@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Our Promises | APM4OYO</title>
+  <meta name="description" content="APM4OYO's record of service and vision for Nigeria.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --blue:#0052cc; --blue-deep:#1d4ed8; --green:#008751; --green-deep:#0b3c26; --ink:#111827; --muted:#4b5563; --line:#e5e7eb; --paper:#fff; --pale:#f6f9fd; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--pale); font:16px/1.7 Manrope,Arial,sans-serif; }
+    a { color:inherit; text-decoration:none; }
+    .wrap { width:min(1120px,92vw); margin:auto; }
+    .nav { background:rgba(255,255,255,.96); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; backdrop-filter:blur(10px); }
+    .nav-inner { min-height:72px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { color:var(--blue); font-weight:800; letter-spacing:-.03em; font-size:20px; }
+    .back { padding:9px 16px; border:1px solid #bfd0eb; border-radius:999px; color:var(--blue); font-size:14px; font-weight:800; }
+    .back:hover { background:#eff6ff; }
+    .hero { color:white; background:linear-gradient(125deg,var(--blue),var(--blue-deep) 62%,var(--green)); padding:76px 0 68px; }
+    .eyebrow { margin:0 0 10px; font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#a7f3d0; }
+    h1,h2 { font-family:"Barlow Condensed",sans-serif; line-height:1; letter-spacing:-.02em; }
+    h1 { margin:0; font-size:clamp(3rem,8vw,5.5rem); text-transform:uppercase; }
+    .hero p:last-child { max-width:700px; margin:20px 0 0; color:#e8f2ff; font-size:18px; }
+    main { padding:52px 0 72px; }
+    .intro { max-width:770px; margin-bottom:30px; color:var(--muted); font-size:17px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+    .card { background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:28px; box-shadow:0 8px 25px rgba(17,24,39,.05); }
+    .card h2 { font-size:31px; margin:0 0 12px; color:var(--blue); }
+    .card p { margin:0; color:var(--muted); }
+    .card strong { color:var(--ink); }
+    .achievement-list { display:flex; flex-direction:column; gap:28px; }
+    .achievement { display:grid; grid-template-columns:minmax(240px,.95fr) minmax(0,1.05fr); overflow:hidden; background:var(--paper); border:1px solid var(--line); border-radius:22px; box-shadow:0 8px 25px rgba(17,24,39,.05); }
+    .achievement:nth-child(even) .achievement-image { order:2; }
+    .achievement-image { min-height:280px; background:#dbeafe; }
+    .achievement-image img { width:100%; height:100%; display:block; object-fit:cover; }
+    .achievement-copy { padding:32px; }
+    .achievement-copy h2 { margin:0 0 14px; color:var(--blue); font-size:34px; }
+    .achievement-copy p { margin:0; color:var(--muted); }
+    .source { display:inline-block; margin-top:18px; color:var(--green-deep); font-size:12px; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+    .number { display:grid; place-items:center; width:38px; height:38px; margin-bottom:20px; border-radius:11px; background:#e8f8f0; color:var(--green-deep); font-weight:800; }
+    .vision { margin-top:42px; padding:42px; border-radius:24px; background:var(--green-deep); color:#fff; }
+    .vision h2 { margin:0 0 16px; font-size:40px; text-transform:uppercase; }
+    .vision > p { max-width:880px; margin:0 0 28px; color:#d1fae5; font-size:17px; }
+    .vision-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .vision-item { padding:19px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16); border-radius:14px; }
+    .vision-item h3 { margin:0 0 7px; font-size:15px; color:#a7f3d0; }
+    .vision-item p { margin:0; color:#f0fdf4; font-size:14px; }
+    footer { padding:30px 0; background:#fff; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:13px; }
+    @media(max-width:700px) { .hero { padding:52px 0; } .grid,.vision-grid { grid-template-columns:1fr; } .achievement { grid-template-columns:1fr; } .achievement:nth-child(even) .achievement-image { order:0; } .achievement-image { min-height:220px; } .achievement-copy,.card,.vision { padding:24px 20px; } .nav-inner { min-height:64px; } .hero p:last-child { font-size:16px; } }
+  </style>
+</head>
+<body>
+  <header class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html">APM4OYO</a><a class="back" href="index.html">← Back to Home</a></div></header>
+  <section class="hero"><div class="wrap"><p class="eyebrow">APM4OYO · Our Promises</p><h1>Leadership that listens.</h1><p>A record of service in Oyo State and a clear agenda for a stronger, more accountable Nigeria.</p></div></section>
+  <main class="wrap">
+    <p class="eyebrow" style="color:var(--green);">Track record</p>
+    <h2 style="font-size:42px;margin:0 0 14px;">Key Achievements &amp; Governing Record</h2>
+    <p class="intro">A focus on practical investments that support communities, strengthen public services and expand economic opportunity across Oyo State.</p>
+    <section class="achievement-list" aria-label="Key achievements">
+      <article class="achievement"><div class="achievement-image"><img src="promises-agriculture.jpg" alt="Agricultural inspection in Oyo State"></div><div class="achievement-copy"><p class="eyebrow" style="color:var(--green);">01 · Agriculture</p><h2>Agriculture &amp; Economic Development</h2><p>Launched the Fasola Agribusiness Transformation Centre and the Eruwa agribusiness project, supporting agricultural production, processing and economic activity across the state.</p></div></article>
+      <article class="achievement"><div class="achievement-image"><img src="promises-electricity.jpg" alt="Electricity infrastructure in Oyo State"></div><div class="achievement-copy"><p class="eyebrow" style="color:var(--green);">02 · Infrastructure</p><h2>Infrastructure &amp; Electricity</h2><p>Delivered road rehabilitation projects and an 11 MW independent power project serving the Oyo State Secretariat and surrounding communities.</p></div></article>
+      <article class="achievement"><div class="achievement-image"><img src="promises-healthcare.jpg" alt="Omituntun Free Medical Mission materials and outreach"></div><div class="achievement-copy"><p class="eyebrow" style="color:var(--green);">03 · Healthcare</p><h2>Healthcare</h2><p>Implemented the Omituntun Free Health Mission, improved primary healthcare facilities and recruited additional healthcare workers across the state.</p><a class="source" href="https://feedbackoysg.com/oyo-state-omituntun-free-medical-mission-flag-off/" target="_blank" rel="noopener noreferrer">Photo source: Oyo State Feedback Service</a></div></article>
+      <article class="achievement"><div class="achievement-image"><img src="promises-education.jpg" alt="Commissioning of a classroom block in Oyo State"></div><div class="achievement-copy"><p class="eyebrow" style="color:var(--green);">04 · Education</p><h2>Education</h2><p>Introduced education programmes and student support initiatives to improve access to learning and upgrade school infrastructure.</p><a class="source" href="https://oyostate.gov.ng/100-days-in-office-makinde-commissions-block-of-20-classrooms-in-oyo/" target="_blank" rel="noopener noreferrer">Photo source: Oyo State Government</a></div></article>
+      <article class="achievement"><div class="achievement-image"><img src="promises-security.jpg" alt="Governor Seyi Makinde inspecting Oyo Amotekun Corps personnel"></div><div class="achievement-copy"><p class="eyebrow" style="color:var(--green);">05 · Security</p><h2>Security</h2><p>Supported security operations including Operation Amotekun and provided security patrol vehicles to protect communities across Oyo State.</p><a class="source" href="https://seyimakinde.com/seyi-makindes-achievements-in-security/" target="_blank" rel="noopener noreferrer">Photo source: Seyi Makinde</a></div></article>
+    </section>
+    <section class="vision">
+      <p class="eyebrow">2027 vision</p><h2>Vision &amp; Aspirations for Nigeria</h2>
+      <p>The proposed <strong>Reset Nigeria Agenda</strong> identifies economic reform, education, national security and governance as its core pillars—translating progress made in Oyo State into a national model of accountable, people-centred leadership.</p>
+      <div class="vision-grid">
+        <article class="vision-item"><h3>Economic Reform &amp; Job Creation</h3><p>Promote productive industries, reduce avoidable business costs and create conditions that support investment and employment.</p></article>
+        <article class="vision-item"><h3>Education &amp; Skills</h3><p>Improve educational standards, teacher development and technical training to prepare young Nigerians for employment and entrepreneurship.</p></article>
+        <article class="vision-item"><h3>National Security</h3><p>Strengthen intelligence, early-warning systems and coordination among security agencies, including potential reforms to security responsibilities.</p></article>
+        <article class="vision-item"><h3>Governance &amp; Accountability</h3><p>Strengthen public institutions, improve transparency and promote more effective coordination between federal, state and local governments.</p></article>
+        <article class="vision-item"><h3>Food Security</h3><p>Support agricultural production, food processing, storage and distribution to improve food availability across Nigeria.</p></article>
+        <article class="vision-item"><h3>National Unity</h3><p>Promote inclusive governance and national dialogue, including a proposed four-year transitional Government of National Unity if elected.</p></article>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap">© 2027 APM4OYO · Leadership that listens.</div></footer>
+</body>
+</html>

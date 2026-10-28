@@ -5,6 +5,12 @@ const root = path.resolve(__dirname, '..');
 const publicDir = path.join(root, 'public');
 const files = [
   'index.html',
+  'our-promises.html',
+  'promises-agriculture.jpg',
+  'promises-electricity.jpg',
+  'promises-healthcare.jpg',
+  'promises-education.jpg',
+  'promises-security.jpg',
   'thankyou.html',
   'adedeji-dhikrullahi.html',
   'akin-fagbemi.html',

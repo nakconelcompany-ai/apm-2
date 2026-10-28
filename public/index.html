@@ -2694,7 +2694,7 @@
       <a href="#home" class="sidebar-nav-link">
         <span class="nav-dot"></span>Home
       </a>
-      <a href="#winning-team" class="sidebar-nav-link">
+      <a href="our-promises.html" class="sidebar-nav-link">
         <span class="nav-dot"></span>APM 2027 Promises
       </a>
       <a href="#register" class="sidebar-nav-link">
@@ -2780,7 +2780,7 @@
       </a>
       <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile site navigation">
         <a href="#home" class="mobile-menu-link">Home</a>
-        <a href="#winning-team" class="mobile-menu-link">APM 2027 Promises</a>
+        <a href="our-promises.html" class="mobile-menu-link">APM 2027 Promises</a>
         <div class="mobile-cand-wrap">
           <button class="mobile-cand-trigger" id="mobileCandTrigger" aria-expanded="false">
             Profiles <span aria-hidden="true">&#9650;</span>
@@ -3375,7 +3375,7 @@
         var clarityResult = document.getElementById('clarity-result');
         var clarityIcon   = document.getElementById('clarity-icon');
         var clarityText   = document.getElementById('clarity-text');
-        var imageIsClear  = false; // gate: blocks submit until check passes
+        var imageIsClear  = false; // guidance only; an unclear card may still be submitted
 
         function setClarityState(state, iconEmoji, title, body) {
           clarityResult.className = 'clarity-result visible ' + state;
@@ -3548,10 +3548,8 @@
             var isVoterCard = await containsVoterCardText(optimizedFile);
             if (processId !== voterFileProcessId) return;
             if (!isVoterCard) {
-              selectedVoterFile = null;
               setClarityState('blurry', '', 'Voter card not recognized',
-                'We could not identify the expected INEC voter-card text. Use a clear, well-lit image of the card. Text recognition does not verify that a card is genuine.');
-              return;
+                'We could not identify the expected INEC voter-card text, but you can still submit this image. Text recognition does not verify that a card is genuine.');
             }
 
             setClarityState('checking', '', 'Checking image quality',
@@ -3567,10 +3565,8 @@
               return;
             }
             if (variance < 60) {
-              selectedVoterFile = null;
               setClarityState('blurry', '', 'Image is too blurry',
-                'Please upload a clearer photo of your voter card. Make sure it is well-lit, in focus, and all text is readable.');
-              return;
+                'You can still submit it, but a clearer photo helps us verify your details.');
             }
 
             var formData = new FormData();
@@ -3579,9 +3575,8 @@
             var result = await response.json();
             if (processId !== voterFileProcessId) return;
             if (!response.ok || result.clear !== true) {
-              selectedVoterFile = null;
               setClarityState('blurry', '', 'Image quality issue detected',
-                result.message || 'Please upload a clearer photo of your voter card.');
+                (result.message ? result.message + ' ' : '') + 'You can still submit this image.');
               return;
             }
             setClarityState('clear', '', 'Voter-card text found; image looks clear',
@@ -3589,9 +3584,13 @@
           } catch (error) {
             if (processId !== voterFileProcessId) return;
             console.error('[VOTER CARD PROCESSING ERROR]', error);
-            selectedVoterFile = null;
-            setClarityState('blurry', '', 'Could not verify voter card',
-              'The file could not be processed or text recognition could not complete. Please try a clear JPG, PNG, WebP, or single-page PDF.');
+            if (selectedVoterFile) {
+              setClarityState('blurry', '', 'Could not verify voter card',
+                'You can still submit this image.');
+            } else {
+              setClarityState('blurry', '', 'Could not prepare voter card',
+                'Please try a JPG, PNG, WebP, or single-page PDF.');
+            }
           } finally {
             if (processId === voterFileProcessId && submitButton) {
               submitButton.disabled = false;
@@ -3724,10 +3723,10 @@
             return;
           }
 
-          /* Block submit if the selected image failed the clarity check. */
-          if (!imageIsClear || selectedVoterFile.size > MAX_CARD_UPLOAD_BYTES) {
+          /* Image quality is advisory; only enforce the upload-size limit. */
+          if (selectedVoterFile.size > MAX_CARD_UPLOAD_BYTES) {
             if (note) {
-              note.textContent = 'Please upload a clearer photo of your voter\'s card before submitting.';
+              note.textContent = 'Your voter card image is too large. Please choose a file under 3 MB.';
               note.style.color = '#fca5a5';
             }
             document.getElementById('voter-upload-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
