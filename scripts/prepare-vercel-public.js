@@ -52,6 +52,11 @@ const files = [
 
 fs.mkdirSync(publicDir, { recursive: true });
 
+// The admin page is served only by the authenticated /ultimate Express route.
+// Remove any older generated copy so Vercel cannot expose it as /admin via cleanUrls.
+const legacyAdminPage = path.join(publicDir, 'admin.html');
+if (fs.existsSync(legacyAdminPage)) fs.unlinkSync(legacyAdminPage);
+
 for (const file of files) {
   fs.copyFileSync(path.join(root, file), path.join(publicDir, file));
 }
