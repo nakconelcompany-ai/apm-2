@@ -1360,7 +1360,7 @@
 
     /* ---------- IMAGE CLARITY FEEDBACK ---------- */
     .clarity-result {
-      display: none;
+      display: none !important;
       border-radius: 14px;
       padding: 14px 16px;
       font-size: 14px;
@@ -2694,7 +2694,7 @@
       <a href="#home" class="sidebar-nav-link">
         <span class="nav-dot"></span>Home
       </a>
-      <a href="our-promises.html" class="sidebar-nav-link">
+      <a href="/our-promises" class="sidebar-nav-link">
         <span class="nav-dot"></span>APM 2027 Promises
       </a>
       <a href="#register" class="sidebar-nav-link">
@@ -2780,7 +2780,7 @@
       </a>
       <nav class="mobile-menu" id="mobileMenu" aria-label="Mobile site navigation">
         <a href="#home" class="mobile-menu-link">Home</a>
-        <a href="our-promises.html" class="mobile-menu-link">APM 2027 Promises</a>
+        <a href="/our-promises" class="mobile-menu-link">APM 2027 Promises</a>
         <div class="mobile-cand-wrap">
           <button class="mobile-cand-trigger" id="mobileCandTrigger" aria-expanded="false">
             Profiles <span aria-hidden="true">&#9650;</span>
@@ -3116,10 +3116,7 @@
 
               <div class="voter-upload-panel" id="voter-upload-panel">
                 <label for="f-voter-card-file" class="upload-label">
-                  <span class="upload-text">
-                    <strong>Choose a card image or PDF</strong>
-                    <span>JPG, PNG, WebP, or PDF (automatically optimized to under 3 MB)</span>
-                  </span>
+                  <span class="upload-text"><strong>Upload voter card</strong></span>
                   <input
                     id="f-voter-card-file"
                     name="voterCardFile"
@@ -3371,7 +3368,7 @@
           cameraPanel.hidden = method !== 'scan' || !cameraStream;
         }
 
-        /* Show selected filename + run clarity check */
+        /* Keep image processing feedback out of the form UI. */
         var clarityResult = document.getElementById('clarity-result');
         var clarityIcon   = document.getElementById('clarity-icon');
         var clarityText   = document.getElementById('clarity-text');
@@ -3528,7 +3525,7 @@
           selectedVoterFile = null;
           clearClarityState();
           if (submitButton) submitButton.disabled = true;
-          uploadPreview.textContent = 'Preparing card image…';
+          uploadPreview.textContent = '';
           uploadPreview.className = 'upload-preview has-file';
           setClarityState('checking', '', 'Preparing voter card',
             'The file will be converted and compressed on this device before upload.');
@@ -3540,8 +3537,7 @@
             var optimizedFile = await compressVoterImage(file);
             if (processId !== voterFileProcessId) return;
             selectedVoterFile = optimizedFile;
-            uploadPreview.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) +
-              ' KB) → optimized to ' + (optimizedFile.size / 1024).toFixed(0) + ' KB';
+            uploadPreview.textContent = file.name + ' successfully uploaded.';
 
             setClarityState('checking', '', 'Checking voter-card text',
               'Text recognition runs in your browser; the card image is not sent to an OCR service.');

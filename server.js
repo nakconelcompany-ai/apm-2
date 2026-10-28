@@ -748,6 +748,10 @@ app.get('/ultimate', (_req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
+app.get(['/our-promises', '/our-promises.html'], (_req, res) => {
+  res.sendFile(path.join(__dirname, 'our-promises.html'));
+});
+
 // ─── Fallback ────────────────────────────────────────────────────────────────
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
