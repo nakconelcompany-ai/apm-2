@@ -5,3 +5,5 @@ data/uploads/
 *.log
 /public/*
 !/public/slide [1-5].png
+!/public/vendor/
+!/public/vendor/**

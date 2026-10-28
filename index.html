@@ -2843,7 +2843,7 @@
             </ul>
           </section>
 
-          <section class="hero-image-slider text-animate" aria-labelledby="leadership-slider-title" aria-roledescription="carousel">
+          <section class="hero-image-slider" aria-labelledby="leadership-slider-title" aria-roledescription="carousel">
             <div class="leadership-slider-intro">
               <div>
                 <p class="leadership-slider-kicker">APM for Oyo State 2027</p>
@@ -3016,12 +3016,12 @@
 
             <div class="field-row">
               <div class="field">
-                <label for="f-ward">Ward</label>
-                <input id="f-ward" name="ward" type="text" placeholder="e.g. Ward 4" required>
+                <label for="f-ward">Ward (optional)</label>
+                <input id="f-ward" name="ward" type="text" placeholder="e.g. Ward 4">
               </div>
               <div class="field">
-                <label for="f-unit">Unit</label>
-                <input id="f-unit" name="unit" type="text" placeholder="e.g. Polling Unit 012" required>
+                <label for="f-unit">Unit (optional)</label>
+                <input id="f-unit" name="unit" type="text" placeholder="e.g. Polling Unit 012">
               </div>
             </div>
 
@@ -3113,13 +3113,13 @@
                 <label for="f-voter-card-file" class="upload-label">
                   <span class="upload-text">
                     <strong>Choose a card image or PDF</strong>
-                    <span>JPG, PNG, HEIC, or PDF</span>
+                    <span>JPG, PNG, WebP, or PDF (automatically optimized to under 3 MB)</span>
                   </span>
                   <input
                     id="f-voter-card-file"
                     name="voterCardFile"
                     type="file"
-                    accept="image/*,.pdf"
+                    accept="image/jpeg,image/png,image/webp,application/pdf,.pdf"
                     class="upload-input">
                 </label>
               </div>
@@ -3179,6 +3179,7 @@
       </div>
     </footer>
 
+    <script src="/vendor/tesseract.min.js"></script>
     <script>
       document.getElementById('yr').textContent = new Date().getFullYear();
 
@@ -3328,6 +3329,10 @@
         var cameraStream   = null;
         var selectedVoterFile = null;
         var selectedVoterMethod = '';
+        var voterFileProcessId = 0;
+        var voterOcrWorkerPromise = null;
+        var MAX_CARD_UPLOAD_BYTES = 3 * 1024 * 1024;
+        var TARGET_CARD_BYTES = MAX_CARD_UPLOAD_BYTES - 128 * 1024;
 
         function stopVoterCamera() {
           if (cameraStream) {
@@ -3338,11 +3343,14 @@
         }
 
         function clearSelectedVoterFile() {
+          voterFileProcessId++;
           selectedVoterFile = null;
           voterFileInput.value = '';
           uploadPreview.textContent = '';
           uploadPreview.className = 'upload-preview';
           clearClarityState();
+          var submitButton = pciForm.querySelector('.submit-btn');
+          if (submitButton) submitButton.disabled = false;
         }
 
         function selectVoterMethod(method) {
@@ -3378,58 +3386,212 @@
           imageIsClear = false;
         }
 
-        function processVoterFile(file) {
-          if (!file) return;
-          selectedVoterFile = file;
-          var name = file.name;
-          var size = (file.size / 1024).toFixed(0) + ' KB';
-          uploadPreview.textContent = name + ' (' + size + ')';
-          uploadPreview.className = 'upload-preview has-file';
-          clearClarityState();
+        function canvasToJpeg(canvas, quality) {
+          return new Promise(function (resolve, reject) {
+            canvas.toBlob(function (blob) {
+              if (!blob) {
+                reject(new Error('Could not process this image.'));
+                return;
+              }
+              resolve(blob);
+            }, 'image/jpeg', quality);
+          });
+        }
 
+        function loadVoterImage(file) {
+          return new Promise(function (resolve, reject) {
+            var image = new Image();
+            var objectUrl = URL.createObjectURL(file);
+            image.onload = function () {
+              URL.revokeObjectURL(objectUrl);
+              resolve(image);
+            };
+            image.onerror = function () {
+              URL.revokeObjectURL(objectUrl);
+              reject(new Error('This image format could not be opened. Please choose a JPG, PNG, or WebP image.'));
+            };
+            image.src = objectUrl;
+          });
+        }
+
+        async function renderVoterPdf(file) {
+          var pdfjs = await import('/vendor/pdfjs/pdf.min.mjs');
+          pdfjs.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.mjs';
+          var loadingTask = pdfjs.getDocument({
+            data: await file.arrayBuffer(),
+            isEvalSupported: false,
+            maxImageSize: 4000000
+          });
+          try {
+            var pdf = await loadingTask.promise;
+            if (pdf.numPages !== 1) {
+              throw new Error('Please upload a single-page PDF containing only the front of your voter card.');
+            }
+            var page = await pdf.getPage(1);
+            var baseViewport = page.getViewport({ scale: 1 });
+            var scale = Math.min(2, 2000 / Math.max(baseViewport.width, baseViewport.height));
+            var viewport = page.getViewport({ scale: scale });
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.ceil(viewport.width);
+            canvas.height = Math.ceil(viewport.height);
+            var canvasContext = canvas.getContext('2d');
+            canvasContext.fillStyle = '#fff';
+            canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+            var renderTask = page.render({ canvasContext: canvasContext, viewport: viewport });
+            await renderTask.promise;
+            page.cleanup();
+            return canvas;
+          } finally {
+            await loadingTask.destroy();
+          }
+        }
+
+        async function compressVoterImage(file) {
+          var sourceCanvas;
           if (file.type === 'application/pdf') {
-            setClarityState('checking', '', 'PDF uploaded',
-              'PDF will be verified on submission.');
-            imageIsClear = true;
-            return;
+            sourceCanvas = await renderVoterPdf(file);
+          } else {
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+              throw new Error('Upload a JPG, PNG, WebP, or single-page PDF voter card.');
+            }
+            var image = await loadVoterImage(file);
+            var scale = Math.min(1, 2000 / Math.max(image.naturalWidth, image.naturalHeight));
+            sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            sourceCanvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            var imageContext = sourceCanvas.getContext('2d');
+            imageContext.fillStyle = '#fff';
+            imageContext.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+            imageContext.drawImage(image, 0, 0, sourceCanvas.width, sourceCanvas.height);
           }
 
-          setClarityState('checking', '', 'Checking image quality…',
-            'Please wait while we check your voter\'s card clarity.');
-
-          estimateSharpness(file, function (variance) {
-            if (selectedVoterFile !== file) return;
-            var THRESHOLD = 60;
-            if (variance < 0) {
-              setClarityState('blurry', '', 'Could not read image',
-                'Please try a different file format (JPG or PNG recommended).');
-              return;
-            }
-            if (variance < THRESHOLD) {
-              setClarityState('blurry', '', 'Image is too blurry',
-                'Please upload a clearer photo of your voter\'s card. Make sure it is well-lit, in focus, and all text is readable.');
-              imageIsClear = false;
-              return;
-            }
-            var fd2 = new FormData();
-            fd2.append('image', file);
-            fetch('/api/check-image-clarity', { method: 'POST', body: fd2 })
-              .then(function (r) { return r.json(); })
-              .then(function (j) {
-                if (selectedVoterFile !== file) return;
-                if (j.clear === false) {
-                  setClarityState('blurry', '', 'Image quality issue detected',
-                    j.message || 'Please upload a clearer photo of your voter\'s card.');
-                } else {
-                  setClarityState('clear', '', 'Image looks good!',
-                    'Your voter\'s card image is clear and readable.');
-                }
-              })
-              .catch(function () {
-                setClarityState('clear', '', 'Image looks good!',
-                  'Your voter\'s card image is clear and readable.');
+          var canvas = sourceCanvas;
+          for (var attempt = 0; attempt < 8; attempt++) {
+            var quality = attempt < 4 ? 0.88 - attempt * 0.1 : 0.58;
+            var blob = await canvasToJpeg(canvas, quality);
+            if (blob.size <= TARGET_CARD_BYTES) {
+              return new File([blob], 'voter-card-' + Date.now() + '.jpg', {
+                type: 'image/jpeg',
+                lastModified: Date.now()
               });
+            }
+            if (attempt >= 3) {
+              var smallerCanvas = document.createElement('canvas');
+              smallerCanvas.width = Math.max(1, Math.round(canvas.width * 0.8));
+              smallerCanvas.height = Math.max(1, Math.round(canvas.height * 0.8));
+              var smallerContext = smallerCanvas.getContext('2d');
+              smallerContext.fillStyle = '#fff';
+              smallerContext.fillRect(0, 0, smallerCanvas.width, smallerCanvas.height);
+              smallerContext.drawImage(canvas, 0, 0, smallerCanvas.width, smallerCanvas.height);
+              canvas = smallerCanvas;
+            }
+          }
+          throw new Error('This voter-card image could not be compressed below 3 MB. Please choose a smaller or lower-resolution image.');
+        }
+
+        function getVoterOcrWorker() {
+          if (voterOcrWorkerPromise) return voterOcrWorkerPromise;
+          if (!window.Tesseract) {
+            return Promise.reject(new Error('Voter-card text recognition is unavailable. Please refresh the page and try again.'));
+          }
+          voterOcrWorkerPromise = window.Tesseract.createWorker('eng', 1, {
+            workerPath: '/vendor/tesseract/worker.min.js',
+            corePath: '/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js',
+            langPath: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng/4.0.0_best_int',
+            gzip: true
+          }).catch(function (error) {
+            voterOcrWorkerPromise = null;
+            throw error;
           });
+          return voterOcrWorkerPromise;
+        }
+
+        async function containsVoterCardText(file) {
+          var worker = await getVoterOcrWorker();
+          var result = await worker.recognize(file);
+          var text = String(result.data.text || '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ');
+          var hasElectionCommission = /\bI\s*N\s*E\s*C\b|INDEPENDENT NATIONAL ELECTORAL/.test(text);
+          var hasVoterCardLabel = /\bVOTER(?: S|S)? CARD\b/.test(text);
+          var hasVoterIdContext = /\bVIN\b|VOTER IDENTIFICATION|POLLING (UNIT|STATION)/.test(text);
+          return hasElectionCommission && (hasVoterCardLabel || hasVoterIdContext);
+        }
+
+        async function processVoterFile(file) {
+          if (!file) return;
+          var processId = ++voterFileProcessId;
+          var submitButton = pciForm.querySelector('.submit-btn');
+          selectedVoterFile = null;
+          clearClarityState();
+          if (submitButton) submitButton.disabled = true;
+          uploadPreview.textContent = 'Preparing card image…';
+          uploadPreview.className = 'upload-preview has-file';
+          setClarityState('checking', '', 'Preparing voter card',
+            'The file will be converted and compressed on this device before upload.');
+
+          try {
+            if (file.size > 20 * 1024 * 1024) {
+              throw new Error('Please select a source file smaller than 20 MB so it can be safely optimized.');
+            }
+            var optimizedFile = await compressVoterImage(file);
+            if (processId !== voterFileProcessId) return;
+            selectedVoterFile = optimizedFile;
+            uploadPreview.textContent = file.name + ' (' + (file.size / 1024).toFixed(0) +
+              ' KB) → optimized to ' + (optimizedFile.size / 1024).toFixed(0) + ' KB';
+
+            setClarityState('checking', '', 'Checking voter-card text',
+              'Text recognition runs in your browser; the card image is not sent to an OCR service.');
+            var isVoterCard = await containsVoterCardText(optimizedFile);
+            if (processId !== voterFileProcessId) return;
+            if (!isVoterCard) {
+              selectedVoterFile = null;
+              setClarityState('blurry', '', 'Voter card not recognized',
+                'We could not identify the expected INEC voter-card text. Use a clear, well-lit image of the card. Text recognition does not verify that a card is genuine.');
+              return;
+            }
+
+            setClarityState('checking', '', 'Checking image quality',
+              'Please wait while we check the card image.');
+            var variance = await new Promise(function (resolve) {
+              estimateSharpness(optimizedFile, resolve);
+            });
+            if (processId !== voterFileProcessId) return;
+            if (variance < 0) {
+              selectedVoterFile = null;
+              setClarityState('blurry', '', 'Could not read image',
+                'Please try again with a supported JPG, PNG, or WebP image.');
+              return;
+            }
+            if (variance < 60) {
+              selectedVoterFile = null;
+              setClarityState('blurry', '', 'Image is too blurry',
+                'Please upload a clearer photo of your voter card. Make sure it is well-lit, in focus, and all text is readable.');
+              return;
+            }
+
+            var formData = new FormData();
+            formData.append('image', optimizedFile);
+            var response = await fetch('/api/check-image-clarity', { method: 'POST', body: formData });
+            var result = await response.json();
+            if (processId !== voterFileProcessId) return;
+            if (!response.ok || result.clear !== true) {
+              selectedVoterFile = null;
+              setClarityState('blurry', '', 'Image quality issue detected',
+                result.message || 'Please upload a clearer photo of your voter card.');
+              return;
+            }
+            setClarityState('clear', '', 'Voter-card text found; image looks clear',
+              'Text recognition is not an official authenticity check. Your optimized image is ready to submit.');
+          } catch (error) {
+            if (processId !== voterFileProcessId) return;
+            console.error('[VOTER CARD PROCESSING ERROR]', error);
+            selectedVoterFile = null;
+            setClarityState('blurry', '', 'Could not verify voter card',
+              'The file could not be processed or text recognition could not complete. Please try a clear JPG, PNG, WebP, or single-page PDF.');
+          } finally {
+            if (processId === voterFileProcessId && submitButton) {
+              submitButton.disabled = false;
+            }
+          }
         }
 
         btnVoterScan.addEventListener('click', function () {
@@ -3558,8 +3720,7 @@
           }
 
           /* Block submit if the selected image failed the clarity check. */
-          if (selectedVoterFile.type !== 'application/pdf'
-              && !imageIsClear) {
+          if (!imageIsClear || selectedVoterFile.size > MAX_CARD_UPLOAD_BYTES) {
             if (note) {
               note.textContent = 'Please upload a clearer photo of your voter\'s card before submitting.';
               note.style.color = '#fca5a5';

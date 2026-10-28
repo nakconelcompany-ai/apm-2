@@ -42,8 +42,24 @@ through the admin dashboard; they are not automatically copied to Neon. Keep
 the existing Vercel Blob credentials available until those files are migrated
 or removed.
 
-The build script copies the root site pages and assets into `public/`; keep the
-generated files committed when the Vercel project does not run a build command.
+The build script copies the root site pages and assets into `public/`, including
+the locally hosted OCR and PDF.js browser workers under `public/vendor/`. Run
+`npm run build` before deployment, or commit the generated public assets when
+the Vercel project does not run a build command.
+
+## Additional security hardening
+
+The app serves its form and API from the same origin, so it does not enable
+cross-origin API access. Responses include basic browser security headers, and
+voter-card uploads are limited to 3 MB and checked against their image
+signatures. The in-browser OCR only checks for voter-card-like text; it cannot
+prove that a card is genuine or officially valid.
+
+For production, use a unique admin password stored only in Vercel environment
+variables, configure Vercel Firewall/WAF rules and rate limits for registration
+and admin endpoints where available, and enable multi-factor authentication
+for the Vercel and Neon accounts. Avoid in-memory rate limiting in a serverless
+deployment, where instances do not share counters.
 The `/admin` route is served directly by the app.
 
 ## Local development

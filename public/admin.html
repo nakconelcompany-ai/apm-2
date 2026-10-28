@@ -1088,13 +1088,15 @@
               <th>Phone Number</th>
               <th>LGA / Ward</th>
               <th>Voter Card</th>
-              <th>Uploaded Document</th>
+              <th>Bank Name</th>
+              <th>Account Name</th>
+              <th>Account Number</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="table-body">
             <tr>
-              <td colspan="8" class="empty-state">
+              <td colspan="10" class="empty-state">
                 Loading registrations...
               </td>
             </tr>
@@ -1284,7 +1286,7 @@
         if (data.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="8" class="empty-state">
+              <td colspan="10" class="empty-state">
                 No registrations found matching your filters.
               </td>
             </tr>
@@ -1294,14 +1296,12 @@
 
         tableBody.innerHTML = data.map((r, idx) => {
           const dateStr = r.createdAt ? new Date(r.createdAt).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A';
-          const hasFile = r.voterCardFile && r.voterCardFile.filename;
           return `
             <tr>
               <td style="color:var(--text-dim); font-weight:600;">${idx + 1}</td>
               <td style="white-space:nowrap; font-size:13px; color:var(--text-muted);">${dateStr}</td>
               <td>
                 <div class="user-name">${escapeHtml(r.name || 'N/A')}</div>
-                <div class="user-sub">DOB: ${escapeHtml(r.dob || 'N/A')}</div>
               </td>
               <td style="font-weight:600; color:var(--green-light);">${escapeHtml(r.phone || 'N/A')}</td>
               <td>
@@ -1313,13 +1313,9 @@
                   ${r.hasVoterCard === 'yes' ? 'Has Voter Card' : 'No Voter Card'}
                 </span>
               </td>
-              <td>
-                ${hasFile ? `
-                  <button type="button" onclick="openDocument('${escapeJsStr(r.id)}')" class="status-badge badge-file" title="Click to view file">
-                    View Document (${escapeHtml(r.voterCardFile.originalName || 'File')})
-                  </button>
-                ` : `<span style="color:var(--text-dim); font-size:13px;">None</span>`}
-              </td>
+              <td>${escapeHtml(r.bankName || 'N/A')}</td>
+              <td>${escapeHtml(r.accountName || 'N/A')}</td>
+              <td>${r.accountNumberLast4 ? `•••• ${escapeHtml(r.accountNumberLast4)}` : 'N/A'}</td>
               <td>
                 <div style="display:flex; gap:6px;">
                   <button class="action-btn" onclick="openDetail('${r.id}')">
@@ -1378,10 +1374,6 @@
             <div class="dossier-item">
               <div class="dossier-label">Account Number</div>
               <div class="dossier-val">${escapeHtml(record.accountNumber || 'N/A')}</div>
-            </div>
-            <div class="dossier-item">
-              <div class="dossier-label">Date of Birth</div>
-              <div class="dossier-val">${escapeHtml(record.dob || 'N/A')}</div>
             </div>
             <div class="dossier-item">
               <div class="dossier-label">Local Government Area (LGA)</div>

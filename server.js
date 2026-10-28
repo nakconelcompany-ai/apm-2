@@ -2,7 +2,7 @@
  * PCI Backend — server.js
  *
  * Endpoints:
- *   POST /api/register           — saves registrant + optional voter card image/PDF
+ *   POST /api/register           — saves registrant + required voter card image
  *   POST /api/check-image-clarity — runs server-side clarity check on an uploaded image
  *
  * Storage:
@@ -13,7 +13,6 @@
 require('dotenv').config();
 
 const express = require('express');
-const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
 const multer  = require('multer');
@@ -33,7 +32,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 const IS_VERCEL = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 const USE_NEON_DATABASE = IS_VERCEL || Boolean(process.env.DATABASE_URL);
-const MAX_UPLOAD_BYTES = IS_VERCEL ? 4 * 1024 * 1024 : 10 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
 
 // ─── Directories ──────────────────────────────────────────────────────────────
 const DATA_DIR    = path.join(__dirname, 'data');
@@ -48,6 +47,18 @@ if (!IS_VERCEL) {
   if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
   }
+
+  const registrations = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  let removedLegacyDob = false;
+  const cleanedRegistrations = registrations.map(record => {
+    if (!Object.prototype.hasOwnProperty.call(record, 'dob')) return record;
+    removedLegacyDob = true;
+    const { dob, ...cleanRecord } = record;
+    return cleanRecord;
+  });
+  if (removedLegacyDob) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(cleanedRegistrations, null, 2), 'utf8');
+  }
 }
 
 // ─── Multer (file upload) ─────────────────────────────────────────────────────
@@ -56,7 +67,7 @@ if (!IS_VERCEL) {
 const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
   filename: (_req, file, cb) => {
-    const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.pdf'];
+    const allowedExt = ['.jpg', '.jpeg', '.png', '.webp'];
     const ext = path.extname(file.originalname).toLowerCase();
     const safeExt = allowedExt.includes(ext) ? ext : '.bin';
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -65,12 +76,11 @@ const diskStorage = multer.diskStorage({
 });
 
 function fileFilter(_req, file, cb) {
-  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp',
-                   'image/heic', 'image/heif', 'application/pdf'];
+  const allowed = ['image/jpeg', 'image/png', 'image/webp'];
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only images (jpg, png, gif, webp, heic) and PDF files are accepted.'));
+    cb(new Error('Upload a JPG, PNG, or WebP image of your voter card. PDF files are converted to images before upload.'));
   }
 }
 
@@ -84,10 +94,17 @@ const upload = multer({
 });
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(cors());
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
+  next();
+});
 
 // Static files (HTML, images, CSS, JS) — served from project root
 app.use('/data', (_req, res) => res.sendStatus(404));
+app.use('/vendor', express.static(path.join(__dirname, 'public', 'vendor')));
 app.use(express.static(__dirname));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -162,14 +179,22 @@ function decryptAccountNumber(encrypted) {
 
 async function ensureDatabaseSchema() {
   if (!schemaReady) {
-    schemaReady = getDatabase()`
-      CREATE TABLE IF NOT EXISTS pci_registrations (
-        id TEXT PRIMARY KEY,
-        phone TEXT NOT NULL UNIQUE,
-        created_at TIMESTAMPTZ NOT NULL,
-        data JSONB NOT NULL
-      )
-    `.catch(error => {
+    schemaReady = (async () => {
+      const sql = getDatabase();
+      await sql`
+        CREATE TABLE IF NOT EXISTS pci_registrations (
+          id TEXT PRIMARY KEY,
+          phone TEXT NOT NULL UNIQUE,
+          created_at TIMESTAMPTZ NOT NULL,
+          data JSONB NOT NULL
+        )
+      `;
+      await sql`
+        UPDATE pci_registrations
+        SET data = data - 'dob'
+        WHERE data ? 'dob'
+      `;
+    })().catch(error => {
       schemaReady = null;
       throw error;
     });
@@ -298,6 +323,25 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
+function getImageMimeType(buffer) {
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return 'image/jpeg';
+  }
+  if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) {
+    return 'image/png';
+  }
+  if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' &&
+      buffer.toString('ascii', 8, 12) === 'WEBP') {
+    return 'image/webp';
+  }
+  return null;
+}
+
+function isValidVoterCardImage(file, buffer = file && file.buffer) {
+  return Boolean(file && buffer && file.size <= MAX_UPLOAD_BYTES &&
+    getImageMimeType(buffer) === file.mimetype);
+}
+
 function adminAuth(req, res, next) {
   const expectedUsername = process.env.ADMIN_USERNAME;
   const expectedPassword = process.env.ADMIN_PASSWORD;
@@ -329,7 +373,7 @@ function constantTimeEqual(expected, provided) {
 }
 
 // ─── POST /api/register ───────────────────────────────────────────────────────
-// Accepts multipart/form-data (because of optional file).
+// Accepts multipart/form-data with a required, size-limited voter card image.
 // Fields: name, phone, email, accountNumber, accountName, bankName, ward, unit, lga, hasVoterCard
 // File  : voterCardFile (required — scan or upload)
 
@@ -338,7 +382,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   let fileInfo = null;
 
   // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || !phone || !email || !accountNumber || !accountName || !bankName || !ward || !unit || !lga) {
+  if (!name || !phone || !email || !accountNumber || !accountName || !bankName || !lga) {
     await discardRequestUpload(req.file);
     return res.status(400).json({
       success: false,
@@ -384,11 +428,20 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
   const recordId = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
   try {
+    const imageBuffer = req.file.buffer || await fs.promises.readFile(req.file.path);
+    if (!isValidVoterCardImage(req.file, imageBuffer)) {
+      await discardRequestUpload(req.file);
+      return res.status(400).json({
+        success: false,
+        message: 'The uploaded file is not a supported voter-card image. Please upload a valid JPG, PNG, or WebP image no larger than 3 MB.'
+      });
+    }
     const encryptedAccountNumber = encryptAccountNumber(cleanAccountNumber);
-    if (req.file && IS_VERCEL) {
+
+    if (IS_VERCEL) {
       const { client, bucket } = getObjectStorage();
 
-      const allowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.pdf'];
+      const allowedExt = ['.jpg', '.jpeg', '.png', '.webp'];
       const originalExt = path.extname(req.file.originalname).toLowerCase();
       const extension = allowedExt.includes(originalExt) ? originalExt : '.bin';
       const key = `${recordId}/votercard${extension}`;
@@ -468,11 +521,7 @@ app.post('/api/register', upload.single('voterCardFile'), async (req, res) => {
 });
 
 // ─── POST /api/check-image-clarity ───────────────────────────────────────────
-// Accepts a single image file in memory, checks basic file-level signals:
-//   - File size (too small = likely corrupt or blank)
-//   - JPEG/PNG header entropy (rough proxy for image content)
-// For full pixel-level analysis the client already runs a Canvas Laplacian check.
-// This endpoint acts as a server-side safety net.
+// Accepts a single image file in memory and checks basic file-level signals.
 
 const uploadTmp = multer({
   storage: multer.memoryStorage(),
@@ -485,10 +534,12 @@ app.post('/api/check-image-clarity', uploadTmp.single('image'), (req, res) => {
     return res.status(400).json({ success: false, message: 'No image provided.' });
   }
 
-  // PDFs — always accept, skip pixel analysis
-  if (req.file.mimetype === 'application/pdf') {
-    return res.json({ success: true, clear: true, score: 100,
-      message: 'PDF accepted.' });
+  if (!isValidVoterCardImage(req.file)) {
+    return res.status(400).json({
+      success: false,
+      clear: false,
+      message: 'The uploaded file is not a supported JPG, PNG, or WebP image.'
+    });
   }
 
   const buf  = req.file.buffer;
@@ -540,7 +591,7 @@ app.get('/api/admin/registrations', async (_req, res) => {
     return res.json({
       success: true,
       total: records.length,
-      data: (USE_NEON_DATABASE ? records : [...records].reverse()).map(({ accountNumberEncrypted, ...record }) => record)
+      data: (USE_NEON_DATABASE ? records : [...records].reverse()).map(({ accountNumberEncrypted, dob, ...record }) => record)
     });
   } catch (error) {
     return sendStorageError(res, error);
@@ -554,7 +605,7 @@ app.get('/api/admin/registrations/:id', async (req, res) => {
     const accountNumber = record.accountNumberEncrypted
       ? decryptAccountNumber(record.accountNumberEncrypted)
       : '';
-    const { accountNumberEncrypted, ...details } = record;
+    const { accountNumberEncrypted, dob, ...details } = record;
     return res.json({ success: true, data: { ...details, accountNumber } });
   } catch (error) {
     return sendStorageError(res, error);
@@ -626,7 +677,7 @@ app.get('/api/admin/registrations/:id/file', async (req, res) => {
 app.use((err, _req, res, next) => {
   if (err instanceof multer.MulterError) {
     const msg = err.code === 'LIMIT_FILE_SIZE'
-      ? `File is too large. Maximum size is ${IS_VERCEL ? '4 MB on Vercel' : '10 MB'}.`
+      ? 'File is too large. Maximum size is 3 MB.'
       : `Upload error: ${err.message}`;
     return res.status(400).json({ success: false, message: msg });
   }

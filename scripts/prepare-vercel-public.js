@@ -56,4 +56,22 @@ for (const file of files) {
   fs.copyFileSync(path.join(root, file), path.join(publicDir, file));
 }
 
-console.log(`Prepared ${files.length} static files for Vercel.`);
+const browserAssets = [
+  ['node_modules/tesseract.js/dist/tesseract.min.js', 'vendor/tesseract.min.js'],
+  ['node_modules/tesseract.js/dist/tesseract.min.js.LICENSE.txt', 'vendor/tesseract.min.js.LICENSE.txt'],
+  ['node_modules/tesseract.js/dist/worker.min.js', 'vendor/tesseract/worker.min.js'],
+  ['node_modules/tesseract.js/dist/worker.min.js.LICENSE.txt', 'vendor/tesseract/worker.min.js.LICENSE.txt'],
+  ['node_modules/tesseract.js-core/LICENSE', 'vendor/tesseract/core/LICENSE'],
+  ['node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js', 'vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js'],
+  ['node_modules/pdfjs-dist/LICENSE', 'vendor/pdfjs/LICENSE'],
+  ['node_modules/pdfjs-dist/build/pdf.min.mjs', 'vendor/pdfjs/pdf.min.mjs'],
+  ['node_modules/pdfjs-dist/build/pdf.worker.min.mjs', 'vendor/pdfjs/pdf.worker.min.mjs']
+];
+
+for (const [source, target] of browserAssets) {
+  const destination = path.join(publicDir, target);
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.copyFileSync(path.join(root, source), destination);
+}
+
+console.log(`Prepared ${files.length} static files and ${browserAssets.length} browser assets for Vercel.`);
