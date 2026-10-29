@@ -255,6 +255,40 @@
       background: rgba(16, 185, 129, 0.1);
     }
 
+    .export-dropdown {
+      position: relative;
+    }
+
+    .export-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 20;
+      min-width: 210px;
+      padding: 6px;
+      border: 1px solid #dce5ef;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(17, 24, 39, 0.16);
+    }
+
+    .export-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #111827;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .export-menu button:hover { background: #eff6ff; color: #0052cc; }
+
     .spin {
       animation: spin 1s linear infinite;
     }
@@ -925,6 +959,64 @@
         padding: 16px;
       }
     }
+
+    /* Mobile dashboard layout: stack content instead of allowing text or controls to overlap. */
+    @media (max-width: 700px) {
+      body { overflow-x: hidden; }
+
+      .admin-container { padding: 12px; }
+
+      .admin-header {
+        display: block;
+        padding: 16px;
+        margin-bottom: 18px;
+      }
+
+      .brand-section { align-items: flex-start; gap: 10px; min-width: 0; }
+      .brand-logo { width: 42px; height: 42px; flex: 0 0 42px; }
+      .brand-titles { min-width: 0; }
+      .brand-titles h1 { margin: 0; font-size: clamp(20px, 7vw, 28px); line-height: 1.04; overflow-wrap: anywhere; }
+      .brand-titles p { margin: 6px 0 0; font-size: 11.5px; line-height: 1.35; flex-wrap: wrap; }
+
+      .header-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        margin-top: 16px;
+        gap: 8px;
+      }
+
+      .header-actions .btn,
+      .header-actions .export-dropdown {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .header-actions .btn { justify-content: center; padding: 10px 8px; font-size: 12px; white-space: nowrap; }
+      .header-actions > .btn-primary { grid-column: 1 / -1; }
+      .export-menu { left: 0; right: auto; width: 100%; }
+
+      .metrics-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 18px; }
+      .metric-card { padding: 16px; }
+      .metric-title { font-size: 12px; }
+      .metric-icon { min-width: 54px; height: 32px; padding: 0 7px; font-size: 12px; }
+
+      .controls-panel { display: block; padding: 14px; margin-bottom: 18px; }
+      .search-box { min-width: 0; width: 100%; }
+      .search-box input { padding: 10px 14px; font-size: 13px; }
+      .filter-group { display: grid; grid-template-columns: 1fr; width: 100%; margin-top: 10px; gap: 8px; }
+      .select-input { width: 100%; min-width: 0; padding: 10px 14px; }
+
+      .table-header-bar { align-items: flex-start; flex-direction: column; gap: 8px; padding: 14px; }
+      .table-title { flex-wrap: wrap; font-size: 15px; gap: 7px; }
+      #last-updated { font-size: 11.5px !important; }
+      .table-wrapper { -webkit-overflow-scrolling: touch; }
+      table { min-width: 1120px; }
+
+      .modal-card { width: calc(100vw - 24px); max-height: calc(100vh - 24px); }
+      .modal-header { padding: 16px; }
+      .modal-body { padding: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -970,9 +1062,15 @@
         <button class="btn btn-secondary" id="btn-refresh">
           <span id="refresh-icon">SYNC</span> Refresh
         </button>
-        <button class="btn btn-outline" id="btn-export">
-          Export CSV
-        </button>
+        <div class="export-dropdown">
+          <button class="btn btn-outline" id="btn-export" type="button" aria-expanded="false" aria-controls="export-menu">
+            Export CSV &#9662;
+          </button>
+          <div class="export-menu" id="export-menu" hidden>
+            <button type="button" id="btn-export-all">Download all</button>
+            <button type="button" id="btn-export-lga">By Local Government</button>
+          </div>
+        </div>
         <a href="index.html" class="btn btn-primary">
           View Website
         </a>
@@ -1138,6 +1236,9 @@
       const btnRefresh = document.getElementById('btn-refresh');
       const refreshIcon = document.getElementById('refresh-icon');
       const btnExport = document.getElementById('btn-export');
+      const exportMenu = document.getElementById('export-menu');
+      const btnExportAll = document.getElementById('btn-export-all');
+      const btnExportLga = document.getElementById('btn-export-lga');
       const lastUpdatedEl = document.getElementById('last-updated');
 
       const modal = document.getElementById('detail-modal');
@@ -1456,21 +1557,63 @@
       };
 
       // Export to CSV. The server decrypts account numbers only for this authenticated download.
-      btnExport.addEventListener('click', async function () {
+      async function downloadCsvExport(lga) {
         try {
-          const response = await adminFetch('/api/admin/registrations/export');
+          const endpoint = '/api/admin/registrations/export' + (lga ? '?lga=' + encodeURIComponent(lga) : '');
+          const response = await adminFetch(endpoint);
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.setAttribute('download', 'apm4oyo registration.csv');
+          const safeLga = String(lga || '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+          link.setAttribute('download', lga ? `apm4oyo registration - ${safeLga}.csv` : 'apm4oyo registration.csv');
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          URL.revokeObjectURL(url);
-          showToast('CSV export downloaded successfully!');
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
         } catch (error) {
-          showToast(error.message || 'Unable to export registrations.', true);
+          throw new Error(error.message || 'Unable to export registrations.');
+        }
+      }
+
+      btnExport.addEventListener('click', function () {
+        const isOpen = !exportMenu.hidden;
+        exportMenu.hidden = isOpen;
+        btnExport.setAttribute('aria-expanded', String(!isOpen));
+      });
+
+      btnExportAll.addEventListener('click', async function () {
+        exportMenu.hidden = true;
+        btnExport.setAttribute('aria-expanded', 'false');
+        try {
+          await downloadCsvExport();
+          showToast('All registrations downloaded successfully!');
+        } catch (error) {
+          showToast(error.message, true);
+        }
+      });
+
+      btnExportLga.addEventListener('click', async function () {
+        exportMenu.hidden = true;
+        btnExport.setAttribute('aria-expanded', 'false');
+        const lgas = [...new Set(allRegistrations.map(record => String(record.lga || '').trim()).filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b));
+        if (!lgas.length) {
+          showToast('There are no Local Government registrations to export.', true);
+          return;
+        }
+        try {
+          for (const lga of lgas) await downloadCsvExport(lga);
+          showToast(`${lgas.length} Local Government CSV file${lgas.length === 1 ? '' : 's'} downloaded.`);
+        } catch (error) {
+          showToast(error.message, true);
+        }
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('.export-dropdown')) {
+          exportMenu.hidden = true;
+          btnExport.setAttribute('aria-expanded', 'false');
         }
       });
 

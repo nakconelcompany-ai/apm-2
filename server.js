@@ -600,10 +600,14 @@ app.get('/api/admin/registrations', async (_req, res) => {
 });
 
 // GET /api/admin/registrations/export — authenticated CSV with full account numbers
-app.get('/api/admin/registrations/export', async (_req, res) => {
+app.get('/api/admin/registrations/export', async (req, res) => {
   try {
     const records = await readRegistrations();
-    const orderedRecords = USE_NEON_DATABASE ? records : [...records].reverse();
+    const requestedLga = typeof req.query.lga === 'string' ? req.query.lga.trim() : '';
+    const matchingRecords = requestedLga
+      ? records.filter(record => String(record.lga || '').trim() === requestedLga)
+      : records;
+    const orderedRecords = USE_NEON_DATABASE ? matchingRecords : [...matchingRecords].reverse();
     const escapeCsvValue = value => {
       const text = String(value ?? '');
       // Prevent spreadsheet applications from treating registrant data as formulas.
@@ -644,7 +648,11 @@ app.get('/api/admin/registrations/export', async (_req, res) => {
     });
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent('apm4oyo registration.csv')}`);
+    const safeLga = requestedLga.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+    const fileName = requestedLga
+      ? `apm4oyo registration - ${safeLga || 'local-government'}.csv`
+      : 'apm4oyo registration.csv';
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
     return res.send(`\uFEFF${[headers.map(escapeCsvValue).join(','), ...rows].join('\n')}`);
   } catch (error) {
     return sendStorageError(res, error);
