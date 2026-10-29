@@ -24,6 +24,7 @@ const { del, get } = require('@vercel/blob');
 const {
   DeleteObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client
 } = require('@aws-sdk/client-s3');
@@ -105,12 +106,12 @@ app.use((_req, res, next) => {
 // Static files (HTML, images, CSS, JS) — served from project root
 app.use('/data', (_req, res) => res.sendStatus(404));
 app.use('/vendor', express.static(path.join(__dirname, 'public', 'vendor')));
-app.use(['/admin', '/admin.html'], (_req, res) => res.sendStatus(404));
+app.use(['/admin', '/admin.html', '/safety.html'], (_req, res) => res.sendStatus(404));
 app.use(express.static(__dirname));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-let sqlClient;
-let schemaReady;
+const databaseClients = { primary: null, backup: null };
+const schemaReady = { primary: null, backup: null };
 let objectStorageClient;
 
 function getObjectStorage() {
@@ -134,14 +135,39 @@ function getObjectStorage() {
   return { client: objectStorageClient, bucket: NEON_STORAGE_BUCKET };
 }
 
-function getDatabase() {
-  if (!process.env.DATABASE_URL) {
+function getDatabase(role = 'primary') {
+  const connectionString = role === 'backup'
+    ? process.env.DATABASE_BACKUP_URL
+    : process.env.DATABASE_URL;
+  if (!connectionString) {
     const error = new Error('Registration database is not configured. Add DATABASE_URL in Vercel project settings.');
     error.code = 'STORAGE_NOT_CONFIGURED';
     throw error;
   }
-  if (!sqlClient) sqlClient = neon(process.env.DATABASE_URL);
-  return sqlClient;
+  if (!databaseClients[role]) databaseClients[role] = neon(connectionString);
+  return databaseClients[role];
+}
+
+function hasBackupDatabase() {
+  return Boolean(process.env.DATABASE_BACKUP_URL);
+}
+
+function getConfiguredLimitBytes(name, fallbackGigabytes) {
+  const configuredGigabytes = Number(process.env[name]);
+  const gigabytes = Number.isFinite(configuredGigabytes) && configuredGigabytes > 0
+    ? configuredGigabytes
+    : fallbackGigabytes;
+  return Math.round(gigabytes * 1024 * 1024 * 1024);
+}
+
+async function withDatabaseFailover(operation) {
+  try {
+    return await operation('primary');
+  } catch (primaryError) {
+    if (!hasBackupDatabase()) throw primaryError;
+    console.error('[DATABASE FAILOVER] Primary database unavailable; using backup database.', primaryError.message);
+    return operation('backup');
+  }
 }
 
 function getAccountEncryptionKey() {
@@ -178,10 +204,10 @@ function decryptAccountNumber(encrypted) {
   ]).toString('utf8');
 }
 
-async function ensureDatabaseSchema() {
-  if (!schemaReady) {
-    schemaReady = (async () => {
-      const sql = getDatabase();
+async function ensureDatabaseSchema(role = 'primary') {
+  if (!schemaReady[role]) {
+    schemaReady[role] = (async () => {
+      const sql = getDatabase(role);
       await sql`
         CREATE TABLE IF NOT EXISTS pci_registrations (
           id TEXT PRIMARY KEY,
@@ -196,21 +222,23 @@ async function ensureDatabaseSchema() {
         WHERE data ? 'dob'
       `;
     })().catch(error => {
-      schemaReady = null;
+      schemaReady[role] = null;
       throw error;
     });
   }
-  await schemaReady;
+  await schemaReady[role];
 }
 
 async function readRegistrations() {
   if (USE_NEON_DATABASE) {
-    await ensureDatabaseSchema();
-    const sql = getDatabase();
-    const rows = await sql`
-      SELECT data FROM pci_registrations ORDER BY created_at DESC
-    `;
-    return rows.map(row => row.data);
+    return withDatabaseFailover(async role => {
+      await ensureDatabaseSchema(role);
+      const sql = getDatabase(role);
+      const rows = await sql`
+        SELECT data FROM pci_registrations ORDER BY created_at DESC
+      `;
+      return rows.map(row => row.data);
+    });
   }
 
   return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
@@ -218,14 +246,17 @@ async function readRegistrations() {
 
 async function saveRegistration(record) {
   if (USE_NEON_DATABASE) {
-    await ensureDatabaseSchema();
-    const sql = getDatabase();
-    const rows = await sql`
-      INSERT INTO pci_registrations (id, phone, created_at, data)
-      VALUES (${record.id}, ${record.phone}, ${record.createdAt}, ${JSON.stringify(record)}::jsonb)
-      ON CONFLICT (phone) DO NOTHING
-      RETURNING id
-    `;
+    const saveToDatabase = async role => {
+      await ensureDatabaseSchema(role);
+      const sql = getDatabase(role);
+      return sql`
+        INSERT INTO pci_registrations (id, phone, created_at, data)
+        VALUES (${record.id}, ${record.phone}, ${record.createdAt}, ${JSON.stringify(record)}::jsonb)
+        ON CONFLICT (phone) DO NOTHING
+        RETURNING id
+      `;
+    };
+    const rows = await withDatabaseFailover(saveToDatabase);
     return rows.length > 0;
   }
 
@@ -238,11 +269,12 @@ async function saveRegistration(record) {
 
 async function deleteRegistration(id) {
   if (USE_NEON_DATABASE) {
-    await ensureDatabaseSchema();
-    const sql = getDatabase();
-    const rows = await sql`
-      DELETE FROM pci_registrations WHERE id = ${id} RETURNING data
-    `;
+    const deleteFromDatabase = async role => {
+      await ensureDatabaseSchema(role);
+      const sql = getDatabase(role);
+      return sql`DELETE FROM pci_registrations WHERE id = ${id} RETURNING data`;
+    };
+    const rows = await withDatabaseFailover(deleteFromDatabase);
     return rows[0]?.data || null;
   }
 
@@ -256,12 +288,14 @@ async function deleteRegistration(id) {
 
 async function findRegistration(id) {
   if (USE_NEON_DATABASE) {
-    await ensureDatabaseSchema();
-    const sql = getDatabase();
-    const rows = await sql`
-      SELECT data FROM pci_registrations WHERE id = ${id} LIMIT 1
-    `;
-    return rows[0]?.data || null;
+    return withDatabaseFailover(async role => {
+      await ensureDatabaseSchema(role);
+      const sql = getDatabase(role);
+      const rows = await sql`
+        SELECT data FROM pci_registrations WHERE id = ${id} LIMIT 1
+      `;
+      return rows[0]?.data || null;
+    });
   }
 
   const records = await readRegistrations();
@@ -363,6 +397,25 @@ function adminAuth(req, res, next) {
     return res.status(401).json({ success: false, message: 'Invalid admin username or password.' });
   }
 
+  next();
+}
+
+function safetyAuth(req, res, next) {
+  const expectedUsername = process.env.SAFETY_USERNAME;
+  const expectedPassword = process.env.SAFETY_PASSWORD;
+  if (!expectedUsername || !expectedPassword) {
+    return res.status(503).json({
+      success: false,
+      message: 'Safety access is not configured. Set SAFETY_USERNAME and SAFETY_PASSWORD in the deployment environment.'
+    });
+  }
+
+  const providedUsername = req.get('x-safety-username') || '';
+  const authorization = req.get('authorization') || '';
+  const providedPassword = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  if (!constantTimeEqual(expectedUsername, providedUsername) || !constantTimeEqual(expectedPassword, providedPassword)) {
+    return res.status(401).json({ success: false, message: 'Invalid safety username or password.' });
+  }
   next();
 }
 
@@ -585,6 +638,75 @@ app.get('/api/admin/auth-mode', (_req, res) => {
 
 app.use('/api/admin', adminAuth);
 
+function formatUsageStatus(bytes, limitBytes) {
+  return {
+    bytes: Number(bytes || 0),
+    limitBytes,
+    percent: Math.min(100, Number(((Number(bytes || 0) / limitBytes) * 100).toFixed(2)))
+  };
+}
+
+async function inspectDatabase(role) {
+  if (role === 'backup' && !hasBackupDatabase()) {
+    return { role, status: 'not-configured', message: 'DATABASE_BACKUP_URL is not configured.' };
+  }
+  try {
+    await ensureDatabaseSchema(role);
+    const sql = getDatabase(role);
+    const rows = await sql`
+      SELECT
+        pg_database_size(current_database())::bigint AS database_bytes,
+        (SELECT COUNT(*) FROM pci_registrations)::bigint AS registration_count
+    `;
+    return {
+      role,
+      status: 'healthy',
+      registrations: Number(rows[0]?.registration_count || 0),
+      ...formatUsageStatus(rows[0]?.database_bytes, getConfiguredLimitBytes('DATABASE_LIMIT_GB', 1))
+    };
+  } catch (error) {
+    console.error(`[SAFETY] ${role} database check failed.`, error.message);
+    return { role, status: 'unavailable', message: 'Database connection could not be checked.' };
+  }
+}
+
+async function inspectObjectStorage() {
+  const limitBytes = getConfiguredLimitBytes('OBJECT_STORAGE_LIMIT_GB', 5);
+  try {
+    if (!IS_VERCEL) {
+      const files = fs.existsSync(UPLOAD_DIR) ? await fs.promises.readdir(UPLOAD_DIR, { withFileTypes: true }) : [];
+      const sizes = await Promise.all(files.filter(file => file.isFile()).map(file => fs.promises.stat(path.join(UPLOAD_DIR, file.name))));
+      return { status: 'healthy', objects: sizes.length, ...formatUsageStatus(sizes.reduce((sum, file) => sum + file.size, 0), limitBytes) };
+    }
+    const { client, bucket } = getObjectStorage();
+    let continuationToken;
+    let bytes = 0;
+    let objects = 0;
+    do {
+      const page = await client.send(new ListObjectsV2Command({ Bucket: bucket, ContinuationToken: continuationToken }));
+      for (const item of page.Contents || []) {
+        bytes += Number(item.Size || 0);
+        objects += 1;
+      }
+      continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+    } while (continuationToken);
+    return { status: 'healthy', objects, ...formatUsageStatus(bytes, limitBytes) };
+  } catch (error) {
+    console.error('[SAFETY] Object storage check failed.', error.message);
+    return { status: 'unavailable', message: 'Private object storage could not be checked.' };
+  }
+}
+
+// GET /api/safety/status — private capacity and health summary
+app.get('/api/safety/status', safetyAuth, async (_req, res) => {
+  const [primary, backup, objectStorage] = await Promise.all([
+    inspectDatabase('primary'),
+    inspectDatabase('backup'),
+    inspectObjectStorage()
+  ]);
+  return res.json({ success: true, checkedAt: new Date().toISOString(), primary, backup, objectStorage });
+});
+
 // GET /api/admin/registrations — fetch all records sorted newest first
 app.get('/api/admin/registrations', async (_req, res) => {
   try {
@@ -763,6 +885,11 @@ app.use((err, _req, res, next) => {
 app.get('/ultimate', (_req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
   res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+app.get('/safety', (_req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+  res.sendFile(path.join(__dirname, 'safety.html'));
 });
 
 app.get(['/our-promises', '/our-promises.html'], (_req, res) => {
