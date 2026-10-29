@@ -3538,6 +3538,7 @@
             if (processId !== voterFileProcessId) return;
             selectedVoterFile = optimizedFile;
             uploadPreview.textContent = file.name + ' successfully uploaded.';
+            uploadPanel.classList.remove('active');
 
             setClarityState('checking', '', 'Checking voter-card text',
               'Text recognition runs in your browser; the card image is not sent to an OCR service.');
