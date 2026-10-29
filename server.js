@@ -604,10 +604,17 @@ app.get('/api/admin/registrations/export', async (req, res) => {
   try {
     const records = await readRegistrations();
     const requestedLga = typeof req.query.lga === 'string' ? req.query.lga.trim() : '';
+    const groupByLga = req.query.groupBy === 'lga';
     const matchingRecords = requestedLga
       ? records.filter(record => String(record.lga || '').trim() === requestedLga)
       : records;
-    const orderedRecords = USE_NEON_DATABASE ? matchingRecords : [...matchingRecords].reverse();
+    const orderedRecords = groupByLga
+      ? [...matchingRecords].sort((first, second) => {
+        const lgaOrder = String(first.lga || 'Unspecified').localeCompare(String(second.lga || 'Unspecified'));
+        if (lgaOrder !== 0) return lgaOrder;
+        return new Date(second.createdAt || 0) - new Date(first.createdAt || 0);
+      })
+      : USE_NEON_DATABASE ? matchingRecords : [...matchingRecords].reverse();
     const escapeCsvValue = value => {
       const text = String(value ?? '');
       // Prevent spreadsheet applications from treating registrant data as formulas.
@@ -651,6 +658,8 @@ app.get('/api/admin/registrations/export', async (req, res) => {
     const safeLga = requestedLga.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
     const fileName = requestedLga
       ? `apm4oyo registration - ${safeLga || 'local-government'}.csv`
+      : groupByLga
+        ? 'apm4oyo registration by local government.csv'
       : 'apm4oyo registration.csv';
     res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
     return res.send(`\uFEFF${[headers.map(escapeCsvValue).join(','), ...rows].join('\n')}`);

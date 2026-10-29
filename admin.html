@@ -1068,7 +1068,7 @@
           </button>
           <div class="export-menu" id="export-menu" hidden>
             <button type="button" id="btn-export-all">Download all</button>
-            <button type="button" id="btn-export-lga">By Local Government</button>
+            <button type="button" id="btn-export-lga">Organise by Local Government</button>
           </div>
         </div>
         <a href="index.html" class="btn btn-primary">
@@ -1557,16 +1557,25 @@
       };
 
       // Export to CSV. The server decrypts account numbers only for this authenticated download.
-      async function downloadCsvExport(lga) {
+      async function downloadCsvExport(options = {}) {
         try {
-          const endpoint = '/api/admin/registrations/export' + (lga ? '?lga=' + encodeURIComponent(lga) : '');
+          const params = new URLSearchParams();
+          if (options.lga) params.set('lga', options.lga);
+          if (options.groupByLga) params.set('groupBy', 'lga');
+          const query = params.toString();
+          const endpoint = '/api/admin/registrations/export' + (query ? '?' + query : '');
           const response = await adminFetch(endpoint);
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          const safeLga = String(lga || '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
-          link.setAttribute('download', lga ? `apm4oyo registration - ${safeLga}.csv` : 'apm4oyo registration.csv');
+          const safeLga = String(options.lga || '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+          const fileName = options.lga
+            ? `apm4oyo registration - ${safeLga}.csv`
+            : options.groupByLga
+              ? 'apm4oyo registration by local government.csv'
+              : 'apm4oyo registration.csv';
+          link.setAttribute('download', fileName);
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1596,15 +1605,13 @@
       btnExportLga.addEventListener('click', async function () {
         exportMenu.hidden = true;
         btnExport.setAttribute('aria-expanded', 'false');
-        const lgas = [...new Set(allRegistrations.map(record => String(record.lga || '').trim()).filter(Boolean))]
-          .sort((a, b) => a.localeCompare(b));
-        if (!lgas.length) {
+        if (!allRegistrations.some(record => String(record.lga || '').trim())) {
           showToast('There are no Local Government registrations to export.', true);
           return;
         }
         try {
-          for (const lga of lgas) await downloadCsvExport(lga);
-          showToast(`${lgas.length} Local Government CSV file${lgas.length === 1 ? '' : 's'} downloaded.`);
+          await downloadCsvExport({ groupByLga: true });
+          showToast('Registrations grouped by Local Government downloaded successfully!');
         } catch (error) {
           showToast(error.message, true);
         }
