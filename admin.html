@@ -489,6 +489,13 @@
       font-size: 15px;
     }
 
+    /* Keep full names readable on one line; the table can scroll horizontally if needed. */
+    th:nth-child(3),
+    td:nth-child(3) {
+      min-width: 240px;
+      white-space: nowrap;
+    }
+
     .user-sub {
       font-size: 12px;
       color: var(--text-dim);

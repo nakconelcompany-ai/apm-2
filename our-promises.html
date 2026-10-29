@@ -35,12 +35,13 @@
     .achievement-list { display:flex; flex-direction:column; gap:28px; }
     .achievement { display:grid; grid-template-columns:minmax(240px,.95fr) minmax(0,1.05fr); overflow:hidden; background:var(--paper); border:1px solid var(--line); border-radius:22px; box-shadow:0 8px 25px rgba(17,24,39,.05); }
     .achievement:nth-child(even) .achievement-image { order:2; }
-    .achievement-image { min-height:280px; background:#dbeafe; }
+    .achievement-image { height:280px; min-height:0; align-self:center; background:#dbeafe; }
     .achievement-image img { width:100%; height:100%; display:block; object-fit:cover; }
     .achievement-copy { padding:32px; }
     .achievement-copy h2 { margin:0 0 14px; color:var(--blue); font-size:34px; }
     .achievement-copy p { margin:0; color:var(--muted); }
     .source { display:inline-block; margin-top:18px; color:var(--green-deep); font-size:12px; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+    .achievement:nth-child(3) .source, .achievement:nth-child(4) .source, .achievement:nth-child(5) .source { display:none; }
     .number { display:grid; place-items:center; width:38px; height:38px; margin-bottom:20px; border-radius:11px; background:#e8f8f0; color:var(--green-deep); font-weight:800; }
     .vision { margin-top:42px; padding:42px; border-radius:24px; background:var(--green-deep); color:#fff; }
     .vision h2 { margin:0 0 16px; font-size:40px; text-transform:uppercase; }
@@ -50,7 +51,7 @@
     .vision-item h3 { margin:0 0 7px; font-size:15px; color:#a7f3d0; }
     .vision-item p { margin:0; color:#f0fdf4; font-size:14px; }
     footer { padding:30px 0; background:#fff; border-top:1px solid var(--line); text-align:center; color:var(--muted); font-size:13px; }
-    @media(max-width:700px) { .hero { padding:52px 0; } .grid,.vision-grid { grid-template-columns:1fr; } .achievement { grid-template-columns:1fr; } .achievement:nth-child(even) .achievement-image { order:0; } .achievement-image { min-height:220px; } .achievement-copy,.card,.vision { padding:24px 20px; } .nav-inner { min-height:64px; } .hero p:last-child { font-size:16px; } }
+    @media(max-width:700px) { .hero { padding:52px 0; } .grid,.vision-grid { grid-template-columns:1fr; } .achievement { grid-template-columns:1fr; } .achievement:nth-child(even) .achievement-image { order:0; } .achievement-image { height:220px; } .achievement-copy,.card,.vision { padding:24px 20px; } .nav-inner { min-height:64px; } .hero p:last-child { font-size:16px; } }
   </style>
 </head>
 <body>
