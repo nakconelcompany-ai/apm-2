@@ -897,6 +897,11 @@ app.get(['/our-promises', '/our-promises.html'], (_req, res) => {
 });
 
 // ─── Fallback ────────────────────────────────────────────────────────────────
+app.get('/sitemap.xml', (_req, res) => {
+  res.type('application/xml');
+  res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
+
 app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

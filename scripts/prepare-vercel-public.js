@@ -20,6 +20,7 @@ const files = [
   'senate.html',
   'house-reps.html',
   'robots.txt',
+  'sitemap.xml',
   'apm1.jfif',
   'apm7.jfif',
   'apm9.jfif',
